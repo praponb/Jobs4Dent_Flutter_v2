@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/auth/user_type_selection_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/splash_screen.dart';
 
@@ -70,7 +71,12 @@ class AuthWrapper extends StatelessWidget {
         }
         
         if (authProvider.user != null) {
-          return const HomeScreen();
+          // Check if user needs to complete profile setup
+          if (authProvider.needsProfileSetup) {
+            return const UserTypeSelectionScreen();
+          } else {
+            return const HomeScreen();
+          }
         } else {
           return const LoginScreen();
         }

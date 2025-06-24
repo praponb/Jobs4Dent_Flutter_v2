@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import 'role_switcher_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -96,7 +97,7 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          _getUserTypeLabel(user.userType),
+                          _getUserTypeLabel(user.currentRole),
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF2196F3),
@@ -104,6 +105,60 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+                      
+                      // Role switcher button (only show if user has multiple roles)
+                      if (user.roles.length > 1) ...[
+                        const SizedBox(height: 8),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RoleSwitcherScreen(),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color(0xFF2196F3).withValues(alpha: 0.3),
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.swap_horiz,
+                                  size: 16,
+                                  color: const Color(0xFF2196F3),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Switch Role',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: const Color(0xFF2196F3),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 12,
+                                  color: const Color(0xFF2196F3),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                      
                       const SizedBox(height: 8),
                       
                       // Email
@@ -146,6 +201,21 @@ class ProfileScreen extends StatelessWidget {
                       // TODO: Navigate to work preferences
                     },
                   ),
+                  // Role Management - only show if user has multiple roles
+                  if (user.roles.length > 1)
+                    _MenuItemData(
+                      icon: Icons.swap_horiz,
+                      title: 'Role Management',
+                      subtitle: 'Switch between your roles (${user.roles.length} roles available)',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RoleSwitcherScreen(),
+                          ),
+                        );
+                      },
+                    ),
                 ]),
 
                 const SizedBox(height: 16),
