@@ -357,7 +357,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
 
                     const SizedBox(height: 20),
 

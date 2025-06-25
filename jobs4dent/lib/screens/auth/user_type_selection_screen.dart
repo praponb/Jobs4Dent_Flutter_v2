@@ -189,7 +189,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                             if (success && context.mounted) {
                               // Navigate to home screen
                               Navigator.of(context).pushReplacementNamed('/home');
-                            } else if (authProvider.error != null) {
+                            } else if (authProvider.error != null && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(authProvider.error!),

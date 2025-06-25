@@ -1,0 +1,506 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../providers/auth_provider.dart';
+
+class SkillsSpecialtiesScreen extends StatefulWidget {
+  const SkillsSpecialtiesScreen({super.key});
+
+  @override
+  State<SkillsSpecialtiesScreen> createState() => _SkillsSpecialtiesScreenState();
+}
+
+class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
+  bool _isLoading = false;
+  List<String> _selectedSkills = [];
+  List<String> _selectedSpecialties = [];
+  List<String> _selectedCertifications = [];
+
+  final List<String> _availableSkills = [
+    'Patient Care',
+    'Dental Procedures',
+    'X-ray Operation',
+    'Sterilization',
+    'Equipment Maintenance',
+    'Patient Education',
+    'Dental Software',
+    'Emergency Care',
+    'Pain Management',
+    'Infection Control',
+    'Dental Photography',
+    'Digital Impressions',
+    'CAD/CAM',
+    'Laser Dentistry',
+    'Sedation Dentistry',
+  ];
+
+  final List<String> _availableSpecialties = [
+    'General Dentistry',
+    'Orthodontics',
+    'Endodontics (Root Canals)',
+    'Periodontics (Gum Disease)',
+    'Oral Surgery',
+    'Prosthodontics',
+    'Pediatric Dentistry',
+    'Cosmetic Dentistry',
+    'Implant Dentistry',
+    'Oral Pathology',
+    'Oral and Maxillofacial Surgery',
+    'Restorative Dentistry',
+    'Preventive Dentistry',
+    'Emergency Dentistry',
+    'Geriatric Dentistry',
+  ];
+
+  final List<String> _availableCertifications = [
+    'CPR Certified',
+    'Local Anesthesia Administration',
+    'Nitrous Oxide Administration',
+    'Expanded Function Dental Assistant (EFDA)',
+    'Registered Dental Assistant (RDA)',
+    'Certified Dental Assistant (CDA)',
+    'Radiation Safety',
+    'OSHA Compliance',
+    'Infection Control',
+    'Dental Hygienist License',
+    'Specialty Board Certification',
+    'Continuing Education Units (CEU)',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() {
+    final user = Provider.of<AuthProvider>(context, listen: false).userModel;
+    if (user != null) {
+      _selectedSkills = List<String>.from(user.skills ?? []);
+      _selectedSpecialties = List<String>.from(user.specialties ?? []);
+      _selectedCertifications = List<String>.from(user.certifications ?? []);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text('Skills & Specialties'),
+        backgroundColor: const Color(0xFF2196F3),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: _isLoading ? null : _saveData,
+            child: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    'Save',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSkillsSection(),
+            const SizedBox(height: 24),
+            _buildSpecialtiesSection(),
+            const SizedBox(height: 24),
+            _buildCertificationsSection(),
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkillsSection() {
+    return _buildSectionCard(
+      title: 'Professional Skills',
+      subtitle: 'Select your professional skills and competencies',
+      icon: Icons.psychology_outlined,
+      children: [
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _availableSkills.map((skill) {
+            final isSelected = _selectedSkills.contains(skill);
+            return _buildSelectableChip(
+              label: skill,
+              isSelected: isSelected,
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _selectedSkills.remove(skill);
+                  } else {
+                    _selectedSkills.add(skill);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 16),
+        _buildAddCustomButton(
+          onPressed: () => _showAddCustomDialog(
+            title: 'Add Custom Skill',
+            hintText: 'Enter your custom skill',
+            onAdd: (skill) {
+              setState(() {
+                if (!_selectedSkills.contains(skill)) {
+                  _selectedSkills.add(skill);
+                  _availableSkills.add(skill);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSpecialtiesSection() {
+    return _buildSectionCard(
+      title: 'Areas of Expertise',
+      subtitle: 'Select your dental specialties and areas of expertise',
+      icon: Icons.medical_services_outlined,
+      children: [
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _availableSpecialties.map((specialty) {
+            final isSelected = _selectedSpecialties.contains(specialty);
+            return _buildSelectableChip(
+              label: specialty,
+              isSelected: isSelected,
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _selectedSpecialties.remove(specialty);
+                  } else {
+                    _selectedSpecialties.add(specialty);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 16),
+        _buildAddCustomButton(
+          onPressed: () => _showAddCustomDialog(
+            title: 'Add Custom Specialty',
+            hintText: 'Enter your custom specialty',
+            onAdd: (specialty) {
+              setState(() {
+                if (!_selectedSpecialties.contains(specialty)) {
+                  _selectedSpecialties.add(specialty);
+                  _availableSpecialties.add(specialty);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCertificationsSection() {
+    return _buildSectionCard(
+      title: 'Certifications & Licenses',
+      subtitle: 'Select your professional certifications and licenses',
+      icon: Icons.verified_outlined,
+      children: [
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _availableCertifications.map((certification) {
+            final isSelected = _selectedCertifications.contains(certification);
+            return _buildSelectableChip(
+              label: certification,
+              isSelected: isSelected,
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _selectedCertifications.remove(certification);
+                  } else {
+                    _selectedCertifications.add(certification);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 16),
+        _buildAddCustomButton(
+          onPressed: () => _showAddCustomDialog(
+            title: 'Add Custom Certification',
+            hintText: 'Enter your custom certification',
+            onAdd: (certification) {
+              setState(() {
+                if (!_selectedCertifications.contains(certification)) {
+                  _selectedCertifications.add(certification);
+                  _availableCertifications.add(certification);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: const Color(0xFF2196F3),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectableChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF2196F3)
+              : Colors.grey[100],
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF2196F3)
+                : Colors.grey[300]!,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected) ...[
+              const Icon(
+                Icons.check,
+                size: 16,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey[700],
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddCustomButton({required VoidCallback onPressed}) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: const Color(0xFF2196F3).withValues(alpha: 0.3),
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.add,
+              size: 16,
+              color: const Color(0xFF2196F3),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Add Custom',
+              style: TextStyle(
+                color: const Color(0xFF2196F3),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddCustomDialog({
+    required String title,
+    required String hintText,
+    required Function(String) onAdd,
+  }) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hintText,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                onAdd(text);
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _saveData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final user = authProvider.userModel;
+      if (user == null) return;
+
+      final updatedUser = user.copyWith(
+        skills: _selectedSkills,
+        specialties: _selectedSpecialties,
+        certifications: _selectedCertifications,
+        updatedAt: DateTime.now(),
+      );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.userId)
+          .update(updatedUser.toMap());
+
+      authProvider.updateUser(updatedUser);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Skills and specialties updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving data: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+} 

@@ -2,6 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import 'role_switcher_screen.dart';
+import 'personal_info_screen.dart';
+import 'education_experience_screen.dart';
+import 'skills_specialties_screen.dart';
+import 'work_location_preference_screen.dart';
+// TODO: Create remaining screens
+// import 'availability_calendar_screen.dart';
+// import 'documents_screen.dart';
+// import 'clinic_info_screen.dart';
+// import 'branch_management_screen.dart';
+// import 'clinic_photos_screen.dart';
+// import 'sales_area_screen.dart';
+// import 'sales_reports_screen.dart';
+// import 'admin_permissions_screen.dart';
+// import 'admin_statistics_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -182,25 +196,183 @@ class ProfileScreen extends StatelessWidget {
                     title: 'Personal Information',
                     subtitle: 'Update your details',
                     onTap: () {
-                      // TODO: Navigate to personal info
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PersonalInfoScreen(),
+                        ),
+                      );
                     },
                   ),
-                  _MenuItemData(
-                    icon: Icons.work_outline,
-                    title: 'Professional Info',
-                    subtitle: 'Skills, experience & qualifications',
-                    onTap: () {
-                      // TODO: Navigate to professional info
-                    },
-                  ),
-                  _MenuItemData(
-                    icon: Icons.location_on_outlined,
-                    title: 'Work Preferences',
-                    subtitle: 'Location and availability',
-                    onTap: () {
-                      // TODO: Navigate to work preferences
-                    },
-                  ),
+                  if (user.userType == 'dentist' || user.userType == 'assistant') ...[
+                    _MenuItemData(
+                      icon: Icons.school_outlined,
+                      title: 'Education & Experience',
+                      subtitle: 'Qualifications and work history',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EducationExperienceScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _MenuItemData(
+                      icon: Icons.psychology_outlined,
+                      title: 'Skills & Specialties',
+                      subtitle: 'Areas of expertise and certifications',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SkillsSpecialtiesScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _MenuItemData(
+                      icon: Icons.location_on_outlined,
+                      title: 'Work Preferences',
+                      subtitle: 'Location and availability',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WorkLocationPreferenceScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    // TODO: Implement availability calendar screen
+                    // _MenuItemData(
+                    //   icon: Icons.calendar_today_outlined,
+                    //   title: 'Availability Calendar',
+                    //   subtitle: 'Set your available days and times',
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => const AvailabilityCalendarScreen(),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                    // TODO: Implement documents screen
+                    // _MenuItemData(
+                    //   icon: Icons.file_upload_outlined,
+                    //   title: 'Supporting Documents',
+                    //   subtitle: 'Upload licenses, certifications, CV',
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => const DocumentsScreen(),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                  ],
+                  // TODO: Implement clinic screens
+                  // if (user.userType == 'clinic') ...[
+                  //   _MenuItemData(
+                  //     icon: Icons.business_outlined,
+                  //     title: 'Clinic Information',
+                  //     subtitle: 'Establishment details and services',
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const ClinicInfoScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  //   _MenuItemData(
+                  //     icon: Icons.account_tree_outlined,
+                  //     title: 'Branch Management',
+                  //     subtitle: 'Manage clinic branches',
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const BranchManagementScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  //   _MenuItemData(
+                  //     icon: Icons.photo_library_outlined,
+                  //     title: 'Clinic Photos',
+                  //     subtitle: 'Upload clinic atmosphere photos',
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const ClinicPhotosScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ],
+                  // TODO: Implement sales screens
+                  // if (user.userType == 'sales') ...[
+                  //   _MenuItemData(
+                  //     icon: Icons.map_outlined,
+                  //     title: 'Area of Responsibility',
+                  //     subtitle: 'Manage your territory and clinics',
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const SalesAreaScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  //   _MenuItemData(
+                  //     icon: Icons.assessment_outlined,
+                  //     title: 'Sales Reports',
+                  //     subtitle: 'View reports and analytics',
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const SalesReportsScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ],
+                  // TODO: Implement admin screens
+                  // if (user.userType == 'admin') ...[
+                  //   _MenuItemData(
+                  //     icon: Icons.admin_panel_settings_outlined,
+                  //     title: 'Permission Management',
+                  //     subtitle: 'Manage user permissions',
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const AdminPermissionsScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  //   _MenuItemData(
+                  //     icon: Icons.analytics_outlined,
+                  //     title: 'System Statistics',
+                  //     subtitle: 'View overall system statistics',
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const AdminStatisticsScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ],
                   // Role Management - only show if user has multiple roles
                   if (user.roles.length > 1)
                     _MenuItemData(
