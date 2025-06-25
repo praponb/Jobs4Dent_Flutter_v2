@@ -24,17 +24,45 @@ class UserModel {
   final String? branchName; // For sub-users, the branch they represent
   final String? branchAddress; // For sub-users, branch address
   
-  // Profile fields
+  // Enhanced Profile fields
   final String? phoneNumber;
   final String? address;
   final List<String>? skills;
   final List<String>? workLocationPreference;
   final Map<String, dynamic>? availability;
-  final List<String>? education;
-  final List<String>? experience;
+  final List<Map<String, dynamic>>? education; // Enhanced education with institution, year, degree
+  final List<Map<String, dynamic>>? experience; // Enhanced experience with details
   final String? clinicName;
   final String? clinicAddress;
   final List<String>? serviceTypes;
+  
+  // New Enhanced Fields for Profile Management
+  
+  // For Dentists/Assistants
+  final List<String>? specialties; // Areas of expertise
+  final List<String>? certifications; // Professional certifications
+  final List<String>? documentUrls; // URLs of uploaded documents (licenses, CV, etc.)
+  final String? currentPosition; // Current job position
+  final String? yearsOfExperience; // Years of professional experience
+  final List<String>? languages; // Languages spoken
+  
+  // For Clinics
+  final String? website; // Clinic website
+  final String? description; // Clinic overview/description
+  final Map<String, String>? operatingHours; // Operating hours by day
+  final List<String>? clinicPhotos; // URLs of clinic photos
+  final List<Map<String, dynamic>>? branches; // Branch information
+  final String? licenseNumber; // Clinic license number
+  final String? establishedYear; // Year clinic was established
+  
+  // For Sales
+  final List<String>? responsibilityAreas; // Areas/regions of responsibility
+  final String? salesTerritory; // Sales territory
+  final String? managerUserId; // ID of reporting manager
+  
+  // For Admin
+  final bool? isSuperAdmin; // Super admin privileges
+  final List<String>? managedUserTypes; // User types this admin can manage
   
   // Account status
   final bool isActive;
@@ -70,6 +98,24 @@ class UserModel {
     this.clinicName,
     this.clinicAddress,
     this.serviceTypes,
+    this.specialties,
+    this.certifications,
+    this.documentUrls,
+    this.currentPosition,
+    this.yearsOfExperience,
+    this.languages,
+    this.website,
+    this.description,
+    this.operatingHours,
+    this.clinicPhotos,
+    this.branches,
+    this.licenseNumber,
+    this.establishedYear,
+    this.responsibilityAreas,
+    this.salesTerritory,
+    this.managerUserId,
+    this.isSuperAdmin,
+    this.managedUserTypes,
     this.isActive = true,
     this.isProfileComplete = false,
     this.lastLoginAt,
@@ -100,11 +146,29 @@ class UserModel {
       skills: List<String>.from(map['skills'] ?? []),
       workLocationPreference: List<String>.from(map['workLocationPreference'] ?? []),
       availability: map['availability'],
-      education: List<String>.from(map['education'] ?? []),
-      experience: List<String>.from(map['experience'] ?? []),
+      education: List<Map<String, dynamic>>.from(map['education'] ?? []),
+      experience: List<Map<String, dynamic>>.from(map['experience'] ?? []),
       clinicName: map['clinicName'],
       clinicAddress: map['clinicAddress'],
       serviceTypes: List<String>.from(map['serviceTypes'] ?? []),
+      specialties: List<String>.from(map['specialties'] ?? []),
+      certifications: List<String>.from(map['certifications'] ?? []),
+      documentUrls: List<String>.from(map['documentUrls'] ?? []),
+      currentPosition: map['currentPosition'],
+      yearsOfExperience: map['yearsOfExperience'],
+      languages: List<String>.from(map['languages'] ?? []),
+      website: map['website'],
+      description: map['description'],
+      operatingHours: Map<String, String>.from(map['operatingHours'] ?? {}),
+      clinicPhotos: List<String>.from(map['clinicPhotos'] ?? []),
+      branches: List<Map<String, dynamic>>.from(map['branches'] ?? []),
+      licenseNumber: map['licenseNumber'],
+      establishedYear: map['establishedYear'],
+      responsibilityAreas: List<String>.from(map['responsibilityAreas'] ?? []),
+      salesTerritory: map['salesTerritory'],
+      managerUserId: map['managerUserId'],
+      isSuperAdmin: map['isSuperAdmin'],
+      managedUserTypes: List<String>.from(map['managedUserTypes'] ?? []),
       isActive: map['isActive'] ?? true,
       isProfileComplete: map['isProfileComplete'] ?? false,
       lastLoginAt: map['lastLoginAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['lastLoginAt']) : null,
@@ -141,6 +205,24 @@ class UserModel {
       'clinicName': clinicName,
       'clinicAddress': clinicAddress,
       'serviceTypes': serviceTypes,
+      'specialties': specialties,
+      'certifications': certifications,
+      'documentUrls': documentUrls,
+      'currentPosition': currentPosition,
+      'yearsOfExperience': yearsOfExperience,
+      'languages': languages,
+      'website': website,
+      'description': description,
+      'operatingHours': operatingHours,
+      'clinicPhotos': clinicPhotos,
+      'branches': branches,
+      'licenseNumber': licenseNumber,
+      'establishedYear': establishedYear,
+      'responsibilityAreas': responsibilityAreas,
+      'salesTerritory': salesTerritory,
+      'managerUserId': managerUserId,
+      'isSuperAdmin': isSuperAdmin,
+      'managedUserTypes': managedUserTypes,
       'isActive': isActive,
       'isProfileComplete': isProfileComplete,
       'lastLoginAt': lastLoginAt?.millisecondsSinceEpoch,
@@ -171,11 +253,29 @@ class UserModel {
     List<String>? skills,
     List<String>? workLocationPreference,
     Map<String, dynamic>? availability,
-    List<String>? education,
-    List<String>? experience,
+    List<Map<String, dynamic>>? education,
+    List<Map<String, dynamic>>? experience,
     String? clinicName,
     String? clinicAddress,
     List<String>? serviceTypes,
+    List<String>? specialties,
+    List<String>? certifications,
+    List<String>? documentUrls,
+    String? currentPosition,
+    String? yearsOfExperience,
+    List<String>? languages,
+    String? website,
+    String? description,
+    Map<String, String>? operatingHours,
+    List<String>? clinicPhotos,
+    List<Map<String, dynamic>>? branches,
+    String? licenseNumber,
+    String? establishedYear,
+    List<String>? responsibilityAreas,
+    String? salesTerritory,
+    String? managerUserId,
+    bool? isSuperAdmin,
+    List<String>? managedUserTypes,
     bool? isActive,
     bool? isProfileComplete,
     DateTime? lastLoginAt,
@@ -209,6 +309,24 @@ class UserModel {
       clinicName: clinicName ?? this.clinicName,
       clinicAddress: clinicAddress ?? this.clinicAddress,
       serviceTypes: serviceTypes ?? this.serviceTypes,
+      specialties: specialties ?? this.specialties,
+      certifications: certifications ?? this.certifications,
+      documentUrls: documentUrls ?? this.documentUrls,
+      currentPosition: currentPosition ?? this.currentPosition,
+      yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
+      languages: languages ?? this.languages,
+      website: website ?? this.website,
+      description: description ?? this.description,
+      operatingHours: operatingHours ?? this.operatingHours,
+      clinicPhotos: clinicPhotos ?? this.clinicPhotos,
+      branches: branches ?? this.branches,
+      licenseNumber: licenseNumber ?? this.licenseNumber,
+      establishedYear: establishedYear ?? this.establishedYear,
+      responsibilityAreas: responsibilityAreas ?? this.responsibilityAreas,
+      salesTerritory: salesTerritory ?? this.salesTerritory,
+      managerUserId: managerUserId ?? this.managerUserId,
+      isSuperAdmin: isSuperAdmin ?? this.isSuperAdmin,
+      managedUserTypes: managedUserTypes ?? this.managedUserTypes,
       isActive: isActive ?? this.isActive,
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,

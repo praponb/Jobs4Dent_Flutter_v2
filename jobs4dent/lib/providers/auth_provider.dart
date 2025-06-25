@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -282,14 +283,14 @@ class AuthProvider with ChangeNotifier {
             }
           },
         );
-        print('✅ New Google user created in Firestore: ${userCredential.user!.email}');
+        debugPrint('✅ New Google user created in Firestore: ${userCredential.user!.email}');
       } else {
         // Load existing user data from Firestore
         await _loadUserModel();
         
         // Update last login time for existing users
         await _updateLastLogin();
-        print('✅ Existing Google user loaded from Firestore: ${userCredential.user!.email}');
+        debugPrint('✅ Existing Google user loaded from Firestore: ${userCredential.user!.email}');
       }
 
       _isLoading = false;
@@ -347,10 +348,10 @@ class AuthProvider with ChangeNotifier {
       _userModel = userModel;
       
       // Log successful user creation
-      print('✅ User document created in Firestore: ${user.email}');
+      debugPrint('✅ User document created in Firestore: ${user.email}');
     } catch (e) {
       _error = 'Error creating user document in Firestore: $e';
-      print('❌ Failed to create user document: $e');
+      debugPrint('❌ Failed to create user document: $e');
     }
   }
 
@@ -525,8 +526,8 @@ class AuthProvider with ChangeNotifier {
     String? address,
     List<String>? skills,
     List<String>? workLocationPreference,
-    List<String>? education,
-    List<String>? experience,
+    List<Map<String, dynamic>>? education,
+    List<Map<String, dynamic>>? experience,
     String? clinicName,
     String? clinicAddress,
     List<String>? serviceTypes,
@@ -561,11 +562,11 @@ class AuthProvider with ChangeNotifier {
       _userModel = updatedUser;
       notifyListeners();
       
-      print('✅ User profile updated in Firestore: ${_user!.email}');
+      debugPrint('✅ User profile updated in Firestore: ${_user!.email}');
       return true;
     } catch (e) {
       _error = 'Error updating user profile in Firestore: $e';
-      print('❌ Failed to update user profile: $e');
+      debugPrint('❌ Failed to update user profile: $e');
       notifyListeners();
       return false;
     }
@@ -589,6 +590,12 @@ class AuthProvider with ChangeNotifier {
 
   void clearSuccessMessage() {
     _successMessage = null;
+    notifyListeners();
+  }
+
+  // Update user model locally
+  void updateUser(UserModel updatedUser) {
+    _userModel = updatedUser;
     notifyListeners();
   }
 
@@ -634,14 +641,14 @@ class AuthProvider with ChangeNotifier {
               .update(updates);
               
           await _loadUserModel(); // Reload updated data
-          print('✅ User data synchronized between Auth and Firestore');
+          debugPrint('✅ User data synchronized between Auth and Firestore');
         }
       }
       
       return true;
     } catch (e) {
       _error = 'Error syncing user data: $e';
-      print('❌ Failed to sync user data: $e');
+      debugPrint('❌ Failed to sync user data: $e');
       return false;
     }
   }
