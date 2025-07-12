@@ -42,7 +42,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
     if (isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Seller Profile'),
+          title: const Text('โปรไฟล์ผู้ขาย'),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black87,
         ),
@@ -53,11 +53,11 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
     if (sellerProducts.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Seller Profile'),
+          title: const Text('โปรไฟล์ผู้ขาย'),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black87,
         ),
-        body: const Center(child: Text('No products found for this seller')),
+        body: const Center(child: Text('ไม่พบสินค้าของผู้ขายรายนี้')),
       );
     }
 
@@ -66,7 +66,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Seller Profile'),
+        title: const Text('โปรไฟล์ผู้ขาย'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -120,12 +120,12 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildStatCard(
-                      'Products',
+                      'สินค้า',
                       '${sellerProducts.length}',
                       MdiIcons.packageVariantClosed,
                     ),
                     _buildStatCard(
-                      'Total Views',
+                      'ยอดดูรวม',
                       '${sellerProducts.fold<int>(0, (sum, product) => sum + product.viewCount)}',
                       MdiIcons.eye,
                     ),
@@ -144,7 +144,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
                   const Padding(
                     padding: EdgeInsets.all(16),
                     child: Text(
-                      'Products',
+                      'สินค้า',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

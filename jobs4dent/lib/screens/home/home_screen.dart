@@ -69,22 +69,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _getSecondaryScreen(String userType) {
     // This would be Jobs for dentists, Applications for clinics, etc.
-    return const Center(
-      child: Text(
-        'Secondary Screen',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
+            return const Center(
+          child: Text(
+            'หน้าจอรอง',
+            style: TextStyle(fontSize: 24),
+          ),
+        );
   }
 
   Widget _getThirdScreen(String userType) {
     // This would be Marketplace, Messages, etc.
-    return const Center(
-      child: Text(
-        'Third Screen',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
+            return const Center(
+          child: Text(
+            'หน้าจอที่สาม',
+            style: TextStyle(fontSize: 24),
+          ),
+        );
   }
 
   BottomNavigationBar _buildBottomNavigationBar(String userType) {
@@ -96,19 +96,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items = [
           const BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+            label: 'แดชบอร์ด',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.work),
-            label: 'Jobs',
+            label: 'งาน',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.store),
-            label: 'Marketplace',
+            label: 'ตลาดซื้อขาย',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'โปรไฟล์',
           ),
         ];
         break;
@@ -116,19 +116,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items = [
           const BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+            label: 'แดชบอร์ด',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.post_add),
-            label: 'Post Jobs',
+            label: 'ประกาศงาน',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.people),
-            label: 'Applications',
+            label: 'ใบสมัคร',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'โปรไฟล์',
           ),
         ];
         break;
@@ -136,19 +136,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items = [
           const BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+            label: 'แดชบอร์ด',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.inventory),
-            label: 'Products',
+            label: 'สินค้า',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: 'Orders',
+            label: 'คำสั่งซื้อ',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'โปรไฟล์',
           ),
         ];
         break;
@@ -156,19 +156,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items = [
           const BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+            label: 'แดชบอร์ด',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.work),
-            label: 'Jobs',
+            label: 'งาน',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.store),
-            label: 'Marketplace',
+            label: 'ตลาดซื้อขาย',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'โปรไฟล์',
           ),
         ];
     }

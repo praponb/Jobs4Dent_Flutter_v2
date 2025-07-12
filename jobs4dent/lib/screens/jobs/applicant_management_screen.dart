@@ -42,15 +42,15 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Applicants'),
+        title: const Text('จัดการผู้สมัคร'),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
           tabs: const [
-            Tab(text: 'All'),
-            Tab(text: 'New'),
-            Tab(text: 'In Progress'),
-            Tab(text: 'Completed'),
+            Tab(text: 'ทั้งหมด'),
+            Tab(text: 'ใหม่'),
+            Tab(text: 'กำลังดำเนินการ'),
+            Tab(text: 'เสร็จสิ้น'),
           ],
         ),
       ),
@@ -81,7 +81,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                 Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
                 const SizedBox(height: 16),
                 Text(
-                  'Error loading applications',
+                  'เกิดข้อผิดพลาดในการโหลดการสมัคร',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
@@ -89,7 +89,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _loadApplications,
-                  child: const Text('Retry'),
+                  child: const Text('ลองใหม่'),
                 ),
               ],
             ),
@@ -116,12 +116,12 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                 const SizedBox(height: 16),
                 Text(
                   statusFilter == null 
-                      ? 'No applications yet'
-                      : 'No ${statusFilter.replaceAll('_', ' ')} applications',
+                      ? 'ยังไม่มีการสมัคร'
+                      : 'ไม่มีการสมัคร${statusFilter.replaceAll('_', ' ')}',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                const Text('Applications will appear here when people apply for your jobs'),
+                const Text('การสมัครจะปรากฏที่นี่เมื่อมีคนสมัครงานของคุณ'),
               ],
             ),
           );
@@ -201,7 +201,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                   Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 4),
                   Text(
-                    'Applied: ${_formatDate(application.appliedAt)}',
+                    'สมัครเมื่อ: ${_formatDate(application.appliedAt)}',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   const SizedBox(width: 16),
@@ -209,7 +209,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                     Icon(Icons.star, size: 16, color: Colors.orange[600]),
                     const SizedBox(width: 4),
                     Text(
-                      '${application.matchingScore!.round()}% match',
+                      'ตรงกัน ${application.matchingScore!.round()}%',
                       style: TextStyle(
                         color: Colors.orange[600],
                         fontWeight: FontWeight.w500,
@@ -237,7 +237,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
               // Cover letter preview
               const SizedBox(height: 12),
               Text(
-                'Cover Letter:',
+                                    'จดหมายนำ:',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -258,7 +258,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                     child: OutlinedButton.icon(
                       onPressed: () => _showUpdateStatusDialog(application),
                       icon: const Icon(Icons.edit, size: 16),
-                      label: const Text('Update Status'),
+                      label: const Text('อัปเดตสถานะ'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -266,7 +266,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                     child: ElevatedButton.icon(
                       onPressed: () => _showApplicationDetails(application),
                       icon: const Icon(Icons.visibility, size: 16),
-                      label: const Text('View Details'),
+                      label: const Text('ดูรายละเอียด'),
                     ),
                   ),
                 ],
@@ -340,23 +340,23 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
   String _getStatusDisplayName(String status) {
     switch (status) {
       case 'submitted':
-        return 'New';
+        return 'ใหม่';
       case 'under_review':
-        return 'Reviewing';
+        return 'กำลังพิจารณา';
       case 'shortlisted':
-        return 'Shortlisted';
+        return 'ผ่านเข้ารอบ';
       case 'interview_scheduled':
-        return 'Interview';
+        return 'นัดสัมภาษณ์';
       case 'interview_completed':
-        return 'Interviewed';
+        return 'สัมภาษณ์แล้ว';
       case 'offered':
-        return 'Offered';
+        return 'ได้รับข้อเสนอ';
       case 'hired':
-        return 'Hired';
+        return 'รับเข้าทำงาน';
       case 'rejected':
-        return 'Rejected';
+        return 'ปฏิเสธ';
       default:
-        return 'Unknown';
+        return 'ไม่ทราบ';
     }
   }
 
@@ -410,7 +410,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                       Navigator.pop(context);
                       _showUpdateStatusDialog(application);
                     },
-                    child: const Text('Update Status'),
+                                          child: const Text('อัปเดตสถานะ'),
                   ),
                 ],
               ),
@@ -425,13 +425,13 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                     children: [
                       // Applicant profile information
                       if (application.applicantProfile != null) ...[
-                        _buildSectionTitle('Applicant Profile'),
+                        _buildSectionTitle('โปรไฟล์ผู้สมัคร'),
                         _buildProfileCard(application.applicantProfile!),
                         const SizedBox(height: 16),
                       ],
 
                       // Cover letter
-                      _buildSectionTitle('Cover Letter'),
+                      _buildSectionTitle('จดหมายนำ'),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
@@ -446,7 +446,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
 
                       // Additional documents
                       if (application.additionalDocuments.isNotEmpty) ...[
-                        _buildSectionTitle('Additional Documents'),
+                        _buildSectionTitle('เอกสารเพิ่มเติม'),
                         ...application.additionalDocuments.map((doc) => Card(
                           child: ListTile(
                             leading: const Icon(Icons.description),
@@ -454,9 +454,9 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                             trailing: IconButton(
                               icon: const Icon(Icons.download),
                               onPressed: () {
-                                // TODO: Implement document download
+                                                                  // Note: Document download feature pending implementation
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Document download - Coming Soon')),
+                                  const SnackBar(content: Text('การดาวน์โหลดเอกสาร - เร็วๆ นี้')),
                                 );
                               },
                             ),
@@ -466,7 +466,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                       ],
 
                       // Application timeline
-                      _buildSectionTitle('Application Timeline'),
+                      _buildSectionTitle('ไทมไลน์การสมัคร'),
                       _buildTimelineCard(application),
                     ],
                   ),
@@ -499,15 +499,15 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (profile['currentPosition'] != null)
-              _buildProfileRow('Position', profile['currentPosition']),
+                              _buildProfileRow('ตำแหน่ง', profile['currentPosition']),
             if (profile['yearsOfExperience'] != null)
-              _buildProfileRow('Experience', '${profile['yearsOfExperience']} years'),
+                              _buildProfileRow('ประสบการณ์', '${profile['yearsOfExperience']} ปี'),
             if (profile['skills'] != null && (profile['skills'] as List).isNotEmpty)
-              _buildProfileRow('Skills', (profile['skills'] as List).join(', ')),
+                              _buildProfileRow('ทักษะ', (profile['skills'] as List).join(', ')),
             if (profile['specialties'] != null && (profile['specialties'] as List).isNotEmpty)
-              _buildProfileRow('Specialties', (profile['specialties'] as List).join(', ')),
+                              _buildProfileRow('ความเชี่ยวชาญ', (profile['specialties'] as List).join(', ')),
             if (profile['education'] != null && (profile['education'] as List).isNotEmpty)
-              _buildProfileRow('Education', '${(profile['education'] as List).length} entries'),
+                              _buildProfileRow('การศึกษา', '${(profile['education'] as List).length} รายการ'),
           ],
         ),
       ),
@@ -540,10 +540,10 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTimelineItem('Applied', application.appliedAt, true),
-            _buildTimelineItem('Last Updated', application.updatedAt, false),
+            _buildTimelineItem('สมัครเมื่อ', application.appliedAt, true),
+            _buildTimelineItem('อัปเดตล่าสุด', application.updatedAt, false),
             if (application.interviewDate != null)
-              _buildTimelineItem('Interview Scheduled', application.interviewDate!, false),
+              _buildTimelineItem('กำหนดการสัมภาษณ์', application.interviewDate!, false),
           ],
         ),
       ),
@@ -601,20 +601,20 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Update Application Status'),
+          title: Text('อัปเดตสถานะใบสมัคร'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Applicant: ${application.applicantName}'),
+                Text('ผู้สมัคร: ${application.applicantName}'),
                 const SizedBox(height: 16),
                 
                 // Status dropdown
                 DropdownButtonFormField<String>(
                   value: selectedStatus,
                   decoration: const InputDecoration(
-                    labelText: 'Status',
+                    labelText: 'สถานะ',
                     border: OutlineInputBorder(),
                   ),
                   items: JobProvider.applicationStatuses.map((status) {
@@ -649,13 +649,13 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                     },
                     child: InputDecorator(
                       decoration: const InputDecoration(
-                        labelText: 'Interview Date',
+                        labelText: 'วันที่สัมภาษณ์',
                         border: OutlineInputBorder(),
                       ),
                       child: Text(
                         interviewDate != null 
                             ? _formatDate(interviewDate!)
-                            : 'Select interview date',
+                            : 'เลือกวันที่สัมภาษณ์',
                       ),
                     ),
                   ),
@@ -663,9 +663,9 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                   TextField(
                     controller: interviewLocationController,
                     decoration: const InputDecoration(
-                      labelText: 'Interview Location',
+                      labelText: 'สถานที่สัมภาษณ์',
                       border: OutlineInputBorder(),
-                      hintText: 'e.g., Clinic office, Video call',
+                      hintText: 'เช่น สำนักงานคลินิก, วิดีโอคอล',
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -676,9 +676,9 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                   controller: notesController,
                   maxLines: 3,
                   decoration: const InputDecoration(
-                    labelText: 'Notes (Optional)',
+                    labelText: 'หมายเหตุ (ไม่บังคับ)',
                     border: OutlineInputBorder(),
-                    hintText: 'Add any notes for the applicant...',
+                    hintText: 'เพิ่มบันทึกสำหรับผู้สมัคร...',
                   ),
                 ),
               ],
@@ -687,7 +687,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+                                  child: const Text('ยกเลิก'),
             ),
             ElevatedButton(
               onPressed: () => _updateApplicationStatus(
@@ -697,7 +697,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                 interviewDate,
                 interviewLocationController.text.trim().isEmpty ? null : interviewLocationController.text.trim(),
               ),
-              child: const Text('Update'),
+                                  child: const Text('อัปเดต'),
             ),
           ],
         ),
@@ -728,7 +728,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Application status updated successfully!'),
+            content: Text('อัปเดตสถานะใบสมัครเรียบร้อยแล้ว!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -737,7 +737,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(jobProvider.error ?? 'Failed to update status'),
+            content: Text(jobProvider.error ?? 'อัปเดตสถานะไม่สำเร็จ'),
             backgroundColor: Colors.red,
           ),
         );

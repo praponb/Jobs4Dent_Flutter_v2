@@ -39,7 +39,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: const Text('หน้าหลัก'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -47,7 +47,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              // TODO: Navigate to notifications
+              // Note: Notifications feature pending implementation
             },
           ),
           IconButton(
@@ -141,7 +141,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome back, ${user.userName}!',
+                      'ยินดีต้อนรับ, ${user.userName}!',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -151,8 +151,8 @@ class _DentistDashboardState extends State<DentistDashboard> {
                     const SizedBox(height: 4),
                     Text(
                       user.userType == 'dentist' 
-                          ? 'Dentist' 
-                          : 'Dental Assistant',
+                          ? 'ทันตแพทย์' 
+                          : 'ผู้ช่วยทันตแพทย์',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white70,
@@ -166,8 +166,8 @@ class _DentistDashboardState extends State<DentistDashboard> {
           const SizedBox(height: 16),
           Text(
             user.specialties?.isNotEmpty == true 
-                ? 'Specialties: ${user.specialties!.take(3).join(', ')}'
-                : 'Find your next dental opportunity today!',
+                ? 'ความเชี่ยวชาญ: ${user.specialties!.take(3).join(', ')}'
+                : 'ค้นหาโอกาสในวิชาชีพทันตกรรมของคุณวันนี้!',
             style: const TextStyle(
               fontSize: 14,
               color: Colors.white,
@@ -192,7 +192,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Quick Stats',
+          'สถิติด่วน',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -204,7 +204,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
           children: [
             Expanded(
               child: _buildStatCard(
-                title: 'Applications',
+                title: 'การสมัคร',
                 value: totalApplications.toString(),
                 icon: Icons.send,
                 color: Colors.orange,
@@ -213,7 +213,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
-                title: 'Interviews',
+                title: 'สัมภาษณ์',
                 value: interviewsScheduled.toString(),
                 icon: Icons.calendar_today,
                 color: Colors.green,
@@ -226,7 +226,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
           children: [
             Expanded(
               child: _buildStatCard(
-                title: 'Offers',
+                title: 'ข้อเสนอ',
                 value: offersReceived.toString(),
                 icon: Icons.star,
                 color: Colors.purple,
@@ -235,7 +235,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
-                title: 'Hired',
+                title: 'ได้งาน',
                 value: hired.toString(),
                 icon: Icons.check_circle,
                 color: Colors.blue,
@@ -301,7 +301,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Quick Actions',
+          'การดำเนินการด่วน',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -313,8 +313,8 @@ class _DentistDashboardState extends State<DentistDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'Search Jobs',
-                subtitle: 'Find new opportunities',
+                title: 'ค้นหางาน',
+                subtitle: 'ค้นหาโอกาสใหม่',
                 icon: Icons.search,
                 color: const Color(0xFF2196F3),
                 onTap: () {
@@ -328,8 +328,8 @@ class _DentistDashboardState extends State<DentistDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'My Applications',
-                subtitle: 'Track your progress',
+                title: 'การสมัครของฉัน',
+                subtitle: 'ติดตามความคืบหน้า',
                 icon: Icons.folder,
                 color: Colors.teal,
                 onTap: () {
@@ -347,8 +347,8 @@ class _DentistDashboardState extends State<DentistDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'Marketplace',
-                subtitle: 'Buy/sell products',
+                title: 'ตลาด',
+                subtitle: 'ซื้อ/ขายผลิตภัณฑ์',
                 icon: Icons.store,
                 color: Colors.green,
                 onTap: () {
@@ -362,8 +362,8 @@ class _DentistDashboardState extends State<DentistDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'Availability',
-                subtitle: 'Manage calendar',
+                title: 'ความพร้อม',
+                subtitle: 'จัดการปฏิทิน',
                 icon: Icons.event_available,
                 color: Colors.purple,
                 onTap: () {
@@ -441,7 +441,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Upcoming Interviews',
+              'การสัมภาษณ์ที่กำลังจะมา',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -460,7 +460,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                     ),
                   );
                 },
-                child: const Text('View All'),
+                child: const Text('ดูทั้งหมด'),
               ),
           ],
         ),
@@ -479,7 +479,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                 Icon(Icons.event_note, size: 48, color: Colors.grey),
                 SizedBox(height: 12),
                 Text(
-                  'No upcoming interviews',
+                  'ไม่มีการสัมภาษณ์ที่กำลังจะมา',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -488,7 +488,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Keep applying to jobs to get interview invitations',
+                  'สมัครงานต่อไปเพื่อรับคำเชิญให้สัมภาษณ์',
                   style: TextStyle(color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
@@ -527,7 +527,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Interview Scheduled',
+                  'มีการนัดสัมภาษณ์',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange[700],
@@ -592,7 +592,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Recent Applications',
+              'การสมัครล่าสุด',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -608,7 +608,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                   ),
                 );
               },
-              child: const Text('View All'),
+              child: const Text('ดูทั้งหมด'),
             ),
           ],
         ),
@@ -627,7 +627,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                 const Icon(Icons.inbox, size: 48, color: Colors.grey),
                 const SizedBox(height: 12),
                 const Text(
-                  'No recent applications',
+                  'ไม่มีการสมัครล่าสุด',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -636,7 +636,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Start applying for jobs to see them here',
+                  'เริ่มสมัครงานเพื่อดูรายการที่นี่',
                   style: TextStyle(color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
@@ -650,7 +650,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                       ),
                     );
                   },
-                  child: const Text('Find Jobs'),
+                  child: const Text('หางาน'),
                 ),
               ],
             ),
@@ -686,7 +686,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
             children: [
               Expanded(
                 child: Text(
-                  'Application to ${application.clinicId}',
+                  'ใบสมัครถึง ${application.clinicId}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -716,7 +716,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
               const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
               Text(
-                'Applied: ${_dateFormat.format(application.appliedAt)}',
+                                  'สมัครเมื่อ: ${_dateFormat.format(application.appliedAt)}',
                 style: const TextStyle(color: Colors.grey),
               ),
             ],
@@ -760,7 +760,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Availability Status',
+              'สถานะความพร้อม',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -769,7 +769,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
             ),
             TextButton(
               onPressed: _showAvailabilityDialog,
-              child: const Text('Manage'),
+              child: const Text('จัดการ'),
             ),
           ],
         ),
@@ -790,7 +790,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                   Icon(Icons.check_circle, color: Colors.green[600]),
                   const SizedBox(width: 8),
                   const Text(
-                    'Available for Work',
+                    'พร้อมทำงาน',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -800,7 +800,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'You are currently available for new opportunities',
+                'คุณพร้อมสำหรับโอกาสงานใหม่',
                 style: TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 12),
@@ -808,15 +808,15 @@ class _DentistDashboardState extends State<DentistDashboard> {
                 children: [
                   Expanded(
                     child: _buildAvailabilityItem(
-                      'Preferred Work Type',
-                      'Full-time, Part-time',
+                      'ประเภทงานที่ต้องการ',
+                      'เต็มเวลา, บางเวลา',
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildAvailabilityItem(
-                      'Location Preference',
-                      'Bangkok, Nearby provinces',
+                      'การกำหนดพื้นที่ปฏิบัติงาน',
+                      'กรุงเทพฯ และจังหวัดใกล้เคียง',
                     ),
                   ),
                 ],
@@ -856,30 +856,30 @@ class _DentistDashboardState extends State<DentistDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Manage Availability'),
+        title: const Text('จัดการความพร้อม'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Availability management functionality will be implemented here.'),
+            Text('ฟังก์ชันการจัดการสถานะความพร้อมจะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
             SizedBox(height: 16),
-            Text('Features to include:'),
-            Text('• Set available/unavailable status'),
-            Text('• Manage work preferences'),
-            Text('• Set location preferences'),
-            Text('• Calendar integration'),
+            Text('ฟีเจอร์ที่จะรวม:'),
+            Text('• ตั้งสถานะพร้อม/ไม่พร้อม'),
+            Text('• จัดการค่าเลือกการทำงาน'),
+            Text('• ตั้งค่าเลือกสถานที่'),
+            Text('• เชื่อมต่อปฏิทิน'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+                          child: const Text('ปิด'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: Navigate to availability management screen
+              // Note: Availability management screen pending implementation
             },
-            child: const Text('Manage'),
+                            child: const Text('จัดการ'),
           ),
         ],
       ),
@@ -908,19 +908,19 @@ class _DentistDashboardState extends State<DentistDashboard> {
   String _getStatusDisplayName(String status) {
     switch (status) {
       case 'submitted':
-        return 'Submitted';
+        return 'ส่งแล้ว';
       case 'under_review':
-        return 'Under Review';
+        return 'กำลังพิจารณา';
       case 'interview_scheduled':
-        return 'Interview Scheduled';
+        return 'นัดสัมภาษณ์แล้ว';
       case 'offer_made':
-        return 'Offer Made';
+        return 'ได้รับข้อเสนอ';
       case 'hired':
-        return 'Hired';
+        return 'ได้งานแล้ว';
       case 'rejected':
-        return 'Rejected';
+        return 'ไม่ผ่าน';
       default:
-        return 'Unknown';
+        return 'ไม่ทราบ';
     }
   }
 } 

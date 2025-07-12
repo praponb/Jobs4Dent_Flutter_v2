@@ -27,18 +27,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   List<String> _selectedLanguages = [];
 
   final List<String> _availableLanguages = [
-    'Thai',
-    'English',
-    'Chinese',
-    'Japanese',
-    'Korean',
-    'German',
-    'French',
-    'Spanish',
-    'Portuguese',
-    'Italian',
-    'Russian',
-    'Arabic',
+    'ไทย',
+    'อังกฤษ',
+    'จีน',
+    'ญี่ปุ่น',
+    'เกาหลี',
+    'เยอรมัน',
+    'ฝรั่งเศส',
+    'สเปน',
+    'โปรตุเกส',
+    'อิตาลี',
+    'รัสเซีย',
+    'อารบิก',
   ];
 
   @override
@@ -65,7 +65,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Personal Information'),
+        title: const Text('ข้อมูลส่วนตัว'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -82,7 +82,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                     ),
                   )
                 : const Text(
-                    'Save',
+                    'บันทึก',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -104,77 +104,77 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               
               // Personal Details Section
               _buildSectionCard(
-                title: 'Personal Details',
+                title: 'รายละเอียดส่วนตัว',
                 children: [
-                  _buildTextField(
-                    controller: _nameController,
-                    label: 'Full Name',
-                    icon: Icons.person_outline,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your full name';
-                      }
-                      return null;
-                    },
-                  ),
+                                      _buildTextField(
+                      controller: _nameController,
+                      label: 'ชื่อ-นามสกุล',
+                      icon: Icons.person_outline,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'กรุณากรอกชื่อ-นามสกุล';
+                        }
+                        return null;
+                      },
+                    ),
                   const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _phoneController,
-                    label: 'Phone Number',
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
-                      }
-                      return null;
-                    },
-                  ),
+                                      _buildTextField(
+                      controller: _phoneController,
+                      label: 'หมายเลขโทรศัพท์',
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'กรุณากรอกหมายเลขโทรศัพท์';
+                        }
+                        return null;
+                      },
+                    ),
                   const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _addressController,
-                    label: 'Current Address',
-                    icon: Icons.location_on_outlined,
-                    maxLines: 3,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your current address';
-                      }
-                      return null;
-                    },
-                  ),
+                                      _buildTextField(
+                      controller: _addressController,
+                      label: 'ที่อยู่ปัจจุบัน',
+                      icon: Icons.location_on_outlined,
+                      maxLines: 3,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'กรุณากรอกที่อยู่ปัจจุบัน';
+                        }
+                        return null;
+                      },
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
               
               // Professional Details Section
               _buildSectionCard(
-                title: 'Professional Details',
+                title: 'รายละเอียดงาน',
                 children: [
-                  _buildTextField(
-                    controller: _currentPositionController,
-                    label: 'Current Position',
-                    icon: Icons.work_outline,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your current position';
-                      }
-                      return null;
-                    },
-                  ),
+                                      _buildTextField(
+                      controller: _currentPositionController,
+                      label: 'ตำแหน่งปัจจุบัน',
+                      icon: Icons.work_outline,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'กรุณากรอกตำแหน่งปัจจุบัน';
+                        }
+                        return null;
+                      },
+                    ),
                   const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _yearsOfExperienceController,
-                    label: 'Years of Experience',
-                    icon: Icons.timeline_outlined,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your years of experience';
-                      }
-                      return null;
-                    },
-                  ),
+                                      _buildTextField(
+                      controller: _yearsOfExperienceController,
+                      label: 'ปีของประสบการณ์',
+                      icon: Icons.timeline_outlined,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'กรุณากรอกปีของประสบการณ์';
+                        }
+                        return null;
+                      },
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -241,7 +241,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Profile Picture',
+            'รูปโปรไฟล์',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -250,7 +250,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Upload a professional-quality photo',
+            'อัปโหลดรูปภาพคุณภาพดี',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[500],
@@ -334,7 +334,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Languages',
+            'ภาษา',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -343,7 +343,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Select languages you can speak',
+            'เลือกภาษาที่คุณพูดได้',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
@@ -406,7 +406,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Photo Library'),
+                title: const Text('คลังรูปภาพ'),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImage(ImageSource.gallery);
@@ -414,7 +414,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_camera),
-                title: const Text('Camera'),
+                title: const Text('กล้อง'),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImage(ImageSource.camera);
@@ -438,7 +438,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error picking image: $e')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการเลือกรูปภาพ: $e')),
         );
       }
     }
@@ -461,7 +461,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error uploading image: $e')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ: $e')),
         );
       }
       return null;
@@ -506,7 +506,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Personal information updated successfully'),
+            content: Text('อัปเดตข้อมูลส่วนตัวเรียบร้อยแล้ว'),
             backgroundColor: Colors.green,
           ),
         );
@@ -516,7 +516,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving information: $e')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกข้อมูล: $e')),
         );
       }
     } finally {

@@ -65,7 +65,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          widget.productToEdit != null ? 'Edit Product' : 'List New Product',
+          widget.productToEdit != null ? 'แก้ไขสินค้า' : 'ลงขายสินค้าใหม่',
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -79,7 +79,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('SAVE'),
+                : const Text('บันทึก'),
           ),
         ],
       ),
@@ -110,7 +110,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Product Images',
+              'รูปภาพสินค้า',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
@@ -153,7 +153,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(MdiIcons.plus, size: 32, color: Colors.grey),
-            const Text('Add Image'),
+            const Text('เพิ่มรูป'),
           ],
         ),
       ),
@@ -210,19 +210,19 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Basic Information',
+              'ข้อมูลพื้นฐาน',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: 'Product Name *',
+                                  labelText: 'ชื่อสินค้า *',
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Product name is required';
+                                      return 'ต้องระบุชื่อสินค้า';
                 }
                 return null;
               },
@@ -232,13 +232,13 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
               controller: _descriptionController,
               maxLines: 4,
               decoration: const InputDecoration(
-                labelText: 'Description *',
+                                  labelText: 'คำอธิบาย *',
                 border: OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Description is required';
+                                      return 'ต้องระบุคำอธิบาย';
                 }
                 return null;
               },
@@ -247,7 +247,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
             DropdownButtonFormField<ProductCondition>(
               value: _selectedCondition,
               decoration: const InputDecoration(
-                labelText: 'Product Condition *',
+                                  labelText: 'สภาพสินค้า *',
                 border: OutlineInputBorder(),
               ),
               items: ProductCondition.values.map((condition) {
@@ -276,7 +276,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Pricing',
+              'ราคา',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
@@ -285,17 +285,17 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
-                labelText: 'Price (฿) *',
+                                  labelText: 'ราคา (฿) *',
                 border: OutlineInputBorder(),
                 prefixText: '฿ ',
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Price is required';
+                                      return 'ต้องระบุราคา';
                 }
                 final price = double.tryParse(value);
                 if (price == null || price <= 0) {
-                  return 'Enter valid price';
+                  return 'กรุณาใส่ราคาที่ถูกต้อง';
                 }
                 return null;
               },
@@ -314,7 +314,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Category',
+              'หมวดหมู่',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
@@ -323,7 +323,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                 return DropdownButtonFormField<ProductCategory>(
                   value: _selectedCategory,
                   decoration: const InputDecoration(
-                    labelText: 'Product Category *',
+                    labelText: 'หมวดหมู่สินค้า *',
                     border: OutlineInputBorder(),
                   ),
                   items: marketplaceProvider.categories.map((category) {
@@ -339,7 +339,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select a category';
+                      return 'กรุณาเลือกหมวดหมู่';
                     }
                     return null;
                   },
@@ -363,7 +363,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error picking images: $e')),
+                              SnackBar(content: Text('เกิดข้อผิดพลาดในการเลือกรูปภาพ: $e')),
         );
       }
     }
@@ -423,8 +423,8 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
             SnackBar(
               content: Text(
                 widget.productToEdit != null 
-                    ? 'Product updated successfully!' 
-                    : 'Product listed successfully!',
+                                    ? 'อัปเดตสินค้าเรียบร้อยแล้ว!'
+                : 'ประกาศขายสินค้าเรียบร้อยแล้ว!',
               ),
               backgroundColor: Colors.green,
             ),
@@ -433,7 +433,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Failed to save product. Please try again.'),
+              content: Text('บันทึกสินค้าไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'),
               backgroundColor: Colors.red,
             ),
           );
@@ -443,7 +443,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('เกิดข้อผิดพลาด: $e'),
             backgroundColor: Colors.red,
           ),
         );

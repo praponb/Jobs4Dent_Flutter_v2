@@ -6,7 +6,7 @@ import 'personal_info_screen.dart';
 import 'education_experience_screen.dart';
 import 'skills_specialties_screen.dart';
 import 'work_location_preference_screen.dart';
-// TODO: Create remaining screens
+// Note: Additional profile screens implementation pending
 // import 'availability_calendar_screen.dart';
 // import 'documents_screen.dart';
 // import 'clinic_info_screen.dart';
@@ -25,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('โปรไฟล์'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -154,7 +154,7 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Switch Role',
+                                  'เปลี่ยนบทบาท',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: const Color(0xFF2196F3),
@@ -193,8 +193,8 @@ class ProfileScreen extends StatelessWidget {
                 _buildMenuSection([
                   _MenuItemData(
                     icon: Icons.person_outline,
-                    title: 'Personal Information',
-                    subtitle: 'Update your details',
+                    title: 'ข้อมูลส่วนตัว',
+                    subtitle: 'อัปเดตรายละเอียดของคุณ',
                     onTap: () {
                       Navigator.push(
                         context,
@@ -207,8 +207,8 @@ class ProfileScreen extends StatelessWidget {
                   if (user.userType == 'dentist' || user.userType == 'assistant') ...[
                     _MenuItemData(
                       icon: Icons.school_outlined,
-                      title: 'Education & Experience',
-                      subtitle: 'Qualifications and work history',
+                      title: 'การศึกษาและประสบการณ์',
+                      subtitle: 'คุณวุฒิและประวัติการทำงาน',
                       onTap: () {
                         Navigator.push(
                           context,
@@ -220,8 +220,8 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     _MenuItemData(
                       icon: Icons.psychology_outlined,
-                      title: 'Skills & Specialties',
-                      subtitle: 'Areas of expertise and certifications',
+                      title: 'ทักษะและความเชี่ยวชาญ',
+                      subtitle: 'ด้านความเชี่ยวชาญและใบรับรอง',
                       onTap: () {
                         Navigator.push(
                           context,
@@ -233,8 +233,8 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     _MenuItemData(
                       icon: Icons.location_on_outlined,
-                      title: 'Work Preferences',
-                      subtitle: 'Location and availability',
+                      title: 'ความต้องการในการทำงาน',
+                      subtitle: 'สถานที่และความพร้อม',
                       onTap: () {
                         Navigator.push(
                           context,
@@ -244,7 +244,7 @@ class ProfileScreen extends StatelessWidget {
                         );
                       },
                     ),
-                    // TODO: Implement availability calendar screen
+                                          // Note: Availability calendar screen implementation pending
                     // _MenuItemData(
                     //   icon: Icons.calendar_today_outlined,
                     //   title: 'Availability Calendar',
@@ -258,7 +258,7 @@ class ProfileScreen extends StatelessWidget {
                     //     );
                     //   },
                     // ),
-                    // TODO: Implement documents screen
+                                          // Note: Documents screen implementation pending
                     // _MenuItemData(
                     //   icon: Icons.file_upload_outlined,
                     //   title: 'Supporting Documents',
@@ -273,7 +273,7 @@ class ProfileScreen extends StatelessWidget {
                     //   },
                     // ),
                   ],
-                  // TODO: Implement clinic screens
+                                      // Note: Clinic management screens implementation pending
                   // if (user.userType == 'clinic') ...[
                   //   _MenuItemData(
                   //     icon: Icons.business_outlined,
@@ -315,7 +315,7 @@ class ProfileScreen extends StatelessWidget {
                   //     },
                   //   ),
                   // ],
-                  // TODO: Implement sales screens
+                                      // Note: Sales management screens implementation pending
                   // if (user.userType == 'sales') ...[
                   //   _MenuItemData(
                   //     icon: Icons.map_outlined,
@@ -344,7 +344,7 @@ class ProfileScreen extends StatelessWidget {
                   //     },
                   //   ),
                   // ],
-                  // TODO: Implement admin screens
+                                      // Note: Admin management screens implementation pending
                   // if (user.userType == 'admin') ...[
                   //   _MenuItemData(
                   //     icon: Icons.admin_panel_settings_outlined,
@@ -377,8 +377,8 @@ class ProfileScreen extends StatelessWidget {
                   if (user.roles.length > 1)
                     _MenuItemData(
                       icon: Icons.swap_horiz,
-                      title: 'Role Management',
-                      subtitle: 'Switch between your roles (${user.roles.length} roles available)',
+                                  title: 'จัดการบทบาท',
+            subtitle: 'เปลี่ยนบทบาทของคุณ (มี ${user.roles.length} บทบาท)',
                       onTap: () {
                         Navigator.push(
                           context,
@@ -395,26 +395,26 @@ class ProfileScreen extends StatelessWidget {
                 _buildMenuSection([
                   _MenuItemData(
                     icon: Icons.notifications_outlined,
-                    title: 'Notifications',
-                    subtitle: 'Manage your alerts',
+                    title: 'การแจ้งเตือน',
+                    subtitle: 'จัดการการแจ้งเตือนของคุณ',
                     onTap: () {
-                      // TODO: Navigate to notifications settings
+                                              // Note: Notifications settings screen implementation pending
                     },
                   ),
                   _MenuItemData(
                     icon: Icons.security_outlined,
-                    title: 'Privacy & Security',
-                    subtitle: 'Account security settings',
+                    title: 'ความเป็นส่วนตัวและความปลอดภัย',
+                    subtitle: 'การตั้งค่าความปลอดภัยบัญชี',
                     onTap: () {
-                      // TODO: Navigate to privacy settings
+                                              // Note: Privacy settings screen implementation pending
                     },
                   ),
                   _MenuItemData(
                     icon: Icons.help_outline,
-                    title: 'Help & Support',
-                    subtitle: 'Get help and contact us',
+                    title: 'ความช่วยเหลือและการสนับสนุน',
+                    subtitle: 'รับความช่วยเหลือและติดต่อเรา',
                     onTap: () {
-                      // TODO: Navigate to help
+                                              // Note: Help screen implementation pending
                     },
                   ),
                 ]),
@@ -425,8 +425,8 @@ class ProfileScreen extends StatelessWidget {
                 _buildMenuSection([
                   _MenuItemData(
                     icon: Icons.logout,
-                    title: 'Logout',
-                    subtitle: 'Sign out of your account',
+                    title: 'ออกจากระบบ',
+                    subtitle: 'ออกจากบัญชีของคุณ',
                     onTap: () {
                       _showLogoutDialog(context, authProvider);
                     },
@@ -548,19 +548,19 @@ class ProfileScreen extends StatelessWidget {
   String _getUserTypeLabel(String userType) {
     switch (userType) {
       case 'dentist':
-        return 'Dentist';
+        return 'ทันตแพทย์';
       case 'assistant':
-        return 'Dental Assistant';
+        return 'ผู้ช่วยทันตแพทย์';
       case 'clinic':
-        return 'Clinic Owner';
+        return 'เจ้าของคลินิก';
       case 'seller':
-        return 'Equipment Seller';
+        return 'ผู้ขายอุปกรณ์';
       case 'sales':
-        return 'Sales Representative';
+        return 'ตัวแทนขาย';
       case 'admin':
-        return 'Administrator';
+        return 'ผู้ดูแลระบบ';
       default:
-        return 'User';
+        return 'ผู้ใช้งาน';
     }
   }
 
@@ -569,14 +569,14 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
+          title: const Text('ออกจากระบบ'),
+          content: const Text('คุณแน่ใจว่าต้องการออกจากระบบหรือไม่?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: const Text('ยกเลิก'),
             ),
             TextButton(
               onPressed: () async {
@@ -584,7 +584,7 @@ class ProfileScreen extends StatelessWidget {
                 await authProvider.signOut();
               },
               child: const Text(
-                'Logout',
+                'ออกจากระบบ',
                 style: TextStyle(color: Colors.red),
               ),
             ),

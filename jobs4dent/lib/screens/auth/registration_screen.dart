@@ -25,26 +25,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final List<Map<String, dynamic>> userTypes = [
     {
       'type': 'dentist',
-      'title': 'Dentist',
-      'description': 'Licensed dental professional',
+      'title': 'ทันตแพทย์',
+      'description': 'ทันตกรรมทั่วไป/ทันตกรรมเฉพาะทาง',
       'icon': Icons.medical_services,
     },
     {
       'type': 'assistant',
-      'title': 'Dental Assistant',
-      'description': 'Dental assistant professional',
+      'title': 'ผู้ช่วยทันตแพทย์/เคาเตอร์',
+      'description': 'ผู้ช่วยทันตแพทย์/พนักงานเคาเตอร์',
       'icon': Icons.medical_information,
     },
     {
       'type': 'clinic',
-      'title': 'Clinic Owner',
-      'description': 'Dental clinic owner/manager',
+      'title': 'เจ้าของคลินิก',
+      'description': 'เจ้าของ/ผู้จัดการคลินิกทันตกรรม',
       'icon': Icons.business,
     },
     {
       'type': 'seller',
-      'title': 'Equipment Seller',
-      'description': 'Dental equipment seller',
+      'title': 'ผู้ขายอุปกรณ์และอื่นๆ',
+      'description': 'ผู้ขายอุปกรณ์ ตัวแทน และอื่นๆ',
       'icon': Icons.store,
     },
   ];
@@ -60,40 +60,40 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return 'กรุณากรอกอีเมล';
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Please enter a valid email';
+      return 'กรุณากรอกอีเมลที่ถูกต้อง';
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return 'กรุณากรอกรหัสผ่าน';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+      return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
     }
     return null;
   }
 
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
+      return 'กรุณายืนยันรหัสผ่าน';
     }
     if (value != _passwordController.text) {
-      return 'Passwords do not match';
+      return 'รหัสผ่านไม่ตรงกัน';
     }
     return null;
   }
 
   String? _validateName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Full name is required';
+      return 'กรุณากรอกชื่อ-นามสกุล';
     }
     if (value.length < 2) {
-      return 'Name must be at least 2 characters';
+      return 'ชื่อต้องมีอย่างน้อย 2 ตัวอักษร';
     }
     return null;
   }
@@ -106,7 +106,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please accept the terms and conditions'),
+          content: Text('กรุณายอมรับข้อกำหนดและเงื่อนไข'),
           backgroundColor: Colors.red,
         ),
       );
@@ -139,7 +139,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Create Account'),
+        title: const Text('สร้างบัญชี'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -156,7 +156,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   children: [
                     // Header
                     const Text(
-                      'Join Jobs4Dent',
+                      'เข้าร่วม Jobs4Dent',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -166,7 +166,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Create your account to get started',
+                      'สร้างบัญชีของคุณเพื่อเริ่มต้น',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
@@ -181,7 +181,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       controller: _nameController,
                       validator: _validateName,
                       decoration: InputDecoration(
-                        labelText: 'Full Name',
+                        labelText: 'ชื่อ-นามสกุล',
                         prefixIcon: const Icon(Icons.person),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -199,7 +199,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       validator: _validateEmail,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'Email Address',
+                        labelText: 'ที่อยู่อีเมล',
                         prefixIcon: const Icon(Icons.email),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -217,7 +217,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       validator: _validatePassword,
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: 'รหัสผ่าน',
                         prefixIcon: const Icon(Icons.lock),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -245,7 +245,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       validator: _validateConfirmPassword,
                       obscureText: _obscureConfirmPassword,
                       decoration: InputDecoration(
-                        labelText: 'Confirm Password',
+                        labelText: 'ยืนยันรหัสผ่าน',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -269,7 +269,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                     // User Type Selection
                     const Text(
-                      'Select Your Role',
+                      'เลือกบทบาทของคุณ',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -381,7 +381,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               });
                             },
                             child: const Text(
-                              'I agree to the Terms of Service and Privacy Policy',
+                              'ฉันยอมรับข้อกำหนดการใช้บริการและนโยบายความเป็นส่วนตัว',
                               style: TextStyle(fontSize: 14),
                             ),
                           ),
@@ -413,7 +413,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               ),
                             )
                           : const Text(
-                              'Create Account',
+                              'สร้างบัญชี',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -428,7 +428,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          'Already have an account? ',
+                          'มีบัญชีแล้ว? ',
                           style: TextStyle(color: Colors.grey),
                         ),
                         GestureDetector(
@@ -436,7 +436,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             Navigator.pop(context);
                           },
                           child: const Text(
-                            'Sign In',
+                            'เข้าสู่ระบบ',
                             style: TextStyle(
                               color: Color(0xFF2196F3),
                               fontWeight: FontWeight.w600,

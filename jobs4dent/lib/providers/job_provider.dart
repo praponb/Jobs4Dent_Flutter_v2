@@ -25,56 +25,57 @@ class JobProvider with ChangeNotifier {
 
   // Job Categories
   static const List<String> jobCategories = [
-    'General Dentist',
-    'Dental Hygienist',
-    'Dental Assistant',
-    'Orthodontic Assistant',
-    'Oral Surgery Assistant',
-    'Endodontic Assistant',
-    'Periodontic Assistant',
-    'Pediatric Dental Assistant',
-    'X-ray Technician',
-    'Dental Lab Technician',
-    'Receptionist',
-    'Office Manager',
-    'Treatment Coordinator',
-    'Insurance Coordinator',
-    'Sterilization Technician',
-  ];
-
-  // Job Types
-  static const List<String> jobTypes = [
-    'full-time',
-    'part-time',
-    'freelance',
-    'locum',
+    'ทันตแพทย์ทั่วไป GP',
+    'ทันตแพทย์จัดฟัน',
+    'ทันตแพทย์ฟันปลอม',
+    'ทันตแพทย์รักษารากฟัน',
+    'ทันตแพทย์เฉพาะทางรากเทียม',
+    'ทันตแพทย์เฉพาะทางศัลย์',
+    'ทันตแพทย์รักษาโรคเหงือก',
+    'ทันตแพทย์รักษาเด็ก',
+    'ทันตแพทย์แม็กซิลโลเฟเชียล',
+    'ทันตแพทย์ผ่าตัดขากรรไกร',
   ];
 
   // Experience Levels
   static const List<String> experienceLevels = [
-    'entry',
-    'mid',
-    'senior',
+    'ไม่มีประสบการณ์',
+    '6 เดือน - 12 เดือน',
+    '1 ปี',
+    '2 ปี',
+    '3 ปี',
+    '4 ปี',
+    '5 ปี',
+    '6 ปี',
+    '7 ปี',
+    '8 ปี',
+    '9 ปี',
+    '10 ปี',
+    '10 ปีขึ้นไป',
   ];
 
   // Salary Types
   static const List<String> salaryTypes = [
-    'monthly',
-    'daily',
-    'hourly',
-    'case-based',
+    '50:50',
+    '60:40',
+    '70:30',
+    '80:20',
+    '45:55',
+    '40:60',
+    '30:70',
   ];
+
 
   // Application Statuses
   static const List<String> applicationStatuses = [
-    'submitted',
-    'under_review',
-    'shortlisted',
-    'interview_scheduled',
-    'interview_completed',
-    'offered',
-    'hired',
-    'rejected',
+    'ส่งแล้ว',
+    'อยู่ระหว่างพิจารณา',
+    'ผ่านเข้ารอบ',
+    'นัดสัมภาษณ์แล้ว',
+    'สัมภาษณ์เสร็จสิ้น',
+    'ได้รับข้อเสนอ',
+    'รับเข้าทำงาน',
+    'ปฏิเสธ',
   ];
 
   void _setLoading(bool loading) {
@@ -101,7 +102,7 @@ class JobProvider with ChangeNotifier {
       
       return true;
     } catch (e) {
-      _setError('Failed to post job: $e');
+      _setError('การโพสต์งานไม่สำเร็จ: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -132,7 +133,7 @@ class JobProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _setError('Failed to update job: $e');
+      _setError('การอัปเดตงานไม่สำเร็จ: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -154,7 +155,7 @@ class JobProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _setError('Failed to delete job: $e');
+      _setError('การลบงานไม่สำเร็จ: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -166,13 +167,10 @@ class JobProvider with ChangeNotifier {
     String? keyword,
     String? province,
     String? city,
-    String? jobType,
     String? jobCategory,
     String? experienceLevel,
     double? minSalary,
     double? maxSalary,
-    List<String>? requiredSkills,
-    List<String>? requiredSpecialties,
     DateTime? startDate,
     DateTime? endDate,
     bool? isRemote,
@@ -183,53 +181,49 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
+      // Use a simple query that only requires a basic composite index
+      // This avoids the need for complex composite indexes for every filter combination
       Query query = _firestore.collection('jobPostings')
-          .where('isActive', isEqualTo: true);
-
-      // Apply filters
-      if (province != null && province.isNotEmpty) {
-        query = query.where('province', isEqualTo: province);
-      }
-      
-      if (city != null && city.isNotEmpty) {
-        query = query.where('city', isEqualTo: city);
-      }
-      
-      if (jobType != null && jobType.isNotEmpty) {
-        query = query.where('jobType', isEqualTo: jobType);
-      }
-      
-      if (jobCategory != null && jobCategory.isNotEmpty) {
-        query = query.where('jobCategory', isEqualTo: jobCategory);
-      }
-      
-      if (experienceLevel != null && experienceLevel.isNotEmpty) {
-        query = query.where('experienceLevel', isEqualTo: experienceLevel);
-      }
-      
-      if (isRemote != null) {
-        query = query.where('isRemote', isEqualTo: isRemote);
-      }
-      
-      if (isUrgent != null) {
-        query = query.where('isUrgent', isEqualTo: isUrgent);
-      }
-
-      final querySnapshot = await query
+          .where('isActive', isEqualTo: true)
           .orderBy('createdAt', descending: true)
-          .limit(50)
-          .get();
+          .limit(100); // Increase limit to ensure we have enough results after filtering
+
+      final querySnapshot = await query.get();
 
       _jobs = querySnapshot.docs
           .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
 
-      // Apply additional filters that can't be done in Firestore
+      // Apply all filters client-side to avoid composite index issues
       if (keyword != null && keyword.isNotEmpty) {
         _jobs = _jobs.where((job) =>
             job.title.toLowerCase().contains(keyword.toLowerCase()) ||
             job.description.toLowerCase().contains(keyword.toLowerCase()) ||
             job.clinicName.toLowerCase().contains(keyword.toLowerCase())).toList();
+      }
+
+      if (province != null && province.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.province == province).toList();
+      }
+      
+      if (city != null && city.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.city == city).toList();
+      }
+      
+      if (jobCategory != null && jobCategory.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.jobCategory == jobCategory).toList();
+      }
+      
+      if (experienceLevel != null && experienceLevel.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.experienceLevel == experienceLevel).toList();
+      }
+      
+      if (isRemote != null) {
+        _jobs = _jobs.where((job) => job.isRemote == isRemote).toList();
+      }
+      
+      if (isUrgent != null) {
+        _jobs = _jobs.where((job) => job.isUrgent == isUrgent).toList();
       }
 
       if (minSalary != null) {
@@ -240,15 +234,15 @@ class JobProvider with ChangeNotifier {
         _jobs = _jobs.where((job) => job.maxSalary != null && job.maxSalary! <= maxSalary).toList();
       }
 
-      if (requiredSkills != null && requiredSkills.isNotEmpty) {
-        _jobs = _jobs.where((job) =>
-            requiredSkills.any((skill) => job.requiredSkills.contains(skill))).toList();
-      }
+      // if (requiredSkills != null && requiredSkills.isNotEmpty) {
+      //   _jobs = _jobs.where((job) =>
+      //       requiredSkills.any((skill) => job.requiredSkills.contains(skill))).toList();
+      // }
 
-      if (requiredSpecialties != null && requiredSpecialties.isNotEmpty) {
-        _jobs = _jobs.where((job) =>
-            requiredSpecialties.any((specialty) => job.requiredSpecialties.contains(specialty))).toList();
-      }
+      // if (requiredSpecialties != null && requiredSpecialties.isNotEmpty) {
+      //   _jobs = _jobs.where((job) =>
+      //       requiredSpecialities.any((specialty) => job.requiredSpecialties.contains(specialty))).toList();
+      // }
 
       if (startDate != null) {
         _jobs = _jobs.where((job) =>
@@ -260,6 +254,11 @@ class JobProvider with ChangeNotifier {
             job.endDate == null || job.endDate!.isBefore(endDate) || job.endDate!.isAtSameMomentAs(endDate)).toList();
       }
 
+      // Limit results to 50 after filtering
+      if (_jobs.length > 50) {
+        _jobs = _jobs.take(50).toList();
+      }
+
       // Calculate matching scores if userId is provided
       if (userId != null) {
         await _calculateMatchingScores(userId);
@@ -267,7 +266,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to search jobs: $e');
+      _setError('การค้นหางานไม่สำเร็จ: $e');
     } finally {
       _setLoading(false);
     }
@@ -292,19 +291,7 @@ class JobProvider with ChangeNotifier {
         }
         factors++;
 
-        // Skills matching (25% weight)
-        if (user.skills != null && user.skills!.isNotEmpty && job.requiredSkills.isNotEmpty) {
-          final matchingSkills = user.skills!.where((skill) => job.requiredSkills.contains(skill)).length;
-          score += (matchingSkills / job.requiredSkills.length) * 25;
-        }
-        factors++;
 
-        // Specialties matching (25% weight)
-        if (user.specialties != null && user.specialties!.isNotEmpty && job.requiredSpecialties.isNotEmpty) {
-          final matchingSpecialties = user.specialties!.where((specialty) => job.requiredSpecialties.contains(specialty)).length;
-          score += (matchingSpecialties / job.requiredSpecialties.length) * 25;
-        }
-        factors++;
 
         // Experience matching (20% weight)
         if (job.minExperienceYears != null && user.yearsOfExperience != null) {
@@ -341,7 +328,7 @@ class JobProvider with ChangeNotifier {
       // Get job details
       final jobDoc = await _firestore.collection('jobPostings').doc(jobId).get();
       if (!jobDoc.exists) {
-        _setError('Job not found');
+        _setError('ไม่พบงาน');
         return false;
       }
 
@@ -350,7 +337,7 @@ class JobProvider with ChangeNotifier {
       // Get applicant details
       final userDoc = await _firestore.collection('users').doc(applicantId).get();
       if (!userDoc.exists) {
-        _setError('User not found');
+        _setError('ไม่พบผู้ใช้');
         return false;
       }
 
@@ -365,7 +352,7 @@ class JobProvider with ChangeNotifier {
           .get();
 
       if (existingApplication.docs.isNotEmpty) {
-        _setError('You have already applied to this job');
+        _setError('คุณได้สมัครงานนี้แล้ว');
         return false;
       }
 
@@ -401,7 +388,7 @@ class JobProvider with ChangeNotifier {
 
       return true;
     } catch (e) {
-      _setError('Failed to apply to job: $e');
+      _setError('การสมัครงานไม่สำเร็จ: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -426,7 +413,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to fetch posted jobs: $e');
+      _setError('การดึงงานที่โพสต์ไม่สำเร็จ: $e');
     } finally {
       _setLoading(false);
     }
@@ -450,7 +437,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to fetch applications: $e');
+      _setError('การดึงใบสมัครไม่สำเร็จ: $e');
     } finally {
       _setLoading(false);
     }
@@ -474,7 +461,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to fetch applicants: $e');
+      _setError('การดึงผู้สมัครไม่สำเร็จ: $e');
     } finally {
       _setLoading(false);
     }
@@ -518,7 +505,7 @@ class JobProvider with ChangeNotifier {
 
       return true;
     } catch (e) {
-      _setError('Failed to update application status: $e');
+      _setError('การอัปเดตสถานะใบสมัครไม่สำเร็จ: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -534,7 +521,7 @@ class JobProvider with ChangeNotifier {
       }
       return null;
     } catch (e) {
-      _setError('Failed to fetch job details: $e');
+      _setError('การดึงรายละเอียดงานไม่สำเร็จ: $e');
       return null;
     }
   }
@@ -570,7 +557,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to load applications: $e');
+      _setError('การโหลดใบสมัครไม่สำเร็จ: $e');
       debugPrint('Error loading user applications: $e');
     } finally {
       _setLoading(false);
@@ -598,7 +585,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to load posted jobs: $e');
+      _setError('การโหลดงานที่โพสต์ไม่สำเร็จ: $e');
       debugPrint('Error loading posted jobs: $e');
     } finally {
       _setLoading(false);
@@ -626,7 +613,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to load applicants: $e');
+      _setError('การโหลดผู้สมัครไม่สำเร็จ: $e');
       debugPrint('Error loading applicants: $e');
     } finally {
       _setLoading(false);
@@ -670,7 +657,7 @@ class JobProvider with ChangeNotifier {
 
       return true;
     } catch (e) {
-      _setError('Failed to submit application: $e');
+      _setError('การส่งใบสมัครไม่สำเร็จ: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -699,7 +686,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to load job applications: $e');
+      _setError('การโหลดใบสมัครงานไม่สำเร็จ: $e');
       debugPrint('Error loading job applications: $e');
     } finally {
       _setLoading(false);
@@ -728,7 +715,7 @@ class JobProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _setError('Failed to load user applications: $e');
+      _setError('การโหลดใบสมัครผู้ใช้ไม่สำเร็จ: $e');
       debugPrint('Error loading user applications: $e');
     } finally {
       _setLoading(false);
@@ -789,7 +776,7 @@ class JobProvider with ChangeNotifier {
 
       return true;
     } catch (e) {
-      _setError('Failed to update application status: $e');
+      _setError('การอัปเดตสถานะใบสมัครไม่สำเร็จ: $e');
       return false;
     } finally {
       _setLoading(false);

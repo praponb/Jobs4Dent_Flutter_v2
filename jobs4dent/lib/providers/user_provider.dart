@@ -31,7 +31,7 @@ class UserProvider with ChangeNotifier {
       notifyListeners();
       return _users;
     } catch (e) {
-      _error = 'Error fetching dentists: $e';
+      _error = 'การดึงข้อมูลทันตแพทย์ไม่สำเร็จ: $e';
       _isLoading = false;
       notifyListeners();
       return [];
@@ -56,7 +56,7 @@ class UserProvider with ChangeNotifier {
       notifyListeners();
       return _users;
     } catch (e) {
-      _error = 'Error fetching clinics: $e';
+      _error = 'การดึงข้อมูลคลินิกไม่สำเร็จ: $e';
       _isLoading = false;
       notifyListeners();
       return [];
@@ -75,7 +75,7 @@ class UserProvider with ChangeNotifier {
       }
       return null;
     } catch (e) {
-      _error = 'Error fetching user: $e';
+      _error = 'การดึงข้อมูลผู้ใช้ไม่สำเร็จ: $e';
       notifyListeners();
       return null;
     }

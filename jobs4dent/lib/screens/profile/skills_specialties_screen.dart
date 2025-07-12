@@ -17,54 +17,54 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
   List<String> _selectedCertifications = [];
 
   final List<String> _availableSkills = [
-    'Patient Care',
-    'Dental Procedures',
-    'X-ray Operation',
-    'Sterilization',
-    'Equipment Maintenance',
-    'Patient Education',
-    'Dental Software',
-    'Emergency Care',
-    'Pain Management',
-    'Infection Control',
-    'Dental Photography',
-    'Digital Impressions',
+    'การดูแลผู้ป่วย',
+    'หัตถการทันตกรรม',
+    'การถ่ายเอ็กซ์เรย์',
+    'การฆ่าเชื้อ',
+    'การบำรุงรักษาอุปกรณ์',
+    'การให้ความรู้ผู้ป่วย',
+    'ซอฟต์แวร์ทันตกรรม',
+    'การดูแลฉุกเฉิน',
+    'การจัดการอาการปวด',
+    'การควบคุมเชื้อ',
+    'การถ่ายภาพทันตกรรม',
+    'การพิมพ์ฟันดิจิทัล',
     'CAD/CAM',
-    'Laser Dentistry',
-    'Sedation Dentistry',
+    'ทันตกรรมเลเซอร์',
+    'ทันตกรรมใส่ยาสลบ',
   ];
 
   final List<String> _availableSpecialties = [
-    'General Dentistry',
-    'Orthodontics',
-    'Endodontics (Root Canals)',
-    'Periodontics (Gum Disease)',
-    'Oral Surgery',
-    'Prosthodontics',
-    'Pediatric Dentistry',
-    'Cosmetic Dentistry',
-    'Implant Dentistry',
-    'Oral Pathology',
-    'Oral and Maxillofacial Surgery',
-    'Restorative Dentistry',
-    'Preventive Dentistry',
-    'Emergency Dentistry',
-    'Geriatric Dentistry',
+    'ทันตกรรมทั่วไป',
+    'จัดฟัน',
+    'รักษารากฟัน',
+    'ปริทันตวิทยา (โรคเหงือก)',
+    'ศัลยกรรมช่องปาก',
+    'ประดิษฐทันต์',
+    'ทันตกรรมเด็ก',
+    'ทันตกรรมความงาม',
+    'ทันตกรรมรากเทียม',
+    'พยาธิวิทยาช่องปาก',
+    'ศัลยกรรมช่องปากและแม็กซิลโลเฟเชียล',
+    'ทันตกรรมบูรณะ',
+    'ทันตกรรมป้องกัน',
+    'ทันตกรรมฉุกเฉิน',
+    'ทันตกรรมผู้สูงอายุ',
   ];
 
   final List<String> _availableCertifications = [
-    'CPR Certified',
-    'Local Anesthesia Administration',
-    'Nitrous Oxide Administration',
-    'Expanded Function Dental Assistant (EFDA)',
-    'Registered Dental Assistant (RDA)',
-    'Certified Dental Assistant (CDA)',
-    'Radiation Safety',
-    'OSHA Compliance',
-    'Infection Control',
-    'Dental Hygienist License',
-    'Specialty Board Certification',
-    'Continuing Education Units (CEU)',
+    'ใบรับรองการช่วยชีวิต (CPR)',
+    'การฉีดยาชาเฉพาะที่',
+    'การให้แก๊สไนตรัสออกไซด์',
+    'ผู้ช่วยทันตแพทย์ขยายหน้าที่ (EFDA)',
+    'ผู้ช่วยทันตแพทย์จดทะเบียน (RDA)',
+    'ผู้ช่วยทันตแพทย์ได้รับการรับรอง (CDA)',
+    'ความปลอดภัยด้านรังสี',
+    'การปฏิบัติตาม OSHA',
+    'การควบคุมเชื้อ',
+    'ใบอนุญาตนักสุขอนามัยช่องปาก',
+    'ใบรับรองคณะกรรมการความเชี่ยวชาญ',
+    'หน่วยการศึกษาต่อเนื่อง (CEU)',
   ];
 
   @override
@@ -87,7 +87,7 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Skills & Specialties'),
+        title: const Text('ทักษะและความเชี่ยวชาญ'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -104,7 +104,7 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
                     ),
                   )
                 : const Text(
-                    'Save',
+                    'บันทึก',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -132,8 +132,8 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
 
   Widget _buildSkillsSection() {
     return _buildSectionCard(
-      title: 'Professional Skills',
-      subtitle: 'Select your professional skills and competencies',
+      title: 'ทักษะวิชาชีพ',
+      subtitle: 'เลือกทักษะและความสามารถวิชาชีพของคุณ',
       icon: Icons.psychology_outlined,
       children: [
         const SizedBox(height: 16),
@@ -160,8 +160,8 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
         const SizedBox(height: 16),
         _buildAddCustomButton(
           onPressed: () => _showAddCustomDialog(
-            title: 'Add Custom Skill',
-            hintText: 'Enter your custom skill',
+                            title: 'เพิ่มทักษะกำหนดเอง',
+                            hintText: 'ใส่ทักษะที่กำหนดเอง',
             onAdd: (skill) {
               setState(() {
                 if (!_selectedSkills.contains(skill)) {
@@ -178,8 +178,8 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
 
   Widget _buildSpecialtiesSection() {
     return _buildSectionCard(
-      title: 'Areas of Expertise',
-      subtitle: 'Select your dental specialties and areas of expertise',
+      title: 'ความเชี่ยวชาญ',
+      subtitle: 'เลือกความเชี่ยวชาญทางทันตกรรมและสาขาที่มีความเชี่ยวชาญ',
       icon: Icons.medical_services_outlined,
       children: [
         const SizedBox(height: 16),
@@ -206,8 +206,8 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
         const SizedBox(height: 16),
         _buildAddCustomButton(
           onPressed: () => _showAddCustomDialog(
-            title: 'Add Custom Specialty',
-            hintText: 'Enter your custom specialty',
+                            title: 'เพิ่มความเชี่ยวชาญกำหนดเอง',
+                            hintText: 'ใส่ความเชี่ยวชาญที่กำหนดเอง',
             onAdd: (specialty) {
               setState(() {
                 if (!_selectedSpecialties.contains(specialty)) {
@@ -224,8 +224,8 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
 
   Widget _buildCertificationsSection() {
     return _buildSectionCard(
-      title: 'Certifications & Licenses',
-      subtitle: 'Select your professional certifications and licenses',
+                    title: 'ใบรับรอง และใบอนุญาต',
+                  subtitle: 'เลือกใบรับรองและใบอนุญาตของคุณ',
       icon: Icons.verified_outlined,
       children: [
         const SizedBox(height: 16),
@@ -252,8 +252,8 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
         const SizedBox(height: 16),
         _buildAddCustomButton(
           onPressed: () => _showAddCustomDialog(
-            title: 'Add Custom Certification',
-            hintText: 'Enter your custom certification',
+                            title: 'เพิ่มใบรับรองกำหนดเอง',
+                            hintText: 'ใส่ใบรับรองที่กำหนดเอง',
             onAdd: (certification) {
               setState(() {
                 if (!_selectedCertifications.contains(certification)) {
@@ -404,7 +404,7 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Add Custom',
+              'เพิ่มกำหนดเอง',
               style: TextStyle(
                 color: const Color(0xFF2196F3),
                 fontWeight: FontWeight.w500,
@@ -440,7 +440,7 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+                          child: const Text('ยกเลิก'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -450,7 +450,7 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
                 Navigator.of(context).pop();
               }
             },
-            child: const Text('Add'),
+                          child: const Text('เพิ่ม'),
           ),
         ],
       ),
@@ -484,7 +484,7 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Skills and specialties updated successfully'),
+            content: Text('อัปเดตทักษะและความเชี่ยวชาญเรียบร้อยแล้ว'),
             backgroundColor: Colors.green,
           ),
         );
@@ -494,7 +494,7 @@ class _SkillsSpecialtiesScreenState extends State<SkillsSpecialtiesScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving data: $e')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกข้อมูล: $e')),
         );
       }
     } finally {

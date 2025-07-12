@@ -46,7 +46,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                     value: 'reschedule',
                     child: ListTile(
                       leading: Icon(Icons.schedule),
-                      title: Text('Reschedule'),
+                      title: Text('เลื่อนนัด'),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -55,7 +55,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                     value: 'cancel',
                     child: ListTile(
                       leading: Icon(Icons.cancel, color: Colors.red),
-                      title: Text('Cancel', style: TextStyle(color: Colors.red)),
+                      title: Text('ยกเลิก', style: TextStyle(color: Colors.red)),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -171,7 +171,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Details',
+              'รายละเอียด',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -181,7 +181,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
             const SizedBox(height: 16),
             _buildDetailRow(
               icon: Icons.access_time,
-              title: 'Date & Time',
+              title: 'วันที่และเวลา',
               content: DateFormat('EEEE, MMMM d, yyyy').format(_appointment.scheduledDateTime),
               subtitle: '${DateFormat('h:mm a').format(_appointment.scheduledDateTime)} - '
                        '${DateFormat('h:mm a').format(_appointment.scheduledDateTime.add(_appointment.duration))}',
@@ -189,21 +189,21 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
             const Divider(),
             _buildDetailRow(
               icon: Icons.schedule,
-              title: 'Duration',
+              title: 'ระยะเวลา',
               content: _formatDuration(_appointment.duration),
             ),
             const Divider(),
             _buildDetailRow(
               icon: _appointment.isVirtual ? Icons.videocam : Icons.location_on,
-              title: 'Location',
-              content: _appointment.isVirtual ? 'Virtual Meeting' : _appointment.location,
-              subtitle: _appointment.isVirtual ? 'Online video conference' : null,
+              title: 'สถานที่',
+              content: _appointment.isVirtual ? 'การประชุมออนไลน์' : _appointment.location,
+              subtitle: _appointment.isVirtual ? 'การประชุมทางวิดีโอออนไลน์' : null,
             ),
             if (_appointment.description.isNotEmpty) ...[
               const Divider(),
               _buildDetailRow(
                 icon: Icons.description,
-                title: 'Description',
+                title: 'คำอธิบาย',
                 content: _appointment.description,
               ),
             ],
@@ -211,7 +211,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
               const Divider(),
               _buildDetailRow(
                 icon: Icons.info_outline,
-                title: 'Cancellation Reason',
+                title: 'เหตุผลในการยกเลิก',
                 content: _appointment.cancellationReason!,
                 isError: true,
               ),
@@ -286,7 +286,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Participants',
+              'ผู้เข้าร่วม',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -300,7 +300,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                 child: Icon(Icons.business, color: Colors.white),
               ),
               title: Text(_appointment.clinicName),
-              subtitle: const Text('Clinic'),
+              subtitle: const Text('คลินิก'),
               contentPadding: EdgeInsets.zero,
             ),
             ListTile(
@@ -309,7 +309,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                 child: Icon(Icons.person, color: Colors.white),
               ),
               title: Text(_appointment.applicantName),
-              subtitle: const Text('Applicant'),
+              subtitle: const Text('ผู้สมัคร'),
               contentPadding: EdgeInsets.zero,
             ),
           ],
@@ -335,7 +335,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                 Icon(Icons.videocam, color: Color(0xFF1976D2)),
                 SizedBox(width: 8),
                 Text(
-                  'Virtual Meeting',
+                  'การประชุมออนไลน์',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -374,7 +374,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                   ElevatedButton.icon(
                     onPressed: () => _launchMeetingLink(),
                     icon: const Icon(Icons.launch),
-                    label: const Text('Join Meeting'),
+                    label: const Text('เข้าร่วมประชุม'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1976D2),
                       foregroundColor: Colors.white,
@@ -406,7 +406,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
               child: ElevatedButton.icon(
                 onPressed: () => _confirmAppointment(),
                 icon: const Icon(Icons.check_circle),
-                label: const Text('Confirm Appointment'),
+                                  label: const Text('ยืนยันนัดหมาย'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
@@ -423,7 +423,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => _rescheduleAppointment(),
                     icon: const Icon(Icons.schedule),
-                    label: const Text('Reschedule'),
+                    label: const Text('เลื่อนเวลา'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF1976D2),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -437,7 +437,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => _cancelAppointment(),
                     icon: const Icon(Icons.cancel),
-                    label: const Text('Cancel'),
+                    label: const Text('ยกเลิก'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -475,7 +475,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Appointment confirmed successfully'),
+            content: Text('ยืนยันนัดหมายเรียบร้อยแล้ว'),
             backgroundColor: Colors.green,
           ),
         );
@@ -485,7 +485,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(appointmentProvider.error ?? 'Failed to confirm appointment'),
+            content: Text(appointmentProvider.error ?? 'ยืนยันนัดหมายไม่สำเร็จ'),
             backgroundColor: Colors.red,
           ),
         );
@@ -497,12 +497,12 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reschedule Appointment'),
-        content: const Text('This feature will be available soon. You can contact the clinic directly to reschedule.'),
+        title: const Text('เลื่อนเวลานัดหมาย'),
+        content: const Text('ฟีเจอร์นี้จะพร้อมใช้งานเร็วๆ นี้ คุณสามารถติดต่อคลินิกโดยตรงเพื่อเลื่อนเวลา'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+                          child: const Text('ตกลง'),
           ),
         ],
       ),
@@ -513,12 +513,12 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cancel Appointment'),
-        content: const Text('Are you sure you want to cancel this appointment? This action cannot be undone.'),
+        title: const Text('ยกเลิกนัดหมาย'),
+        content: const Text('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกนัดหมายนี้? การกระทำนี้ไม่สามารถยกเลิกได้'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Keep'),
+                          child: const Text('เก็บไว้'),
           ),
           TextButton(
             onPressed: () {
@@ -526,7 +526,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
               _showCancellationReasonDialog();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Cancel Appointment'),
+            child: const Text('ยกเลิกนัดหมาย'),
           ),
         ],
       ),
@@ -539,27 +539,27 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cancellation Reason'),
+        title: const Text('เหตุผลการยกเลิก'),
         content: TextField(
           controller: reasonController,
           maxLines: 3,
           decoration: const InputDecoration(
-            hintText: 'Please provide a reason for cancellation...',
+            hintText: 'โปรดระบุเหตุผลในการยกเลิก...',
             border: OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Back'),
+            child: const Text('กลับ'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               _performCancellation(reasonController.text.trim());
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Cancel Appointment'),
+                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('ยกเลิกนัดหมาย'),
           ),
         ],
       ),
@@ -572,7 +572,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     final appointmentProvider = Provider.of<AppointmentProvider>(context, listen: false);
     final success = await appointmentProvider.cancelAppointment(
       _appointment.appointmentId,
-      reason.isEmpty ? 'No reason provided' : reason,
+      reason.isEmpty ? 'ไม่ได้ระบุเหตุผล' : reason,
     );
     
     setState(() => _isLoading = false);
@@ -581,7 +581,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Appointment cancelled successfully'),
+            content: Text('ยกเลิกนัดหมายเรียบร้อยแล้ว'),
             backgroundColor: Colors.orange,
           ),
         );
@@ -591,7 +591,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(appointmentProvider.error ?? 'Failed to cancel appointment'),
+            content: Text(appointmentProvider.error ?? 'ยกเลิกนัดหมายไม่สำเร็จ'),
             backgroundColor: Colors.red,
           ),
         );
@@ -609,7 +609,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Could not open meeting link'),
+            content: Text('ไม่สามารถเปิดลิงก์การประชุมได้'),
             backgroundColor: Colors.red,
           ),
         );

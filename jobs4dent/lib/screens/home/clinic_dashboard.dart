@@ -44,7 +44,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Clinic Dashboard'),
+        title: const Text('แดชบอร์ดคลินิก'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -52,7 +52,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              // TODO: Navigate to notifications
+              // Note: Notifications feature pending implementation
             },
           ),
           IconButton(
@@ -120,7 +120,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           );
         },
         icon: const Icon(Icons.add),
-        label: const Text('Post Job'),
+        label: const Text('ประกาศงาน'),
         backgroundColor: const Color(0xFF2196F3),
       ),
     );
@@ -164,7 +164,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user.clinicName ?? 'Your Clinic',
+                      user.clinicName ?? 'คลินิกของคุณ',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      user.userType == 'clinic' ? 'Main Clinic' : 'Clinic Branch',
+                      user.userType == 'clinic' ? 'คลินิกหลัก' : 'สาขาคลินิก',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white70,
@@ -186,7 +186,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           ),
           const SizedBox(height: 16),
           Text(
-            user.address ?? 'Manage your clinic and find the best dental professionals',
+            user.address ?? 'จัดการคลินิกของคุณและค้นหาผู้เชี่ยวชาญทันตกรรมที่ดีที่สุด',
             style: const TextStyle(
               fontSize: 14,
               color: Colors.white,
@@ -195,7 +195,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           if (user.branches?.isNotEmpty == true) ...[
             const SizedBox(height: 12),
             Text(
-              '${user.branches!.length} Branch${user.branches!.length > 1 ? 'es' : ''}',
+              '${user.branches!.length} สาขา',
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
@@ -222,7 +222,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Key Metrics',
+          'ตัวชี้วัดหลัก',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -234,21 +234,21 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           children: [
             Expanded(
               child: _buildMetricCard(
-                title: 'Active Jobs',
+                title: 'งานที่เปิดรับ',
                 value: activeJobs.toString(),
                 icon: Icons.work,
                 color: Colors.green,
-                subtitle: 'Currently hiring',
+                subtitle: 'กำลังรับสมัคร',
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildMetricCard(
-                title: 'Applications',
+                title: 'ใบสมัคร',
                 value: totalApplications.toString(),
                 icon: Icons.people,
                 color: Colors.orange,
-                subtitle: 'Total received',
+                subtitle: 'รวมที่ได้รับ',
               ),
             ),
           ],
@@ -258,21 +258,21 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           children: [
             Expanded(
               child: _buildMetricCard(
-                title: 'Filled',
+                title: 'จ้างงานแล้ว',
                 value: filledJobs.toString(),
                 icon: Icons.check_circle,
                 color: Colors.blue,
-                subtitle: 'Successfully hired',
+                subtitle: 'จ้างงานสำเร็จ',
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildMetricCard(
-                title: 'Expired',
+                title: 'หมดอายุ',
                 value: expiredJobs.toString(),
                 icon: Icons.schedule,
                 color: Colors.red,
-                subtitle: 'Past deadline',
+                subtitle: 'เลยกำหนด',
               ),
             ),
           ],
@@ -345,7 +345,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Quick Actions',
+          'การดำเนินการด่วน',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -357,8 +357,8 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'Post New Job',
-                subtitle: 'Find dental professionals',
+                title: 'ประกาศงานใหม่',
+                subtitle: 'หาผู้เชี่ยวชาญทันตกรรม',
                 icon: Icons.add_circle,
                 color: const Color(0xFF2196F3),
                 onTap: () {
@@ -372,8 +372,8 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'View Applications',
-                subtitle: 'Review candidates',
+                title: 'ดูใบสมัคร',
+                subtitle: 'ตรวจสอบผู้สมัคร',
                 icon: Icons.inbox,
                 color: Colors.teal,
                 onTap: () {
@@ -391,7 +391,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'Manage Branches',
+                title: 'จัดการสาขา',
                 subtitle: 'Sub-users & permissions',
                 icon: Icons.account_tree,
                 color: Colors.purple,
@@ -406,8 +406,8 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'Marketplace',
-                subtitle: 'Buy/sell products',
+                title: 'ตลาดซื้อขาย',
+                subtitle: 'ซื้อ/ขายสินค้า',
                 icon: Icons.store,
                 color: Colors.green,
                 onTap: () {
@@ -493,19 +493,22 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Job Posting Performance',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              Expanded(
+                child: Text(
+                  'ประสิทธิภาพการประกาศงาน',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               TextButton(
                 onPressed: () {
                   _showDetailedAnalytics();
                 },
-                child: const Text('View Details'),
+                child: const Text('ดูรายละเอียด'),
               ),
             ],
           ),
@@ -537,8 +540,8 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                if (value.toInt() < months.length) {
+                const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                if (value.toInt() >= 0 && value.toInt() < months.length) {
                   return Text(months[value.toInt()]);
                 }
                 return const Text('');
@@ -558,7 +561,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
         borderData: FlBorderData(show: false),
         lineBarsData: [
           LineChartBarData(
-            spots: List.generate(6, (index) {
+            spots: List.generate(12, (index) {
               return FlSpot(
                 index.toDouble(),
                 (monthlyApplications[index + 1] ?? 0).toDouble(),
@@ -590,19 +593,22 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Active Job Postings',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Expanded(
+              child: Text(
+                'ประกาศงานที่เปิดอยู่',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             TextButton(
               onPressed: () {
                 // Navigate to full jobs list
               },
-              child: const Text('View All'),
+              child: const Text('ดูทั้งหมด'),
             ),
           ],
         ),
@@ -621,7 +627,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 const Icon(Icons.work_off, size: 48, color: Colors.grey),
                 const SizedBox(height: 12),
                 const Text(
-                  'No active job postings',
+                  'ไม่มีประกาศงานที่เปิดอยู่',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -630,7 +636,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Create your first job posting to start hiring',
+                  'สร้างประกาศงานแรกของคุณเพื่อเริ่มต้นการจ้างงาน',
                   style: TextStyle(color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
@@ -644,7 +650,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                       ),
                     );
                   },
-                  child: const Text('Post Job'),
+                  child: const Text('ประกาศหางาน'),
                 ),
               ],
             ),
@@ -692,7 +698,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${job.jobType} • ${job.jobCategory}',
+                      job.jobCategory,
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ],
@@ -705,7 +711,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  job.isUrgent ? 'Urgent' : 'Active',
+                  job.isUrgent ? 'เร่งด่วน' : 'เปิดใช้งาน',
                   style: TextStyle(
                     fontSize: 12,
                     color: job.isUrgent ? Colors.red[700] : Colors.green[700],
@@ -728,7 +734,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
               Icon(Icons.people, size: 16, color: Colors.grey[600]),
               const SizedBox(width: 4),
               Text(
-                '${applications.length} applications',
+                '${applications.length} ใบสมัคร',
                 style: const TextStyle(color: Colors.grey),
               ),
             ],
@@ -740,7 +746,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 Icon(Icons.schedule, size: 16, color: Colors.orange[600]),
                 const SizedBox(width: 4),
                 Text(
-                  'Deadline: ${_dateFormat.format(job.deadline!)}',
+                  'กำหนดส่ง: ${_dateFormat.format(job.deadline!)}',
                   style: TextStyle(
                     color: Colors.orange[600],
                     fontSize: 12,
@@ -768,12 +774,15 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Recent Applications',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Expanded(
+              child: Text(
+                'ใบสมัครล่าสุด',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             TextButton(
@@ -785,7 +794,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                   ),
                 );
               },
-              child: const Text('View All'),
+              child: const Text('ดูทั้งหมด'),
             ),
           ],
         ),
@@ -804,7 +813,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 Icon(Icons.inbox, size: 48, color: Colors.grey),
                 SizedBox(height: 12),
                 Text(
-                  'No recent applications',
+                  'ไม่มีใบสมัครล่าสุด',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -813,7 +822,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Applications will appear here when candidates apply',
+                  'ใบสมัครจะแสดงที่นี่เมื่อมีผู้สมัคร',
                   style: TextStyle(color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
@@ -863,7 +872,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Applied ${_getTimeAgo(application.appliedAt)}',
+                  'สมัครเมื่อ ${_getTimeAgo(application.appliedAt)}',
                   style: const TextStyle(
                     color: Colors.grey,
                     fontSize: 12,
@@ -901,12 +910,15 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Branch Management',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Expanded(
+              child: Text(
+                'การจัดการสาขา',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             TextButton(
@@ -918,7 +930,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                   ),
                 );
               },
-              child: const Text('Manage'),
+              child: const Text('จัดการ'),
             ),
           ],
         ),
@@ -949,8 +961,8 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                         ),
                         Text(
                           branches.isEmpty 
-                              ? 'No branches configured'
-                              : '${branches.length} branch${branches.length > 1 ? 'es' : ''} active',
+                              ? 'ยังไม่ได้ตั้งค่าสาขา'
+                              : '${branches.length} สาขาเปิดใช้งาน',
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ],
@@ -977,7 +989,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      '+${branches.length - 3} more branches',
+                      '+${branches.length - 3} สาขาอื่นๆ',
                       style: const TextStyle(
                         color: Colors.blue,
                         fontSize: 12,
@@ -1001,7 +1013,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              branch['name'] ?? 'Branch',
+              branch['name'] ?? 'สาขา',
               style: const TextStyle(fontSize: 14),
             ),
           ),
@@ -1012,7 +1024,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'Active',
+              'เปิดใช้งาน',
               style: TextStyle(
                 fontSize: 10,
                 color: Colors.green[700],
@@ -1028,24 +1040,24 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Detailed Analytics'),
+        title: const Text('รายงานวิเคราะห์โดยละเอียด'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Detailed analytics functionality will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features to include:'),
-            Text('• Monthly application trends'),
-            Text('• Job category performance'),
-            Text('• Hiring success rates'),
-            Text('• Time-to-fill metrics'),
-            Text('• Candidate source analysis'),
+                    Text('ฟังก์ชันการวิเคราะห์แบบละเอียดจะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์ที่จะรวม:'),
+                    Text('• แนวโน้มการสมัครงานรายเดือน'),
+        Text('• ประสิทธิภาพตามหมวดหมู่งาน'),
+        Text('• อัตราการจ้างงานที่สำเร็จ'),
+        Text('• ตัวชี้วัดเวลาในการจ้างงาน'),
+        Text('• การวิเคราะห์แหล่งที่มาของผู้สมัคร'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -1074,35 +1086,35 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
   String _getStatusDisplayName(String status) {
     switch (status) {
       case 'submitted':
-        return 'New';
+        return 'ใหม่';
       case 'under_review':
-        return 'Reviewing';
+        return 'กำลังพิจารณา';
       case 'interview_scheduled':
-        return 'Interview';
+        return 'นัดสัมภาษณ์';
       case 'offer_made':
-        return 'Offer Made';
+        return 'ให้ข้อเสนอแล้ว';
       case 'hired':
-        return 'Hired';
+        return 'จ้างแล้ว';
       case 'rejected':
-        return 'Rejected';
+        return 'ปฏิเสธ';
       default:
-        return 'Unknown';
+        return 'ไม่ทราบ';
     }
   }
 
-  String _getTimeAgo(DateTime dateTime) {
+    String _getTimeAgo(DateTime dateTime) {
     final difference = DateTime.now().difference(dateTime);
     
     if (difference.inDays > 7) {
       return _dateFormat.format(dateTime);
     } else if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
+      return '${difference.inDays} วันที่แล้ว';
     } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
+      return '${difference.inHours} ชั่วโมงที่แล้ว';
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
+      return '${difference.inMinutes} นาทีที่แล้ว';
     } else {
-      return 'Just now';
+      return 'เมื่อสักครู่';
     }
   }
 } 

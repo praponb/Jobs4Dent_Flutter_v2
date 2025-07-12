@@ -37,7 +37,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('My Products'),
+        title: const Text('สินค้าของฉัน'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -99,7 +99,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No products listed yet',
+            'ยังไม่มีสินค้าที่ลงขาย',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -108,7 +108,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Start selling by listing your first product',
+            'เริ่มขายโดยลงขายสินค้าแรกของคุณ',
             style: TextStyle(
               color: Colors.grey[500],
             ),
@@ -124,7 +124,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               );
             },
             icon: Icon(MdiIcons.plus),
-            label: const Text('List Product'),
+            label: const Text('ลงขายสินค้า'),
           ),
         ],
       ),
@@ -211,8 +211,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                           context,
                           MaterialPageRoute(
                                                     builder: (context) => Scaffold(
-                          appBar: AppBar(title: Text('Product Detail')),
-                          body: Center(child: Text('Product detail view coming soon!')),
+                                appBar: AppBar(title: Text('รายละเอียดสินค้า')),
+      body: Center(child: Text('หน้ารายละเอียดสินค้า เร็วๆ นี้!')),
                         ),
                           ),
                         );
@@ -239,7 +239,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         children: [
                           Icon(Icons.visibility),
                           SizedBox(width: 8),
-                          Text('View'),
+                          Text('ดู'),
                         ],
                       ),
                     ),
@@ -249,7 +249,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         children: [
                           Icon(Icons.edit),
                           SizedBox(width: 8),
-                          Text('Edit'),
+                          Text('แก้ไข'),
                         ],
                       ),
                     ),
@@ -259,7 +259,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         children: [
                           Icon(Icons.delete, color: Colors.red),
                           SizedBox(width: 8),
-                          Text('Delete', style: TextStyle(color: Colors.red)),
+                          Text('ลบ', style: TextStyle(color: Colors.red)),
                         ],
                       ),
                     ),
@@ -271,8 +271,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             Row(
               children: [
                 _buildStatusChip(
-                  product.isActive ? 'Active' : 'Inactive',
-                  product.isActive ? Colors.green : Colors.red,
+                              product.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
+            product.isActive ? Colors.green : Colors.red,
                 ),
                 const SizedBox(width: 8),
                 _buildStatusChip(
@@ -281,7 +281,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                 ),
                 const Spacer(),
                 Text(
-                  '${product.viewCount} views',
+                  '${product.viewCount} ครั้งชม',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -289,7 +289,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${product.inquiryCount} inquiries',
+                  '${product.inquiryCount} สอบถาม',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -325,12 +325,12 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Product'),
-        content: Text('Are you sure you want to delete "${product.name}"?'),
+        title: const Text('ลบสินค้า'),
+        content: Text('คุณแน่ใจหรือไม่ว่าต้องการลบ "${product.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+                          child: const Text('ยกเลิก'),
           ),
           TextButton(
             onPressed: () async {
@@ -344,20 +344,20 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               if (success) {
                 scaffoldMessenger.showSnackBar(
                   const SnackBar(
-                    content: Text('Product deleted successfully'),
+                    content: Text('ลบสินค้าเรียบร้อยแล้ว'),
                     backgroundColor: Colors.green,
                   ),
                 );
               } else {
                 scaffoldMessenger.showSnackBar(
                   const SnackBar(
-                    content: Text('Failed to delete product'),
+                    content: Text('ลบสินค้าไม่สำเร็จ'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('ลบ', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

@@ -40,7 +40,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Seller Dashboard'),
+        title: const Text('แดชบอร์ดผู้ขาย'),
         backgroundColor: const Color(0xFF4CAF50),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -116,7 +116,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
           );
         },
         icon: const Icon(Icons.add),
-        label: const Text('Add Product'),
+        label: const Text('เพิ่มสินค้า'),
         backgroundColor: const Color(0xFF4CAF50),
       ),
     );
@@ -164,7 +164,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome, ${user.userName}!',
+                      'ยินดีต้อนรับ, ${user.userName}!',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     ),
                     const SizedBox(height: 4),
                     const Text(
-                      'Marketplace Seller',
+                      'ผู้ขายในตลาด',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.white70,
@@ -186,7 +186,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Manage your dental products and track sales performance',
+            'จัดการผลิตภัณฑ์ทันตกรรมของคุณและติดตามผลการขาย',
             style: TextStyle(
               fontSize: 14,
               color: Colors.white,
@@ -208,7 +208,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Sales Overview',
+          'ภาพรวมการขาย',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -220,9 +220,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
           children: [
             Expanded(
               child: _buildSalesCard(
-                title: 'Products',
+                title: 'สินค้า',
                 value: totalProducts.toString(),
-                subtitle: '$activeProducts active',
+                subtitle: '$activeProducts เปิดใช้งาน',
                 icon: Icons.inventory,
                 color: Colors.blue,
               ),
@@ -230,9 +230,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildSalesCard(
-                title: 'Views',
+                title: 'ครั้งชม',
                 value: _numberFormat.format(totalViews),
-                subtitle: 'Total views',
+                subtitle: 'ยอดดูทั้งหมด',
                 icon: Icons.visibility,
                 color: Colors.orange,
               ),
@@ -244,9 +244,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
           children: [
             Expanded(
               child: _buildSalesCard(
-                title: 'Inquiries',
+                title: 'สอบถาม',
                 value: totalInquiries.toString(),
-                subtitle: 'Customer inquiries',
+                subtitle: 'คำถามจากลูกค้า',
                 icon: Icons.question_answer,
                 color: Colors.green,
               ),
@@ -254,9 +254,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildSalesCard(
-                title: 'Orders',
+                title: 'คำสั่งซื้อ',
                 value: '12',
-                subtitle: 'This month',
+                subtitle: 'เดือนนี้',
                 icon: Icons.shopping_cart,
                 color: Colors.purple,
               ),
@@ -331,7 +331,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Quick Actions',
+          'การดำเนินการด่วน',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -343,8 +343,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'Add Product',
-                subtitle: 'List new item',
+                title: 'เพิ่มสินค้า',
+                subtitle: 'ลงรายการใหม่',
                 icon: Icons.add_box,
                 color: const Color(0xFF4CAF50),
                 onTap: () {
@@ -358,8 +358,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'My Products',
-                subtitle: 'Manage inventory',
+                title: 'สินค้าของฉัน',
+                subtitle: 'จัดการสินค้าคงคลัง',
                 icon: Icons.inventory_2,
                 color: Colors.blue,
                 onTap: () {
@@ -377,8 +377,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'Orders',
-                subtitle: 'Manage orders',
+                title: 'คำสั่งซื้อ',
+                subtitle: 'จัดการคำสั่งซื้อ',
                 icon: Icons.receipt_long,
                 color: Colors.orange,
                 onTap: () {
@@ -389,8 +389,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'Analytics',
-                subtitle: 'View reports',
+                title: 'รายงาน',
+                subtitle: 'ดูรายงาน',
                 icon: Icons.analytics,
                 color: Colors.purple,
                 onTap: () {
@@ -474,17 +474,20 @@ class _SellerDashboardState extends State<SellerDashboard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Sales Performance',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              Expanded(
+                child: Text(
+                  'ประสิทธิภาพการขาย',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               TextButton(
                 onPressed: () => _showDetailedAnalytics(),
-                child: const Text('View Details'),
+                child: const Text('ดูรายละเอียด'),
               ),
             ],
           ),
@@ -499,8 +502,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                        if (value.toInt() < months.length) {
+                        const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                        if (value.toInt() >= 0 && value.toInt() < months.length) {
                           return Text(months[value.toInt()]);
                         }
                         return const Text('');
@@ -521,12 +524,18 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 lineBarsData: [
                   LineChartBarData(
                     spots: const [
-                      FlSpot(0, 1500),
-                      FlSpot(1, 2300),
-                      FlSpot(2, 1800),
-                      FlSpot(3, 2800),
-                      FlSpot(4, 3200),
-                      FlSpot(5, 2900),
+                      FlSpot(0, 1500),  // ม.ค.
+                      FlSpot(1, 2300),  // ก.พ.
+                      FlSpot(2, 1800),  // มี.ค.
+                      FlSpot(3, 2800),  // เม.ย.
+                      FlSpot(4, 3200),  // พ.ค.
+                      FlSpot(5, 2900),  // มิ.ย.
+                      FlSpot(6, 3500),  // ก.ค.
+                      FlSpot(7, 3100),  // ส.ค.
+                      FlSpot(8, 2700),  // ก.ย.
+                      FlSpot(9, 3300),  // ต.ค.
+                      FlSpot(10, 2800), // พ.ย.
+                      FlSpot(11, 3000), // ธ.ค.
                     ],
                     isCurved: true,
                     color: const Color(0xFF4CAF50),
@@ -558,12 +567,15 @@ class _SellerDashboardState extends State<SellerDashboard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Product Performance',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Expanded(
+              child: Text(
+                'ประสิทธิภาพสินค้า',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             TextButton(
@@ -573,7 +585,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   MaterialPageRoute(builder: (context) => const MyProductsScreen()),
                 );
               },
-              child: const Text('View All'),
+              child: const Text('ดูทั้งหมด'),
             ),
           ],
         ),
@@ -592,7 +604,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 const Icon(Icons.inventory, size: 48, color: Colors.grey),
                 const SizedBox(height: 12),
                 const Text(
-                  'No products listed yet',
+                  'ยังไม่มีสินค้าที่ลงขาย',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -601,7 +613,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Start by adding your first product to the marketplace',
+                  'เริ่มต้นด้วยการเพิ่มสินค้าแรกของคุณใน marketplace',
                   style: TextStyle(color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
@@ -615,7 +627,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                       ),
                     );
                   },
-                  child: const Text('Add Product'),
+                  child: const Text('เพิ่มสินค้า'),
                 ),
               ],
             ),
@@ -695,7 +707,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      '${product.viewCount} views',
+                      '${product.viewCount} ครั้งชม',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.grey,
@@ -705,7 +717,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     Icon(Icons.question_answer, size: 14, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      '${product.inquiryCount} inquiries',
+                      '${product.inquiryCount} สอบถาม',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.grey,
@@ -723,7 +735,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              product.isActive ? 'Active' : 'Inactive',
+                                product.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
               style: TextStyle(
                 fontSize: 12,
                 color: product.isActive ? Colors.green[700] : Colors.red[700],
@@ -741,7 +753,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Top Performing Categories',
+                          'หมวดหมู่ขายดี',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -764,13 +776,13 @@ class _SellerDashboardState extends State<SellerDashboard> {
           ),
           child: Column(
             children: [
-              _buildCategoryRow('Dental Instruments', '45%', Colors.blue),
+              _buildCategoryRow('เครื่องมือทันตกรรม', '45%', Colors.blue),
               const Divider(),
-              _buildCategoryRow('Disposables', '25%', Colors.green),
+                              _buildCategoryRow('วัสดุใช้แล้วทิ้ง', '25%', Colors.green),
               const Divider(),
-              _buildCategoryRow('Equipment', '20%', Colors.orange),
+                              _buildCategoryRow('เครื่องมือ', '20%', Colors.orange),
               const Divider(),
-              _buildCategoryRow('Materials', '10%', Colors.purple),
+                              _buildCategoryRow('วัสดุ', '10%', Colors.purple),
             ],
           ),
         ),
@@ -816,9 +828,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
 
   Widget _buildRecentOrders() {
     final orders = [
-      {'id': 'ORD-001', 'product': 'Dental Forceps Set', 'amount': '₿1,250', 'status': 'Shipped', 'date': '2 days ago'},
-      {'id': 'ORD-002', 'product': 'X-Ray Film', 'amount': '₿850', 'status': 'Processing', 'date': '3 days ago'},
-      {'id': 'ORD-003', 'product': 'Dental Burs Kit', 'amount': '₿420', 'status': 'Delivered', 'date': '5 days ago'},
+      {'id': 'ORD-001', 'product': 'ชุดคีมทันตกรรม', 'amount': '₿1,250', 'status': 'จัดส่งแล้ว', 'date': '2 วันที่แล้ว'},
+      {'id': 'ORD-002', 'product': 'ฟิล์มเอกซเรย์', 'amount': '₿850', 'status': 'กำลังดำเนินการ', 'date': '3 วันที่แล้ว'},
+      {'id': 'ORD-003', 'product': 'ชุดดอกสว่านทันตกรรม', 'amount': '₿420', 'status': 'ส่งถึงแล้ว', 'date': '5 วันที่แล้ว'},
     ];
 
     return Column(
@@ -828,7 +840,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Recent Orders',
+              'คำสั่งซื้อล่าสุด',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -837,7 +849,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
             ),
             TextButton(
               onPressed: () => _showOrderManagement(),
-              child: const Text('View All'),
+              child: const Text('ดูทั้งหมด'),
             ),
           ],
         ),
@@ -866,13 +878,13 @@ class _SellerDashboardState extends State<SellerDashboard> {
   Widget _buildOrderItem(Map<String, dynamic> order) {
     Color statusColor;
     switch (order['status']) {
-      case 'Shipped':
+      case 'จัดส่งแล้ว':
         statusColor = Colors.blue;
         break;
-      case 'Processing':
+      case 'กำลังดำเนินการ':
         statusColor = Colors.orange;
         break;
-      case 'Delivered':
+      case 'ส่งถึงแล้ว':
         statusColor = Colors.green;
         break;
       default:
@@ -943,28 +955,28 @@ class _SellerDashboardState extends State<SellerDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Order Notifications'),
+        title: const Text('แจ้งเตือนคำสั่งซื้อ'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('You have 3 new orders!'),
+            Text('คุณมีคำสั่งซื้อใหม่ 3 รายการ!'),
             SizedBox(height: 16),
-            Text('• Dental Forceps Set - ₿1,250'),
-            Text('• X-Ray Film Pack - ₿850'),
-            Text('• Sterilization Kit - ₿620'),
+            Text('• ชุดคีมทันตกรรม - ₿1,250'),
+            Text('• ชุดฟิล์มเอกซเรย์ - ₿850'),
+            Text('• ชุดฆ่าเชื้อ - ₿620'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               _showOrderManagement();
             },
-            child: const Text('View Orders'),
+            child: const Text('ดูคำสั่งซื้อ'),
           ),
         ],
       ),
@@ -975,24 +987,24 @@ class _SellerDashboardState extends State<SellerDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Order Management'),
+        title: const Text('จัดการคำสั่งซื้อ'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Order management functionality will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features to include:'),
-            Text('• View all orders'),
-            Text('• Update order status'),
-            Text('• Shipping management'),
-            Text('• Customer communication'),
-            Text('• Order analytics'),
+                    Text('ฟังก์ชันการจัดการคำสั่งซื้อจะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์ที่จะรวม:'),
+            Text('• ดูคำสั่งซื้อทั้งหมด'),
+            Text('• อัปเดตสถานะคำสั่งซื้อ'),
+            Text('• การจัดการจัดส่ง'),
+            Text('• การสื่อสารกับลูกค้า'),
+            Text('• การวิเคราะห์คำสั่งซื้อ'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -1003,24 +1015,24 @@ class _SellerDashboardState extends State<SellerDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Detailed Analytics'),
+        title: const Text('รายงานวิเคราะห์โดยละเอียด'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Advanced seller analytics will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features:'),
-            Text('• Sales trends'),
-            Text('• Product performance'),
-            Text('• Customer insights'),
-            Text('• Revenue forecasting'),
-            Text('• Market analysis'),
+                    Text('การวิเคราะห์ขั้นสูงสำหรับผู้ขายจะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์:'),
+            Text('• แนวโน้มการขาย'),
+            Text('• ประสิทธิภาพของสินค้า'),
+            Text('• ข้อมูลเชิงลึกของลูกค้า'),
+            Text('• การพยากรณ์รายได้'),
+            Text('• การวิเคราะห์ตลาด'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),

@@ -16,29 +16,29 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
   final List<Map<String, dynamic>> userTypes = [
     {
       'type': 'dentist',
-      'title': 'Dentist',
-      'description': 'Licensed dental professional seeking opportunities',
+      'title': 'ทันตแพทย์',
+      'description': 'ผู้เชี่ยวชาญทันตกรรมที่ได้รับใบอนุญาตแล้ว',
       'icon': Icons.medical_services,
       'isDentist': true,
     },
     {
       'type': 'assistant',
-      'title': 'Dental Assistant',
-      'description': 'Dental assistant looking for job opportunities',
+      'title': 'ผู้ช่วยทันตแพทย์',
+      'description': 'ผู้ช่วยทันตแพทย์ที่กำลังมองหางาน',
       'icon': Icons.medical_information,
       'isDentist': true,
     },
     {
       'type': 'clinic',
-      'title': 'Clinic Owner',
-      'description': 'Dental clinic looking to hire professionals',
+      'title': 'เจ้าของคลินิก',
+      'description': 'คลินิกทันตกรรมที่กำลังมองหาบุคลากร',
       'icon': Icons.business,
       'isDentist': false,
     },
     {
       'type': 'seller',
-      'title': 'Equipment Seller',
-      'description': 'Seller of dental equipment and supplies',
+      'title': 'ผู้ขายอุปกรณ์',
+      'description': 'ผู้ขายอุปกรณ์และเวชภัณฑ์ทันตกรรม',
       'icon': Icons.store,
       'isDentist': false,
     },
@@ -49,7 +49,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Select Your Role'),
+        title: const Text('เลือกบทบาทของคุณ'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
       ),
@@ -63,7 +63,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
               
               // Header
               const Text(
-                'What best describes you?',
+                'อะไรที่อธิบายคุณได้ดีที่สุด?',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -73,7 +73,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Select your role to customize your experience',
+                'เลือกบทบาทของคุณเพื่อปรับแต่งประสบการณ์ของคุณ',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
@@ -208,7 +208,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                       elevation: 2,
                     ),
                     child: const Text(
-                      'Continue',
+                      'ดำเนินการต่อ',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

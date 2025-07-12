@@ -50,13 +50,13 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Applications'),
+        title: const Text('การสมัครของฉัน'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'All'),
-            Tab(text: 'Active'),
-            Tab(text: 'Completed'),
+            Tab(text: 'ทั้งหมด'),
+            Tab(text: 'กำลังดำเนินการ'),
+            Tab(text: 'เสร็จสิ้น'),
           ],
         ),
       ),
@@ -86,7 +86,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                 Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
                 const SizedBox(height: 16),
                 Text(
-                  'Error loading applications',
+                  'เกิดข้อผิดพลาดในการโหลดการสมัคร',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
@@ -94,7 +94,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _loadApplications,
-                  child: const Text('Retry'),
+                  child: const Text('ลองใหม่'),
                 ),
               ],
             ),
@@ -119,18 +119,18 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                 const SizedBox(height: 16),
                 Text(
                   statusFilter == null 
-                      ? 'No applications yet'
-                      : 'No $statusFilter applications',
+                      ? 'ยังไม่มีการสมัคร'
+                      : 'ไม่มีการสมัคร$statusFilter',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                const Text('Start applying for jobs to see them here'),
+                const Text('เริ่มสมัครงานเพื่อดูรายการที่นี่'),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/job-search');
                   },
-                  child: const Text('Find Jobs'),
+                  child: const Text('ค้นหางาน'),
                 ),
               ],
             ),
@@ -171,14 +171,14 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                       children: [
                         // Note: In a real app, you'd fetch job details by jobId
                         Text(
-                          'Job Application', // Placeholder - would be actual job title
+                          'การสมัครงาน', // Placeholder - would be actual job title
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Applied to ${application.clinicId}', // Placeholder - would be clinic name
+                          'สมัครไปที่ ${application.clinicId}', // Placeholder - would be clinic name
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.blue[700],
                           ),
@@ -197,7 +197,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                   Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 4),
                   Text(
-                    'Applied: ${_formatDate(application.appliedAt)}',
+                    'สมัครเมื่อ: ${_formatDate(application.appliedAt)}',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
@@ -208,7 +208,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                   Icon(Icons.update, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 4),
                   Text(
-                    'Updated: ${_formatDate(application.updatedAt)}',
+                    'อัปเดต: ${_formatDate(application.updatedAt)}',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
@@ -233,7 +233,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Interview Scheduled',
+                              'นัดสัมภาษณ์แล้ว',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.orange[700],
@@ -276,7 +276,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Notes from Clinic:',
+                              'หมายเหตุจากคลินิก:',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue[700],
@@ -382,23 +382,23 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
   String _getStatusDisplayName(String status) {
     switch (status) {
       case 'submitted':
-        return 'Submitted';
+        return 'ส่งแล้ว';
       case 'under_review':
-        return 'Under Review';
+        return 'กำลังพิจารณา';
       case 'shortlisted':
-        return 'Shortlisted';
+        return 'คัดเลือก';
       case 'interview_scheduled':
-        return 'Interview';
+        return 'สัมภาษณ์';
       case 'interview_completed':
-        return 'Interviewed';
+        return 'สัมภาษณ์แล้ว';
       case 'offered':
-        return 'Offered';
+        return 'ได้รับข้อเสนอ';
       case 'hired':
-        return 'Hired';
+        return 'ได้งาน';
       case 'rejected':
-        return 'Rejected';
+        return 'ไม่ผ่าน';
       default:
-        return 'Unknown';
+        return 'ไม่ทราบ';
     }
   }
 
@@ -441,7 +441,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                 children: [
                   Expanded(
                     child: Text(
-                      'Application Details',
+                      'รายละเอียดใบสมัคร',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -460,26 +460,26 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Basic Info
-                      _buildDetailRow('Applied Date', _formatDate(application.appliedAt)),
-                      _buildDetailRow('Last Updated', _formatDate(application.updatedAt)),
-                      _buildDetailRow('Application ID', application.applicationId),
+                      _buildDetailRow('วันที่สมัคร', _formatDate(application.appliedAt)),
+                      _buildDetailRow('อัปเดตล่าสุด', _formatDate(application.updatedAt)),
+                      _buildDetailRow('หมายเลขใบสมัคร', application.applicationId),
                       
                       if (application.interviewDate != null) ...[
                         const SizedBox(height: 16),
                         const Divider(),
                         const SizedBox(height: 16),
                         Text(
-                          'Interview Information',
+                          'ข้อมูลการสัมภาษณ์',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        _buildDetailRow('Interview Date', _formatDate(application.interviewDate!)),
+                        _buildDetailRow('วันที่สัมภาษณ์', _formatDate(application.interviewDate!)),
                         if (application.interviewLocation != null)
-                          _buildDetailRow('Location', application.interviewLocation!),
+                          _buildDetailRow('สถานที่', application.interviewLocation!),
                         if (application.interviewNotes != null)
-                          _buildDetailRow('Notes', application.interviewNotes!),
+                          _buildDetailRow('หมายเหตุ', application.interviewNotes!),
                       ],
 
                       const SizedBox(height: 16),
@@ -488,7 +488,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
 
                       // Cover Letter
                       Text(
-                        'Cover Letter',
+                        'จดหมายนำ',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -509,7 +509,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                       if (application.additionalDocuments.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text(
-                          'Additional Documents',
+                          'เอกสารเพิ่มเติม',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -531,7 +531,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                       if (application.notes != null && application.notes!.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text(
-                          'Notes from Clinic',
+                          'หมายเหตุจากคลินิก',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

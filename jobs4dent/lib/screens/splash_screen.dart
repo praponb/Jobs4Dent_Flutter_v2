@@ -48,7 +48,7 @@ class SplashScreen extends StatelessWidget {
             
             // Subtitle
             const Text(
-              'Connecting Dental Professionals',
+              'เชื่อมต่อผู้เชี่ยวชาญทางทันตกรรม',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white70,

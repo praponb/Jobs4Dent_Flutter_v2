@@ -22,10 +22,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return 'กรุณากรอกอีเมล';
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Please enter a valid email';
+      return 'กรุณากรอกอีเมลที่ถูกต้อง';
     }
     return null;
   }
@@ -53,7 +53,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Reset Password'),
+        title: const Text('รีเซ็ตรหัสผ่าน'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
       ),
@@ -88,7 +88,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   if (!_isEmailSent) ...[
                     // Title
                     const Text(
-                      'Forgot Password?',
+                      'ลืมรหัสผ่าน?',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -101,7 +101,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     
                     // Description
                     const Text(
-                      'Enter your email address and we\'ll send you a link to reset your password.',
+                      'กรอกที่อยู่อีเมลของคุณ แล้วเราจะส่งลิงค์รีเซ็ตรหัสผ่านให้คุณ',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
@@ -124,7 +124,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             validator: _validateEmail,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
-                              labelText: 'Email Address',
+                              labelText: 'ที่อยู่อีเมล',
                               prefixIcon: const Icon(Icons.email),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -158,7 +158,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     ),
                                   )
                                 : const Text(
-                                    'Send Reset Link',
+                                    'ส่งลิงค์รีเซ็ต',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -171,7 +171,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ] else ...[
                     // Success message
                     const Text(
-                      'Check Your Email',
+                      'ตรวจสอบอีเมลของคุณ',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -183,7 +183,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     const SizedBox(height: 16),
                     
                     Text(
-                      'We\'ve sent a password reset link to:\n${_emailController.text}',
+                      'เราได้ส่งลิงค์รีเซ็ตรหัสผ่านไปที่:\n${_emailController.text}',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
@@ -209,7 +209,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         elevation: 2,
                       ),
                       child: const Text(
-                        'Back to Sign In',
+                        'กลับไปเข้าสู่ระบบ',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -226,7 +226,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          'Remember your password? ',
+                          'จำรหัสผ่านได้แล้ว? ',
                           style: TextStyle(color: Colors.grey),
                         ),
                         GestureDetector(
@@ -234,7 +234,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             Navigator.pop(context);
                           },
                           child: const Text(
-                            'Sign In',
+                            'เข้าสู่ระบบ',
                             style: TextStyle(
                               color: Color(0xFF2196F3),
                               fontWeight: FontWeight.w600,

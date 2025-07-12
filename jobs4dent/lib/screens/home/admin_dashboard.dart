@@ -32,7 +32,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        title: const Text('แดชบอร์ดแอดมิน'),
         backgroundColor: const Color(0xFF9C27B0),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -64,7 +64,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Icon(Icons.campaign, size: 20),
                     SizedBox(width: 8),
-                    Text('Broadcast Message'),
+                    Text('ส่งข้อความประกาศ'),
                   ],
                 ),
               ),
@@ -74,7 +74,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Icon(Icons.list_alt, size: 20),
                     SizedBox(width: 8),
-                    Text('System Logs'),
+                    Text('บันทึกระบบ'),
                   ],
                 ),
               ),
@@ -84,7 +84,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Icon(Icons.backup, size: 20),
                     SizedBox(width: 8),
-                    Text('Data Backup'),
+                    Text('สำรองข้อมูล'),
                   ],
                 ),
               ),
@@ -192,7 +192,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      user.isSuperAdmin == true ? 'Super Administrator' : 'Administrator',
+                      user.isSuperAdmin == true ? 'ผู้ดูแลระบบสูงสุด' : 'ผู้ดูแลระบบ',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white70,
@@ -205,7 +205,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Manage the Jobs4Dent platform and monitor system performance',
+            'จัดการแพลตฟอร์ม Jobs4Dent และติดตามประสิทธิภาพระบบ',
             style: TextStyle(
               fontSize: 14,
               color: Colors.white,
@@ -221,7 +221,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'System Overview',
+          'ภาพรวมระบบ',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -233,7 +233,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             Expanded(
               child: _buildSystemCard(
-                title: 'Total Users',
+                title: 'ผู้ใช้รวม',
                 value: '2,847',
                 change: '+12%',
                 isPositive: true,
@@ -244,7 +244,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildSystemCard(
-                title: 'Active Jobs',
+                title: 'งานที่เปิดอยู่',
                 value: '456',
                 change: '+8%',
                 isPositive: true,
@@ -259,7 +259,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             Expanded(
               child: _buildSystemCard(
-                title: 'Marketplace Sales',
+                title: 'ยอดขายตลาดสินค้า',
                 value: '₿1.2M',
                 change: '+15%',
                 isPositive: true,
@@ -270,9 +270,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildSystemCard(
-                title: 'System Health',
+                title: 'สุขภาพระบบ',
                 value: '98.5%',
-                change: 'Excellent',
+                                  change: 'ดีเยี่ยม',
                 isPositive: true,
                 icon: Icons.health_and_safety,
                 color: Colors.purple,
@@ -356,7 +356,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Admin Tools',
+          'เครื่องมือผู้ดูแล',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -368,8 +368,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'User Management',
-                subtitle: 'Manage all users',
+                title: 'จัดการผู้ใช้',
+                subtitle: 'จัดการผู้ใช้ทั้งหมด',
                 icon: Icons.person_outline,
                 color: Colors.blue,
                 onTap: () => _showUserManagement(),
@@ -378,8 +378,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'Categories',
-                subtitle: 'Job & product categories',
+                title: 'หมวดหมู่',
+                subtitle: 'หมวดหมู่งานและสินค้า',
                 icon: Icons.category,
                 color: Colors.teal,
                 onTap: () => _showCategoryManagement(),
@@ -392,8 +392,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'Service Packages',
-                subtitle: 'Pricing & packages',
+                title: 'แพ็คเกจบริการ',
+                subtitle: 'ราคาและแพ็คเกจ',
                 icon: Icons.payment,
                 color: Colors.green,
                 onTap: () => _showServicePackages(),
@@ -402,8 +402,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
-                title: 'Analytics',
-                subtitle: 'Reports & insights',
+                title: 'รายงาน',
+                subtitle: 'รายงานและข้อมูลเชิงลึก',
                 icon: Icons.analytics,
                 color: Colors.purple,
                 onTap: () => _showAnalytics(),
@@ -483,7 +483,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'User Distribution',
+            'การกระจายผู้ใช้',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -498,7 +498,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 sections: [
                   PieChartSectionData(
                     value: 45,
-                    title: '45%\nDentists',
+                    title: '45%\nทันตแพทย์',
                     color: Colors.blue,
                     radius: 80,
                     titleStyle: const TextStyle(
@@ -509,7 +509,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   PieChartSectionData(
                     value: 30,
-                    title: '30%\nAssistants',
+                    title: '30%\nผู้ช่วย',
                     color: Colors.green,
                     radius: 80,
                     titleStyle: const TextStyle(
@@ -520,7 +520,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   PieChartSectionData(
                     value: 20,
-                    title: '20%\nClinics',
+                    title: '20%\nคลินิก',
                     color: Colors.orange,
                     radius: 80,
                     titleStyle: const TextStyle(
@@ -531,7 +531,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   PieChartSectionData(
                     value: 5,
-                    title: '5%\nOthers',
+                    title: '5%\nอื่นๆ',
                     color: Colors.purple,
                     radius: 80,
                     titleStyle: const TextStyle(
@@ -556,7 +556,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Platform Statistics',
+          'สถิติแพลตฟอร์ม',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -579,15 +579,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ),
           child: Column(
             children: [
-              _buildStatRow('Total Job Postings', '1,234', Icons.work),
+              _buildStatRow('ประกาศงานทั้งหมด', '1,234', Icons.work),
               const Divider(),
-              _buildStatRow('Applications Submitted', '5,678', Icons.send),
+                              _buildStatRow('ใบสมัครที่ส่ง', '5,678', Icons.send),
               const Divider(),
-              _buildStatRow('Successful Hires', '891', Icons.handshake),
+              _buildStatRow('จ้างงานสำเร็จ', '891', Icons.handshake),
               const Divider(),
-              _buildStatRow('Products Listed', '2,345', Icons.inventory),
+              _buildStatRow('สินค้าที่ลงรายการ', '2,345', Icons.inventory),
               const Divider(),
-              _buildStatRow('Marketplace Sales', '₿1,200,000', Icons.attach_money),
+              _buildStatRow('ยอดขายตลาดสินค้า', '₿1,200,000', Icons.attach_money),
             ],
           ),
         ),
@@ -626,11 +626,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _buildRecentActivity() {
     final activities = [
-      {'type': 'user', 'message': 'New clinic registered: Bangkok Dental Center', 'time': '2 hours ago'},
-      {'type': 'job', 'message': '5 new job postings created', 'time': '3 hours ago'},
-      {'type': 'sale', 'message': 'Product sold: Dental X-Ray Machine', 'time': '5 hours ago'},
-      {'type': 'system', 'message': 'System maintenance completed', 'time': '1 day ago'},
-      {'type': 'user', 'message': '3 new dentists joined the platform', 'time': '1 day ago'},
+      {'type': 'user', 'message': 'คลินิกใหม่ลงทะเบียน: คลินิกทันตกรรมกรุงเทพ', 'time': '2 ชั่วโมงที่แล้ว'},
+      {'type': 'job', 'message': 'มีการสร้างประกาศงาน 5 ตำแหน่งใหม่', 'time': '3 ชั่วโมงที่แล้ว'},
+      {'type': 'sale', 'message': 'ขายสินค้า: เครื่องเอ็กซ์เรย์ทันตกรรม', 'time': '5 ชั่วโมงที่แล้ว'},
+      {'type': 'system', 'message': 'การบำรุงรักษาระบบเสร็จสิ้น', 'time': '1 วันที่แล้ว'},
+      {'type': 'user', 'message': 'ทันตแพทย์ใหม่ 3 คนเข้าร่วมแพลตฟอร์ม', 'time': '1 วันที่แล้ว'},
     ];
 
     return Column(
@@ -640,7 +640,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Recent System Activity',
+              'กิจกรรมล่าสุดในระบบ',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -649,7 +649,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
             TextButton(
               onPressed: () => _showSystemLogs(),
-              child: const Text('View All'),
+              child: const Text('ดูทั้งหมด'),
             ),
           ],
         ),
@@ -746,7 +746,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Revenue Overview',
+          'ภาพรวมรายได้',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -758,7 +758,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             Expanded(
               child: _buildRevenueCard(
-                title: 'Monthly Revenue',
+                title: 'รายได้รายเดือน',
                 amount: '₿125,000',
                 change: '+18%',
                 icon: Icons.trending_up,
@@ -767,7 +767,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildRevenueCard(
-                title: 'Yearly Revenue',
+                title: 'รายได้รายปี',
                 amount: '₿1,200,000',
                 change: '+25%',
                 icon: Icons.monetization_on,
@@ -850,13 +850,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('User Management'),
+        title: const Text('จัดการผู้ใช้'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('User management functionality will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features to include:'),
+                    Text('ฟังก์ชันการจัดการผู้ใช้จะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์ที่จะรวม:'),
             Text('• Create, edit, delete users'),
             Text('• Suspend/activate accounts'),
             Text('• Manage user roles'),
@@ -867,7 +867,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -878,13 +878,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Category Management'),
+        title: const Text('จัดการหมวดหมู่'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Category management will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features:'),
+                    Text('การจัดการหมวดหมู่จะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์:'),
             Text('• Job categories'),
             Text('• Product categories'),
             Text('• Category hierarchy'),
@@ -894,7 +894,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -905,23 +905,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Service Packages'),
+        title: const Text('แพ็คเกจบริการ'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Service package management will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features:'),
-            Text('• Create pricing tiers'),
-            Text('• Feature limitations'),
-            Text('• Subscription management'),
+                    Text('การจัดการแพ็คเกจบริการจะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์:'),
+        Text('• สร้างระดับราคา'),
+        Text('• จำกัดฟีเจอร์'),
+        Text('• จัดการการสมัครสมาชิก'),
             Text('• Revenue tracking'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -932,13 +932,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Advanced Analytics'),
+        title: const Text('รายงานวิเคราะห์ขั้นสูง'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Advanced analytics dashboard will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features:'),
+                    Text('แดชบอร์ดการวิเคราะห์ขั้นสูงจะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์:'),
             Text('• User engagement metrics'),
             Text('• Revenue analytics'),
             Text('• Job posting performance'),
@@ -949,7 +949,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -960,19 +960,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('System Alerts'),
+        title: const Text('แจ้งเตือนระบบ'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('No critical alerts at this time.'),
+            Text('ไม่มีการแจ้งเตือนที่สำคัญในขณะนี้'),
             SizedBox(height: 16),
-            Text('All systems operating normally.'),
+            Text('ระบบทั้งหมดทำงานปกติ'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -985,19 +985,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Broadcast Message'),
+        title: const Text('ส่งข้อความประกาศ'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Send a message to all users or specific user groups.'),
+            const Text('ส่งข้อความถึงผู้ใช้ทั้งหมดหรือกลุ่มผู้ใช้ที่ระบุ'),
             const SizedBox(height: 16),
             TextField(
               controller: messageController,
               maxLines: 3,
               decoration: const InputDecoration(
-                labelText: 'Message',
+                labelText: 'ข้อความ',
                 border: OutlineInputBorder(),
-                hintText: 'Enter your message here...',
+                                    hintText: 'ใส่ข้อความของคุณที่นี่...',
               ),
             ),
           ],
@@ -1005,7 +1005,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('ยกเลิก'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1013,12 +1013,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Message broadcasted successfully'),
+                  content: Text('ส่งข้อความประกาศเรียบร้อยแล้ว'),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: const Text('Send'),
+            child: const Text('ส่ง'),
           ),
         ],
       ),
@@ -1029,24 +1029,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('System Logs'),
+        title: const Text('บันทึกระบบ'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('System logs and error monitoring will be implemented here.'),
-            SizedBox(height: 16),
-            Text('Features:'),
-            Text('• Real-time error monitoring'),
-            Text('• Performance metrics'),
-            Text('• User activity logs'),
-            Text('• Security events'),
-            Text('• Export capabilities'),
+                    Text('บันทึกระบบและการตรวจสอบข้อผิดพลาดจะพัฒนาให้ใช้งานได้เร็วๆ นี้'),
+        SizedBox(height: 16),
+        Text('ฟีเจอร์:'),
+                    Text('• ตรวจสอบข้อผิดพลาดแบบเรียลไทม์'),
+                Text('• ตัวชี้วัดประสิทธิภาพ'),
+        Text('• บันทึกกิจกรรมผู้ใช้'),
+        Text('• เหตุการณ์ด้านความปลอดภัย'),
+        Text('• ความสามารถในการส่งออก'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -1057,31 +1057,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Data Backup'),
+        title: const Text('สำรองข้อมูล'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Create a backup of all system data.'),
+            Text('สร้างการสำรองข้อมูลของระบบทั้งหมด'),
             SizedBox(height: 16),
-            Text('This may take several minutes to complete.'),
+            Text('อาจใช้เวลาหลายนาทีในการเสร็จสมบูรณ์'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('ยกเลิก'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Backup initiated successfully'),
+                  content: Text('เริ่มสำรองข้อมูลเรียบร้อยแล้ว'),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: const Text('Start Backup'),
+            child: const Text('เริ่มสำรองข้อมูล'),
           ),
         ],
       ),
