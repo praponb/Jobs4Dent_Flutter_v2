@@ -158,7 +158,7 @@ class AuthProvider with ChangeNotifier {
         isEmailVerified: false,
       );
 
-      _successMessage = 'Registration successful! Please check your email to verify your account.';
+      _successMessage = 'ลงทะเบียนสำเร็จแล้ว! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีของคุณ';
       _isLoading = false;
       notifyListeners();
       return true;
@@ -188,7 +188,7 @@ class AuthProvider with ChangeNotifier {
 
       // Check if email is verified
       if (!userCredential.user!.emailVerified) {
-        _error = 'Please verify your email before signing in.';
+        _error = 'กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ';
         await _auth.signOut();
         _isLoading = false;
         notifyListeners();
@@ -217,13 +217,13 @@ class AuthProvider with ChangeNotifier {
     try {
       if (_user != null && !_user!.emailVerified) {
         await _user!.sendEmailVerification();
-        _successMessage = 'Verification email sent! Please check your inbox.';
+        _successMessage = 'ส่งอีเมลยืนยันแล้ว! กรุณาตรวจสอบกล่องจดหมายของคุณ';
         notifyListeners();
         return true;
       }
       return false;
     } catch (e) {
-      _error = 'Failed to send verification email: ${_getErrorMessage(e)}';
+              _error = 'ไม่สามารถส่งอีเมลยืนยันได้: ${_getErrorMessage(e)}';
       notifyListeners();
       return false;
     }
@@ -235,11 +235,11 @@ class AuthProvider with ChangeNotifier {
       _error = null;
       _successMessage = null;
       await _auth.sendPasswordResetEmail(email: email);
-      _successMessage = 'Password reset email sent! Please check your inbox.';
+      _successMessage = 'ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว! กรุณาตรวจสอบกล่องจดหมายของคุณ';
       notifyListeners();
       return true;
     } catch (e) {
-      _error = 'Failed to send reset email: ${_getErrorMessage(e)}';
+              _error = 'ไม่สามารถส่งอีเมลรีเซ็ตได้: ${_getErrorMessage(e)}';
       notifyListeners();
       return false;
     }
@@ -482,7 +482,7 @@ class AuthProvider with ChangeNotifier {
       _userModel = _userModel!.copyWith(subUserIds: currentSubUsers);
 
       _isLoading = false;
-      _successMessage = 'Sub-user created successfully! Verification email sent.';
+      _successMessage = 'สร้างผู้ใช้ย่อยสำเร็จแล้ว! อีเมลยืนยันถูกส่งไปแล้ว';
       notifyListeners();
       return true;
     } catch (e) {
@@ -670,7 +670,7 @@ class AuthProvider with ChangeNotifier {
         case 'user-disabled':
           return 'This user account has been disabled.';
         case 'too-many-requests':
-          return 'Too many attempts. Please try again later.';
+          return 'พยายามหลายครั้งเกินไป กรุณาลองใหม่อีกครั้งในภายหลัง';
         default:
           return error.message ?? 'An error occurred.';
       }

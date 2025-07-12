@@ -34,7 +34,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Branch Management'),
+        title: const Text('จัดการสาขา'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
       ),
@@ -54,7 +54,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'Access Denied',
+                    'ไม่อนุญาตให้เข้าถึง',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -63,7 +63,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Only clinic owners can manage sub-users',
+                    'เฉพาะเจ้าของคลินิกเท่านั้นที่สามารถจัดการผู้ใช้ย่อยได้',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -94,7 +94,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        userModel.clinicName ?? 'My Clinic',
+                        userModel.clinicName ?? 'คลินิกของฉัน',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -106,7 +106,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                   const SizedBox(height: 8),
                   
                   Text(
-                    'Manage your branch accounts and permissions',
+                    'จัดการบัญชีสาขาและสิทธิ์การเข้าถึงของคุณ',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -129,7 +129,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Total Branches',
+                                'สาขาทั้งหมด',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[600],
@@ -160,7 +160,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Active',
+                                'ใช้งานอยู่',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[600],
@@ -186,7 +186,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                   
                   // Sub-users list
                   const Text(
-                    'Branch Accounts',
+                    'บัญชีสาขา',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -208,7 +208,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No Branches Yet',
+                              'ยังไม่มีสาขา',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -217,7 +217,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Create branch accounts to manage multiple clinic locations',
+                              'สร้างบัญชีสาขาเพื่อจัดการคลินิกหลายแห่ง',
                               style: TextStyle(
                                 color: Colors.grey[500],
                               ),
@@ -269,14 +269,14 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                subUser.branchName ?? 'Branch',
+                                                subUser.branchName ?? 'สาขา',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                               Text(
-                                                subUser.branchAddress ?? 'No address',
+                                                subUser.branchAddress ?? 'ไม่มีที่อยู่',
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.grey[600],
@@ -297,7 +297,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                           child: Text(
-                                            subUser.isActive ? 'Active' : 'Inactive',
+                                            subUser.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
@@ -363,8 +363,8 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                                         const SizedBox(width: 4),
                                         Text(
                                           subUser.isEmailVerified 
-                                              ? 'Email Verified' 
-                                              : 'Email Not Verified',
+                                                              ? 'อีเมลยืนยันแล้ว'
+                : 'อีเมลยังไม่ยืนยัน',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: subUser.isEmailVerified 
@@ -374,7 +374,7 @@ class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
                                         ),
                                         const Spacer(),
                                         Text(
-                                          'Created: ${_formatDate(subUser.createdAt)}',
+                                          'สร้างเมื่อ: ${_formatDate(subUser.createdAt)}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: Colors.grey[500],

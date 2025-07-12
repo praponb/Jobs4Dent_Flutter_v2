@@ -29,17 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return 'กรุณากรอกอีเมล';
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Please enter a valid email';
+      return 'กรุณากรอกอีเมลที่ถูกต้อง';
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return 'กรุณากรอกรหัสผ่าน';
     }
     return null;
   }
@@ -138,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Your Gateway to Dental Career Opportunities',
+                        'ประตูสู่โอกาสในการทำงานด้านทันตกรรม',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
@@ -152,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   
                   // Welcome Text
                   const Text(
-                    'Welcome Back!',
+                    'ยินดีต้อนรับกลับมา!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Sign in to access your account',
+                    'เข้าสู่ระบบเพื่อเข้าถึงบัญชีของคุณ',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
@@ -196,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                'Quick Sign-in',
+                                'เข้าสู่ระบบเร็ว',
                                 style: TextStyle(
                                   color: !_isEmailLogin ? Colors.white : Colors.grey[600],
                                   fontWeight: FontWeight.w600,
@@ -222,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                'Email & Password',
+                                'อีเมลและรหัสผ่าน',
                                 style: TextStyle(
                                   color: _isEmailLogin ? Colors.white : Colors.grey[600],
                                   fontWeight: FontWeight.w600,
@@ -251,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             validator: _validateEmail,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
-                              labelText: 'Email Address',
+                              labelText: 'ที่อยู่อีเมล',
                               prefixIcon: const Icon(Icons.email),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -269,7 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             validator: _validatePassword,
                             obscureText: _obscurePassword,
                             decoration: InputDecoration(
-                              labelText: 'Password',
+                              labelText: 'รหัสผ่าน',
                               prefixIcon: const Icon(Icons.lock),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -304,7 +304,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 );
                               },
                               child: const Text(
-                                'Forgot Password?',
+                                'ลืมรหัสผ่าน?',
                                 style: TextStyle(
                                   color: Color(0xFF2196F3),
                                   fontWeight: FontWeight.w600,
@@ -337,7 +337,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   )
                                 : const Text(
-                                    'Sign In',
+                                    'เข้าสู่ระบบ',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -369,7 +369,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                       label: Text(
-                        authProvider.isLoading ? 'Signing in...' : 'Continue with Google',
+                        authProvider.isLoading ? 'กำลังเข้าสู่ระบบ...' : 'ดำเนินการต่อด้วย Google',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -394,7 +394,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'Don\'t have an account? ',
+                        'ยังไม่มีบัญชี? ',
                         style: TextStyle(color: Colors.grey),
                       ),
                       GestureDetector(
@@ -407,7 +407,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: const Text(
-                          'Sign Up',
+                          'สมัครสมาชิก',
                           style: TextStyle(
                             color: Color(0xFF2196F3),
                             fontWeight: FontWeight.w600,
@@ -458,17 +458,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       _FeatureItem(
                         icon: Icons.work,
-                        text: 'Find dental job opportunities',
+                        text: 'ค้นหาโอกาสงานด้านทันตกรรม',
                       ),
                       SizedBox(height: 12),
                       _FeatureItem(
                         icon: Icons.people,
-                        text: 'Connect with dental professionals',
+                        text: 'เชื่อมต่อกับผู้เชี่ยวชาญทันตกรรม',
                       ),
                       SizedBox(height: 12),
                       _FeatureItem(
                         icon: Icons.store,
-                        text: 'Access dental equipment marketplace',
+                        text: 'เข้าถึงตลาดเครื่องมือทันตกรรม',
                       ),
                     ],
                   ),

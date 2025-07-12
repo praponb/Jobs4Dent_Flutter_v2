@@ -15,11 +15,11 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
   List<String> _selectedProvinces = [];
   List<String> _selectedCities = [];
   bool _isWillingToRelocate = false;
-  String _preferredWorkType = 'Full-time';
+  String _preferredWorkType = 'เต็มเวลา';
 
   final Map<String, List<String>> _thailandProvinces = {
-    'Bangkok': ['Bangkok'],
-    'Central Thailand': [
+    'กรุงเทพมหานคร': ['กรุงเทพมหานคร'],
+    'ภาคกลาง': [
       'Ayutthaya',
       'Lopburi',
       'Nakhon Pathom',
@@ -32,7 +32,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
       'Sing Buri',
       'Suphan Buri',
     ],
-    'Northern Thailand': [
+    'ภาคเหนือ': [
       'Chiang Mai',
       'Chiang Rai',
       'Kamphaeng Phet',
@@ -49,7 +49,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
       'Uttaradit',
       'Uthai Thani',
     ],
-    'Northeastern Thailand': [
+    'ภาคตะวันออกเฉียงเหนือ': [
       'Amnat Charoen',
       'Bueng Kan',
       'Buri Ram',
@@ -71,7 +71,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
       'Udon Thani',
       'Yasothon',
     ],
-    'Eastern Thailand': [
+    'ภาคตะวันออก': [
       'Chachoengsao',
       'Chanthaburi',
       'Chonburi',
@@ -80,13 +80,13 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
       'Sa Kaeo',
       'Trat',
     ],
-    'Western Thailand': [
+    'ภาคตะวันตก': [
       'Kanchanaburi',
       'Phetchaburi',
       'Prachuap Khiri Khan',
       'Ratchaburi',
     ],
-    'Southern Thailand': [
+    'ภาคใต้': [
       'Chumphon',
       'Krabi',
       'Nakhon Si Thammarat',
@@ -105,12 +105,12 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
   };
 
   final List<String> _workTypes = [
-    'Full-time',
-    'Part-time',
-    'Contract',
-    'Freelance',
-    'Temporary',
-    'Internship',
+    'เต็มเวลา',
+    'ไม่เต็มเวลา', 
+    'ตามสัญญา',
+    'อิสระ',
+    'ชั่วคราว',
+    'ฝึกงาน',
   ];
 
   @override
@@ -124,7 +124,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
     if (user != null) {
       _selectedProvinces = List<String>.from(user.workLocationPreference ?? []);
       _isWillingToRelocate = user.availability?['willingToRelocate'] ?? false;
-      _preferredWorkType = user.availability?['preferredWorkType'] ?? 'Full-time';
+      _preferredWorkType = user.availability?['preferredWorkType'] ?? 'เต็มเวลา';
       
       // Extract cities from selected provinces
       _selectedCities = [];
@@ -148,7 +148,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Work Location Preference'),
+        title: const Text('ความต้องการสถานที่ทำงาน'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -165,7 +165,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                     ),
                   )
                 : const Text(
-                    'Save',
+                    'บันทึก',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -223,7 +223,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Preferred Work Locations',
+                      'พื้นที่ทำงานที่ต้องการ',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -232,7 +232,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Select provinces/cities where you want to work',
+                      'เลือกจังหวัด/เมืองที่คุณต้องการทำงาน',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -295,7 +295,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
           const SizedBox(height: 16),
           if (_selectedCities.isNotEmpty) ...[
             const Text(
-              'Selected Locations:',
+              'พื้นที่ที่เลือก:',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
@@ -383,7 +383,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Preferred Work Type',
+                      'ประเภทงานที่ต้องการ',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -392,7 +392,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Select your preferred employment type',
+                      'เลือกประเภทการจ้างงานที่ต้องการ',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -457,7 +457,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Relocation Preference',
+                      'การย้ายที่ทำงาน',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -466,7 +466,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Are you willing to relocate for the right opportunity?',
+                      'คุณเต็มใจย้ายที่ทำงานสำหรับโอกาสที่เหมาะสมหรือไม่?',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -485,11 +485,11 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                 _isWillingToRelocate = value;
               });
             },
-            title: const Text('Willing to relocate'),
+            title: const Text('เต็มใจย้ายที่อยู่'),
             subtitle: Text(
               _isWillingToRelocate
-                  ? 'Open to job opportunities in other locations'
-                  : 'Prefer to work in selected locations only',
+                                  ? 'เปิดรับโอกาสงานในพื้นที่อื่น'
+                : 'ต้องการทำงานในพื้นที่ที่เลือกเท่านั้น',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],
@@ -570,7 +570,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Work location preferences updated successfully'),
+            content: Text('อัปเดตค่ากำหนดสถานที่ทำงานเรียบร้อยแล้ว'),
             backgroundColor: Colors.green,
           ),
         );
@@ -580,7 +580,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving data: $e')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกข้อมูล: $e')),
         );
       }
     } finally {

@@ -60,7 +60,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Verification email sent!'),
+            content: Text('ส่งอีเมลยืนยันแล้ว!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -73,7 +73,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Verify Email'),
+        title: const Text('ยืนยันอีเมล'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -112,7 +112,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     
                     // Title
                     const Text(
-                      'Check Your Email',
+                      'ตรวจสอบอีเมลของคุณ',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     
                     // Description
                     Text(
-                      'We\'ve sent a verification link to:\n${widget.email}',
+                      'เราได้ส่งลิงค์ยืนยันไปที่:\n${widget.email}',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
@@ -137,7 +137,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     const SizedBox(height: 8),
                     
                     const Text(
-                      'Please check your email and click the verification link to activate your account.',
+                      'กรุณาตรวจสอบอีเมลของคุณและคลิกลิงค์ยืนยันเพื่อเปิดใช้งานบัญชีของคุณ',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
@@ -165,8 +165,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           : const Icon(Icons.refresh),
                       label: Text(
                         _canResendEmail
-                            ? 'Resend Verification Email'
-                            : 'Resend in ${_resendCountdown}s',
+                            ? 'ส่งอีเมลยืนยันใหม่'
+                            : 'ส่งใหม่ใน $_resendCountdown วินาที',
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2196F3),
@@ -200,7 +200,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Back to Sign In',
+                        'กลับไปเข้าสู่ระบบ',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -220,7 +220,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       child: Column(
                         children: [
                           const Text(
-                            'Didn\'t receive the email?',
+                            'ไม่ได้รับอีเมลหรือ?',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -229,7 +229,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '• Check your spam or junk folder\n• Make sure ${widget.email} is correct\n• Try resending the verification email',
+                            '• ตรวจสอบโฟลเดอร์สแปมหรือขยะ\n• ตรวจสอบว่า ${widget.email} ถูกต้อง\n• ลองส่งอีเมลยืนยันใหม่อีกครั้ง',
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey[600],

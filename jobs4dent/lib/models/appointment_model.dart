@@ -183,28 +183,28 @@ class AppointmentModel {
   String get statusDisplayName {
     switch (status) {
       case AppointmentStatus.pending:
-        return 'Pending';
+        return 'รอดำเนินการ';
       case AppointmentStatus.confirmed:
-        return 'Confirmed';
+        return 'ยืนยันแล้ว';
       case AppointmentStatus.cancelled:
-        return 'Cancelled';
+        return 'ยกเลิกแล้ว';
       case AppointmentStatus.completed:
-        return 'Completed';
+        return 'เสร็จสิ้น';
       case AppointmentStatus.rescheduled:
-        return 'Rescheduled';
+        return 'เลื่อนนัดแล้ว';
     }
   }
 
   String get typeDisplayName {
     switch (type) {
       case AppointmentType.interview:
-        return 'Interview';
+        return 'สัมภาษณ์งาน';
       case AppointmentType.jobDiscussion:
-        return 'Job Discussion';
+        return 'พูดคุยเรื่องงาน';
       case AppointmentType.consultation:
-        return 'Consultation';
+        return 'ปรึกษา';
       case AppointmentType.other:
-        return 'Other';
+        return 'อื่นๆ';
     }
   }
 

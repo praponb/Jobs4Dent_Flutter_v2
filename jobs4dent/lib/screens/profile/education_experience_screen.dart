@@ -38,7 +38,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Education & Experience'),
+        title: const Text('การศึกษาและประสบการณ์'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -55,7 +55,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                     ),
                   )
                 : const Text(
-                    'Save',
+                    'บันทึก',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -66,8 +66,8 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'Education'),
-            Tab(text: 'Experience'),
+            Tab(text: 'การศึกษา'),
+            Tab(text: 'ประสบการณ์'),
           ],
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
@@ -91,15 +91,15 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildAddButton(
-            title: 'Add Education',
+            title: 'เพิ่มการศึกษา',
             onPressed: () => _showEducationDialog(),
           ),
           const SizedBox(height: 16),
           if (_educationList.isEmpty)
             _buildEmptyState(
               icon: Icons.school_outlined,
-              title: 'No education added yet',
-              subtitle: 'Add your educational qualifications',
+              title: 'ยังไม่ได้เพิ่มการศึกษา',
+              subtitle: 'เพิ่มคุณวุฒิการศึกษาของคุณ',
             )
           else
             ..._educationList.asMap().entries.map((entry) {
@@ -119,15 +119,15 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildAddButton(
-            title: 'Add Experience',
+            title: 'เพิ่มประสบการณ์',
             onPressed: () => _showExperienceDialog(),
           ),
           const SizedBox(height: 16),
           if (_experienceList.isEmpty)
             _buildEmptyState(
               icon: Icons.work_outlined,
-              title: 'No experience added yet',
-              subtitle: 'Add your work experience',
+              title: 'ยังไม่ได้เพิ่มประสบการณ์',
+              subtitle: 'เพิ่มประสบการณ์การทำงานของคุณ',
             )
           else
             ..._experienceList.asMap().entries.map((entry) {
@@ -224,7 +224,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      education['degree'] ?? 'Degree',
+                      education['degree'] ?? 'ปริญญา',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -233,7 +233,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      education['institution'] ?? 'Institution',
+                      education['institution'] ?? 'สถาบัน',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -257,7 +257,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                       children: [
                         Icon(Icons.edit, size: 16),
                         SizedBox(width: 8),
-                        Text('Edit'),
+                        Text('แก้ไข'),
                       ],
                     ),
                   ),
@@ -267,7 +267,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                       children: [
                         Icon(Icons.delete, size: 16, color: Colors.red),
                         SizedBox(width: 8),
-                        Text('Delete', style: TextStyle(color: Colors.red)),
+                        Text('ลบ', style: TextStyle(color: Colors.red)),
                       ],
                     ),
                   ),
@@ -288,7 +288,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  education['graduationYear']?.toString() ?? 'Year',
+                  education['graduationYear']?.toString() ?? 'ปี',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF2196F3),
@@ -308,7 +308,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'GPA: ${education['gpa']}',
+                    'เกรดเฉลี่ย: ${education['gpa']}',
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.green,
@@ -344,7 +344,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      experience['position'] ?? 'Position',
+                      experience['position'] ?? 'ตำแหน่ง',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -353,7 +353,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      experience['company'] ?? 'Company',
+                      experience['company'] ?? 'บริษัท',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -377,7 +377,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                       children: [
                         Icon(Icons.edit, size: 16),
                         SizedBox(width: 8),
-                        Text('Edit'),
+                        Text('แก้ไข'),
                       ],
                     ),
                   ),
@@ -387,7 +387,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                       children: [
                         Icon(Icons.delete, size: 16, color: Colors.red),
                         SizedBox(width: 8),
-                        Text('Delete', style: TextStyle(color: Colors.red)),
+                        Text('ลบ', style: TextStyle(color: Colors.red)),
                       ],
                     ),
                   ),
@@ -408,7 +408,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '${experience['startYear']?.toString() ?? ''} - ${experience['endYear']?.toString() ?? 'Present'}',
+                  '${experience['startYear']?.toString() ?? ''} - ${experience['endYear']?.toString() ?? 'ปัจจุบัน'}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF2196F3),
@@ -444,7 +444,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(education == null ? 'Add Education' : 'Edit Education'),
+                  title: Text(education == null ? 'เพิ่มข้อมูลการศึกษา' : 'แก้ไขข้อมูลการศึกษา'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -452,16 +452,16 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
               TextField(
                 controller: degreeController,
                 decoration: const InputDecoration(
-                  labelText: 'Degree',
-                  hintText: 'e.g., Doctor of Dental Surgery',
+                  labelText: 'ปริญญา',
+                  hintText: 'เช่น ทันตแพทยศาสตรบัณฑิต',
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: institutionController,
                 decoration: const InputDecoration(
-                  labelText: 'Institution',
-                  hintText: 'e.g., University of California',
+                  labelText: 'สถาบัน',
+                  hintText: 'เช่น มหาวิทยาลัยมหิดล',
                 ),
               ),
               const SizedBox(height: 16),
@@ -469,8 +469,8 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                 controller: graduationYearController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  labelText: 'Graduation Year',
-                  hintText: 'e.g., 2020',
+                  labelText: 'ปีที่จบการศึกษา',
+                  hintText: 'เช่น 2020',
                 ),
               ),
               const SizedBox(height: 16),
@@ -478,8 +478,8 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                 controller: gpaController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  labelText: 'GPA (Optional)',
-                  hintText: 'e.g., 3.8',
+                  labelText: 'เกรดเฉลี่ย (ไม่บังคับ)',
+                  hintText: 'เช่น 3.8',
                 ),
               ),
             ],
@@ -488,7 +488,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text('ยกเลิก'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -514,12 +514,12 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Please fill in degree and institution'),
+                    content: Text('กรุณากรอกปริญญาและสถาบัน'),
                   ),
                 );
               }
             },
-            child: Text(education == null ? 'Add' : 'Update'),
+            child: Text(education == null ? 'เพิ่ม' : 'อัปเดต'),
           ),
         ],
       ),
@@ -542,7 +542,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(experience == null ? 'Add Experience' : 'Edit Experience'),
+          title: Text(experience == null ? 'เพิ่มประสบการณ์' : 'แก้ไขประสบการณ์'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -550,16 +550,16 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                 TextField(
                   controller: positionController,
                   decoration: const InputDecoration(
-                    labelText: 'Position',
-                    hintText: 'e.g., General Dentist',
+                    labelText: 'ตำแหน่ง',
+                    hintText: 'เช่น ทันตแพทย์ทั่วไป',
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: companyController,
                   decoration: const InputDecoration(
-                    labelText: 'Company/Clinic',
-                    hintText: 'e.g., Smile Dental Clinic',
+                    labelText: 'บริษัท/คลินิก',
+                    hintText: 'เช่น คลินิกทันตกรรมสไมล์',
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -567,8 +567,8 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                   controller: startYearController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    labelText: 'Start Year',
-                    hintText: 'e.g., 2018',
+                    labelText: 'ปีที่เริ่ม',
+                    hintText: 'เช่น 2018',
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -582,7 +582,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                         });
                       },
                     ),
-                    const Text('Current Position'),
+                    const Text('ตำแหน่งปัจจุบัน'),
                   ],
                 ),
                 if (!isCurrentJob) ...[
@@ -591,8 +591,8 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                     controller: endYearController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: 'End Year',
-                      hintText: 'e.g., 2020',
+                      labelText: 'ปีที่สิ้นสุด',
+                      hintText: 'เช่น 2020',
                     ),
                   ),
                 ],
@@ -601,8 +601,8 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                   controller: descriptionController,
                   maxLines: 3,
                   decoration: const InputDecoration(
-                    labelText: 'Description (Optional)',
-                    hintText: 'Brief description of your role...',
+                    labelText: 'คำอธิบาย (ไม่บังคับ)',
+                    hintText: 'คำอธิบายสั้นๆ เกี่ยวกับบทบาทของคุณ...',
                   ),
                 ),
               ],
@@ -611,7 +611,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: const Text('ยกเลิก'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -637,12 +637,12 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Please fill in position and company'),
+                      content: Text('กรุณากรอกตำแหน่งและบริษัท'),
                     ),
                   );
                 }
               },
-              child: Text(experience == null ? 'Add' : 'Update'),
+              child: Text(experience == null ? 'เพิ่ม' : 'อัปเดต'),
             ),
           ],
         ),
@@ -654,12 +654,12 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Education'),
-        content: const Text('Are you sure you want to delete this education entry?'),
+        title: const Text('ลบข้อมูลการศึกษา'),
+        content: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลการศึกษานี้?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text('ยกเลิก'),
           ),
           TextButton(
             onPressed: () {
@@ -668,7 +668,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
               });
               Navigator.of(context).pop();
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('ลบ', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -679,12 +679,12 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Experience'),
-        content: const Text('Are you sure you want to delete this experience entry?'),
+        title: const Text('ลบข้อมูลประสบการณ์'),
+        content: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลประสบการณ์นี้?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text('ยกเลิก'),
           ),
           TextButton(
             onPressed: () {
@@ -693,7 +693,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
               });
               Navigator.of(context).pop();
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('ลบ', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -726,7 +726,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Education and experience updated successfully'),
+            content: Text('อัปเดตข้อมูลการศึกษาและประสบการณ์เรียบร้อยแล้ว'),
             backgroundColor: Colors.green,
           ),
         );
@@ -736,7 +736,7 @@ class _EducationExperienceScreenState extends State<EducationExperienceScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving data: $e')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกข้อมูล: $e')),
         );
       }
     } finally {

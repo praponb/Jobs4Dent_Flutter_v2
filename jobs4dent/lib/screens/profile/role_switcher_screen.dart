@@ -9,7 +9,7 @@ class RoleSwitcherScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Switch Role'),
+        title: const Text('เปลี่ยนบทบาท'),
         backgroundColor: const Color(0xFF2196F3),
         foregroundColor: Colors.white,
       ),
@@ -19,7 +19,7 @@ class RoleSwitcherScreen extends StatelessWidget {
           
           if (userModel == null) {
             return const Center(
-              child: Text('No user data available'),
+              child: Text('ไม่มีข้อมูลผู้ใช้'),
             );
           }
 
@@ -32,7 +32,7 @@ class RoleSwitcherScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Current Role',
+                  'บทบาทปัจจุบัน',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -76,7 +76,7 @@ class RoleSwitcherScreen extends StatelessWidget {
 
                 if (availableRoles.length > 1) ...[
                   const Text(
-                    'Available Roles',
+                    'บทบาทที่มี',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -101,7 +101,7 @@ class RoleSwitcherScreen extends StatelessWidget {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Switched to ${_getRoleTitle(role)}'),
+                                    content: Text('เปลี่ยนเป็น ${_getRoleTitle(role)} แล้ว'),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
@@ -191,7 +191,7 @@ class RoleSwitcherScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Single Role Account',
+                          'บัญชีบทบาทเดียว',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -200,7 +200,7 @@ class RoleSwitcherScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'You currently have only one role. Contact support to add additional roles to your account.',
+                          'คุณมีบทบาทเดียวในขณะนี้ ติดต่อฝ่ายสนับสนุนเพื่อเพิ่มบทบาทอื่นในบัญชีของคุณ',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.blue[700],
@@ -271,13 +271,13 @@ class RoleSwitcherScreen extends StatelessWidget {
   String _getRoleTitle(String role) {
     switch (role) {
       case 'dentist':
-        return 'Dentist';
+        return 'ทันตแพทย์';
       case 'assistant':
-        return 'Dental Assistant';
+        return 'ผู้ช่วยทันตแพทย์';
       case 'clinic':
-        return 'Clinic Owner';
+        return 'เจ้าของคลินิก';
       case 'seller':
-        return 'Equipment Seller';
+        return 'ผู้ขายอุปกรณ์';
       default:
         return role.toUpperCase();
     }
@@ -286,15 +286,15 @@ class RoleSwitcherScreen extends StatelessWidget {
   String _getRoleDescription(String role) {
     switch (role) {
       case 'dentist':
-        return 'Licensed dental professional';
+        return 'ผู้ประกอบวิชาชีพทันตกรรม';
       case 'assistant':
-        return 'Dental assistant professional';
+        return 'ผู้ช่วยทันตแพทย์มืออาชีพ';
       case 'clinic':
-        return 'Dental clinic owner/manager';
+        return 'เจ้าของ/ผู้จัดการคลินิกทันตกรรม';
       case 'seller':
-        return 'Dental equipment seller';
+        return 'ผู้ขายอุปกรณ์ทันตกรรม';
       default:
-        return 'Professional role';
+        return 'บทบาทมืออาชีพ';
     }
   }
 } 

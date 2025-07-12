@@ -44,7 +44,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Marketplace'),
+        title: const Text('ตลาดซื้อขาย'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -54,8 +54,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
           unselectedLabelColor: Colors.grey[600],
           indicatorColor: Theme.of(context).primaryColor,
           tabs: const [
-            Tab(text: 'Browse'),
-            Tab(text: 'Categories'),
+            Tab(text: 'เรียกดู'),
+            Tab(text: 'หมวดหมู่'),
           ],
         ),
         actions: [
@@ -83,7 +83,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
                   children: [
                     Icon(MdiIcons.packageVariantClosed),
                     SizedBox(width: 8),
-                    Text('My Products'),
+                    Text('สินค้าของฉัน'),
                   ],
                 ),
               ),
@@ -115,7 +115,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Search products...',
+          hintText: 'ค้นหาสินค้า...',
           prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -146,7 +146,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
             : provider.products;
 
         if (products.isEmpty) {
-          return const Center(child: Text('No products found'));
+          return const Center(child: Text('ไม่พบสินค้า'));
         }
 
         return GridView.builder(
@@ -188,7 +188,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
                   ),
                 ),
                 title: Text(category.name),
-                subtitle: Text('$productCount items'),
+                subtitle: Text('$productCount รายการ'),
                 trailing: Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () => _showCategoryProducts(category),
               ),
@@ -204,9 +204,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to product detail screen
+                      // Note: Product detail screen navigation pending implementation
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Product detail view coming soon!')),
+                            const SnackBar(content: Text('หน้ารายละเอียดสินค้า เร็วๆ นี้!')),
           );
         },
         child: Column(
@@ -285,7 +285,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with TickerProvid
             foregroundColor: Colors.black87,
           ),
           body: products.isEmpty
-              ? const Center(child: Text('No products in this category'))
+              ? const Center(child: Text('ไม่มีสินค้าในหมวดหมู่นี้'))
               : GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

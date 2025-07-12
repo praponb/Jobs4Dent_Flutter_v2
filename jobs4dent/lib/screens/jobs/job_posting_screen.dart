@@ -19,90 +19,168 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _minSalaryController = TextEditingController();
-  final _maxSalaryController = TextEditingController();
-  final _salaryDetailsController = TextEditingController();
-  final _benefitsController = TextEditingController();
   final _perksController = TextEditingController();
-  final _addressController = TextEditingController();
+  final _workingDaysController = TextEditingController();
   final _workingHoursController = TextEditingController();
   final _additionalRequirementsController = TextEditingController();
-  final _cityController = TextEditingController();
 
-  // Form values
-  String? _selectedBranchId;
-  String _selectedJobType = 'full-time';
   String _selectedJobCategory = JobProvider.jobCategories.first;
-  String _selectedExperienceLevel = 'entry';
-  String _selectedSalaryType = 'monthly';
-  String _selectedProvince = 'กรุงเทพมหานคร';
+  String _selectedExperienceLevel = 'ไม่มีประสบการณ์';
+  String _selectedSalaryType = '50:50';
+  String _selectedProvinceZones = 'กรุงเทพฯ ในเมือง';
+  String _selectedLocationZones = 'พระราม 8 สามเสน ราชวัตร ศรีย่าน ดุสิต';
 
-  List<String> _selectedRequiredSkills = [];
-  List<String> _selectedRequiredSpecialties = [];
-  List<String> _selectedRequiredCertifications = [];
-  List<String> _selectedRequiredLanguages = [];
-  List<String> _selectedRequiredSoftware = [];
-  List<String> _selectedWorkingDays = [];
-  int? _minExperienceYears;
-  DateTime? _startDate;
-  DateTime? _endDate;
-  DateTime? _deadline;
-  bool _isUrgent = false;
-  bool _isRemote = false;
-  bool _travelRequired = false;
+  List<String> _selectedWorkingType = [];
+
+  final List<String> _workingType = [
+    'ประจำ', 'Part-time'
+  ];
 
   // Thai provinces
-  final List<String> _thaiProvinces = [
-    'กรุงเทพมหานคร', 'กระบี่', 'กาญจนบุรี', 'กาฬสินธุ์', 'กำแพงเพชร',
-    'ขอนแก่น', 'จันทบุรี', 'ฉะเชิงเทรา', 'ชลบุรี', 'ชัยนาท', 'ชัยภูมิ',
-    'ชุมพร', 'เชียงราย', 'เชียงใหม่', 'ตรัง', 'ตราด', 'ตาก',
-    'นครนายก', 'นครปฐม', 'นครพนม', 'นครราชสีมา', 'นครศรีธรรมราช',
-    'นครสวรรค์', 'นนทบุรี', 'นราธิวาส', 'น่าน', 'บึงกาฬ', 'บุรีรัมย์',
-    'ปทุมธานี', 'ประจวบคีรีขันธ์', 'ปราจีนบุรี', 'ปัตตานี', 'พระนครศรีอยุธยา',
-    'พังงา', 'พัทลุง', 'พิจิตร', 'พิษณุโลก', 'เพชรบุรี', 'เพชรบูรณ์',
-    'แพร่', 'ภูเก็ต', 'มหาสารคาม', 'มุกดาหาร', 'แม่ฮ่องสอน',
-    'ยะลา', 'ยโสธร', 'ร้อยเอ็ด', 'ระนอง', 'ระยอง', 'ราชบุรี',
-    'ลพบุรี', 'ลำปาง', 'ลำพูน', 'เลย', 'ศรีสะเกษ', 'สกลนคร',
-    'สงขลา', 'สตูล', 'สมุทรปราการ', 'สมุทรสงคราม', 'สมุทรสาคร',
-    'สระแก้ว', 'สระบุรี', 'สิงห์บุรี', 'สุโขทัย', 'สุพรรณบุรี',
-    'สุราษฎร์ธานี', 'สุรินทร์', 'หนองคาย', 'หนองบัวลำภู', 'อ่างทอง',
-    'อำนาจเจริญ', 'อุดรธานี', 'อุตรดิตถ์', 'อุทัยธานี', 'อุบลราชธานี'
+  final List<String> _thaiProvinceZones = [
+    'กรุงเทพฯ ในเมือง',
+    'กรุงเทพฯ ตอนเหนือ',
+    'กรุงเทพฯ ฝั่งตะวันออก',
+    'กรุงเทพฯ ธนบุรี',
+    'กรุงเทพฯ นนทบุรี',
+    'กรุงเทพฯ ปทุมธานี',
+    'ต่างจังหวัด',
   ];
 
-  // Working days
-  final List<String> _workingDays = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-  ];
-
-  // Dental skills
-  final List<String> _dentalSkills = [
-    'Oral Examination', 'Dental Cleaning', 'X-ray Operation', 'Dental Assisting',
-    'Sterilization', 'Patient Communication', 'Dental Software', 'Insurance Processing',
-    'Appointment Scheduling', 'Dental Photography', 'Impression Taking', 'Chart Management',
-    'Emergency Care', 'Pain Management', 'Local Anesthesia', 'Dental Materials Knowledge'
-  ];
-
-  // Dental specialties
-  final List<String> _dentalSpecialties = [
-    'General Dentistry', 'Orthodontics', 'Oral Surgery', 'Endodontics',
-    'Periodontics', 'Prosthodontics', 'Pediatric Dentistry', 'Oral Pathology',
-    'Oral Radiology', 'Dental Hygiene', 'Dental Laboratory', 'Cosmetic Dentistry'
-  ];
-
-  // Common certifications
-  final List<String> _certifications = [
-    'Dental License', 'CPR Certification', 'Radiology License', 'Local Anesthesia Certification',
-    'Infection Control Certification', 'OSHA Training', 'HIPAA Training'
-  ];
-
-  // Common languages
-  final List<String> _languages = [
-    'Thai', 'English', 'Chinese', 'Japanese', 'Korean', 'Arabic', 'French', 'German'
-  ];
-
-  // Common software
-  final List<String> _dentalSoftware = [
-    'Dentrix', 'Eaglesoft', 'Open Dental', 'Practice-Web', 'Curve Dental',
-    'PracticeWorks', 'SoftDent', 'Dental Office Manager'
+  final List<List<String>> _thaiLocationZones = [
+    
+    //กรุงเทพฯ ในเมือง
+    ['พระราม 8 สามเสน ราชวัตร ศรีย่าน ดุสิต',
+    'สยาม จุฬาลงกรณ์ สามย่าน สนามกีฬาแห่งชาติ หัวลำโพง ปทุมวัน',
+    'สีลม ศาลาแดง บางรัก สี่พระยา สุรวงศ์',
+    'วิทยุ ชิดลม หลังสวน เพลินจิต ร่วมฤดี สารสิน ราชดำริ ลุมพินี',
+    'ราชเทวี พญาไท รางน้ำ ประตูน้ำ ราชปรารภ',
+    'อารีย์ อนุสาวรีย์ ราชครู สนามเป้า',
+    'สะพานควาย จตุจักร หมอชิต ประดิพัทธ์ อินทามะระ',
+    'รัชดาภิเษก ห้วยขวาง สุทธิสาร ศูนย์วัฒนธรรม เหม่งจ๋าย',
+    'พระราม 9 เพชรบุรีตัดใหม่ RCA ดินแดง ศูนย์วิจัย คลองตัน',
+    'นานาฝั่งเหนือ นานาฝั่งใต้',
+    'สุขุมวิท อโศก ทองหล่อ เอกมัย พร้อมพงษ์ ประสานมิตร',
+    'อ่อนนุช อุดมสุข พระโขนง บางจาก ปุณณวิถี',
+    'คลองเตย กล้วยน้ำไท ท่าเรือ พระราม 4',
+    'สาทร นราธิวาส เย็นอากาศ ช่องนนทรี สุรศักดิ์ เซ้นต์หลุย เจริญราษฎร์ เจริญกรุง',
+    'พระราม 3 สาธุประดิษฐ์ นางลิ้นจี่ ยานนาวา',
+    'เยาวราช บางลำพู พระนคร ป้อมปราบ สัมพันธวงศ์',
+    ],
+    //กรุงเทพฯ ตอนเหนือ
+    ['เกษตรศาสตร์ รัชโยธิน เสือใหญ่ เสนานิคม วังหิน รัชวิภา บางเขน',
+    'เกษตร-นวมินทร์ (ประเสริฐมนูกิจ) สุคนธสวัสดิ์ นวลจันทร์ มัยลาภ ลาดปลาเค้า',
+    'เลียบทางด่วนรามอินทรา (ประดิษฐ์มนูธรรม) โยธินพัฒนา CDC ศรีวรา',
+    'รามอินทรา วัชรพล สายไหม หทัยราษฎร์ นวมินทร์ แฟชั่นไอส์แลนด์ สุขาภิบาล 5',
+    'ลาดพร้าวตอนต้น ห้าแยกลาดพร้าว เซ็นทรัลลาดพร้าว โชคชัยร่วมมิตร',
+    'ลาดพร้าวตอนกลาง โชคชัย 4 ลาดพร้าว 71 นาคนิวาส',
+    'ลาดพร้าวตอนปลาย มหาดไทย ลาดพร้าว 101 แฮปปี้แลนด์ เดอะมอลล์บางกะปิ',
+    'ดอนเมือง สะพานใหม่ วิภาวดี สรงประภา หลักสี่',
+    ],
+    //กรุงเทพฯ ฝั่งตะวันออก
+    [
+    'ศรีนครินทร์ พัฒนาการ กรุงเทพกรีฑา สวนหลวง',
+    'บางนา สรรพวุธ ลาซาล แบริ่ง สันติคาม ม.รามคำแหง 2 เมกะบางนา เอแบคบางนา',
+    'รามคำแหงตอนต้น ม.รามคำแหง หัวหมาก เอแบครามคำแหง ทาวน์อินทาวน์ บดินทรเดชา',
+    'รามคำแหงตอนกลาง นิด้า เสรีไทย สุขาภิบาล 2',
+    'ร่มเกล้า หนองจอก มีนบุรี รามคำแหงตอนปลาย ซอยมิสทีน สุวินทวงศ์',
+    'เทพารักษ์ บางพลี สำโรง แพรกษา ปู่เจ้าสมิงพราย ศรีด่าน ปากน้ำ บางปู สมุทรปราการ',
+    'ลาดกระบัง สุวรรณภูมิ มอเตอร์เวย์ เฉลิมพระเกียรติ ประเวศ',
+    ],
+    //กรุงเทพฯ ธนบุรี
+    ['วงเวียนใหญ่ เจริญนคร กรุงธนบุรี ตากสิน อิสรภาพ',
+    'กัลปพฤกษ์ ท่าพระ ตลาดพลู โพธิ์นิมิตร วุฒากาศ บางหว้า เทอดไท',
+    'ตลิ่งชัน ปิ่นเกล้า จรัญสนิทวงศ์ บางอ้อ บางพลัด บรมราชชนนี อรุณอัมรินทร์ ราชพฤกษ์',
+    'บางบอน ดาวคะนอง จอมทอง เอกชัย กัลปพฤกษ์',
+    'ราษฎร์บูรณะ สุขสวัสดิ์ ประชาอุทิศ พระประแดง พุทธบูชา ทุ่งครุ',
+    'พระราม 2 บางขุนเทียน ท่าข้าม เทียนทะเล',
+    'บางแค เพชรเกษม ภาษีเจริญ หนองแขม',
+    ],
+    //กรุงเทพฯ นนทบุรี
+    ['บางซื่อ วงศ์สว่าง เตาปูน ประชาชื่น บางโพ บางซ่อน ประชาราษฎร์ กรุงเทพนนท์',
+    'รัตนาธิเบศร์ สนามบินน้ำ พระนั่งเกล้า สามัคคี เรวดี',
+    'ราชพฤกษ์ ถนน 345 บางกรวย ติวานนท์ นครอินทร์ พระราม 5 พิบูลสงคราม ชัยพฤกษ์',
+    'แจ้งวัฒนะ เมืองทอง งามวงศ์วาน เลียบคลองประปา แคราย ปากเกร็ด',
+    'นนทบุรี บางใหญ่ บางบัวทอง ไทรน้อย ไทรม้า ท่าอิฐ',
+    ],
+    //กรงเทพฯ ปทุมธานี
+    ['รังสิต ลำลูกกา ปทุมธานี คลองหลวง'],
+    //ต่างจังหวัด
+    ['นครปฐม',
+    'อยุธยา',
+    'กำแพงเพชร',
+    'ชัยนาท',
+    'นครนายก',
+    'นครสวรรค์',
+    'พิจิตร',
+    'พิษณุโลก',
+    'เพชรบูรณ์',
+    'ลพบุรี',
+    'สมุทรสงคราม',
+    'สมุทรสาคร',
+    'สิงห์บุรี',
+    'สุโขทัย',
+    'สุพรรณบุรี',
+    'สระบุรี',
+    'อ่างทอง',
+    'อุทัยธานี',
+    'เชียงใหม่',
+    'เชียงราย',
+    'น่าน',
+    'พะเยา',
+    'แพร่',
+    'แม่ฮ่องสอน',
+    'ลำปาง',
+    'ลำพูน',
+    'อุตรดิตถ์',
+    'ประจวบคีรีขันธ์',
+    'กาญจนบุรี',
+    'ตาก',
+    'เพชรบุรี',
+    'ราชบุรี',
+    'ชลบุรี',
+    'จันทบุรี',
+    'ฉะเชิงเทรา',
+    'ตราด',
+    'ปราจีนบุรี',
+    'ระยอง',
+    'สระแก้ว',
+    'ชลบุรี',
+    'นครราชสีมา',
+    'ขอนแก่น',
+    'กาฬสินธุ์',
+    'ชัยภูมิ',
+    'นครพนม',
+    'บึงกาฬ',
+    'บุรีรัมย์',
+    'มหาสารคาม',
+    'มุกดาหาร',
+    'ยโสธร',
+    'ร้อยเอ็ด',
+    'เลย',
+    'ศรีสะเกษ',
+    'สกลนคร',
+    'สุรินทร์',
+    'หนองคาย',
+    'หนองบัวลำภู',
+    'อำนาจเจริญ',
+    'อุดรธานี',
+    'อุบลราชธานี',
+    'ภูเก็ต',
+    'กระบี่',
+    'ชุมพร',
+    'ตรัง',
+    'นครศรีธรรมราช',
+    'นราธิวาส',
+    'ปัตตานี',
+    'พังงา',
+    'พัทลุง',
+    'ยะลา',
+    'ระนอง',
+    'สงขลา',
+    'สตูล',
+    'สุราษฎร์ธานี',
+    ],
   ];
 
   @override
@@ -111,39 +189,58 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     _initializeForm();
   }
 
+  List<String> _getCurrentLocationZones() {
+    int provinceIndex = _thaiProvinceZones.indexOf(_selectedProvinceZones);
+    if (provinceIndex >= 0 && provinceIndex < _thaiLocationZones.length) {
+      final locationZones = _thaiLocationZones[provinceIndex];
+      if (locationZones.isNotEmpty) {
+        return locationZones;
+      }
+    }
+    // Default to first zone if not found or empty
+    return _thaiLocationZones.isNotEmpty && _thaiLocationZones.first.isNotEmpty 
+        ? _thaiLocationZones.first 
+        : ['กรุงเทพฯ']; // Ultimate fallback
+  }
+
+  String _getValidLocationZone() {
+    final availableLocations = _getCurrentLocationZones();
+    if (availableLocations.contains(_selectedLocationZones)) {
+      return _selectedLocationZones;
+    }
+    // If current selection is not valid, update it and return first option
+    if (availableLocations.isNotEmpty) {
+      _selectedLocationZones = availableLocations.first;
+      return _selectedLocationZones;
+    }
+    // Ultimate fallback
+    return 'กรุงเทพฯ';
+  }
+
   void _initializeForm() {
     if (widget.jobToEdit != null) {
       final job = widget.jobToEdit!;
       _titleController.text = job.title;
       _descriptionController.text = job.description;
-      _selectedBranchId = job.branchId;
-      _selectedJobType = job.jobType;
       _selectedJobCategory = job.jobCategory;
       _selectedExperienceLevel = job.experienceLevel;
       _selectedSalaryType = job.salaryType;
-      _selectedProvince = job.province;
-      _cityController.text = job.city;
-      _addressController.text = job.address ?? '';
+      _selectedProvinceZones = job.province;
+      
+      final availableLocations = _getCurrentLocationZones();
+      if (availableLocations.contains(job.city)) {
+        _selectedLocationZones = job.city;
+      } else {
+        _selectedLocationZones = availableLocations.first;
+      }
+      
       _minSalaryController.text = job.minSalary?.toString() ?? '';
-      _maxSalaryController.text = job.maxSalary?.toString() ?? '';
-      _salaryDetailsController.text = job.salaryDetails ?? '';
-      _benefitsController.text = job.benefits ?? '';
       _perksController.text = job.perks ?? '';
+      _workingDaysController.text = job.workingDays?.join(', ') ?? '';
       _workingHoursController.text = job.workingHours ?? '';
       _additionalRequirementsController.text = job.additionalRequirements ?? '';
-      _selectedRequiredSkills = List.from(job.requiredSkills);
-      _selectedRequiredSpecialties = List.from(job.requiredSpecialties);
-      _selectedRequiredCertifications = List.from(job.requiredCertifications ?? []);
-      _selectedRequiredLanguages = List.from(job.requiredLanguages ?? []);
-      _selectedRequiredSoftware = List.from(job.requiredSoftware ?? []);
-      _selectedWorkingDays = List.from(job.workingDays ?? []);
-      _minExperienceYears = job.minExperienceYears;
-      _startDate = job.startDate;
-      _endDate = job.endDate;
-      _deadline = job.deadline;
-      _isUrgent = job.isUrgent;
-      _isRemote = job.isRemote;
-      _travelRequired = job.travelRequired;
+
+      _selectedWorkingType = List.from(job.workingDays ?? []);
     }
   }
 
@@ -152,14 +249,10 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     _titleController.dispose();
     _descriptionController.dispose();
     _minSalaryController.dispose();
-    _maxSalaryController.dispose();
-    _salaryDetailsController.dispose();
-    _benefitsController.dispose();
     _perksController.dispose();
-    _addressController.dispose();
+    _workingDaysController.dispose();
     _workingHoursController.dispose();
     _additionalRequirementsController.dispose();
-    _cityController.dispose();
     super.dispose();
   }
 
@@ -167,7 +260,7 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.jobToEdit != null ? 'Edit Job Posting' : 'Post New Job'),
+        title: Text(widget.jobToEdit != null ? 'แก้ไขประกาศงาน' : 'ประกาศงานใหม่'),
         actions: [
           Consumer<JobProvider>(
             builder: (context, jobProvider, child) {
@@ -180,7 +273,7 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text(
-                        widget.jobToEdit != null ? 'Update' : 'Post',
+                        widget.jobToEdit != null ? 'อัปเดต' : 'ประกาศ',
                         style: const TextStyle(color: Colors.white),
                       ),
               );
@@ -196,20 +289,20 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Basic Information Section
-              _buildSectionHeader('Basic Information'),
+              _buildSectionHeader('ข้อมูลพื้นฐาน'),
               const SizedBox(height: 16),
 
               // Job Title
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: 'Job Title *',
+                  labelText: 'หัวข้อ *',
                   border: OutlineInputBorder(),
-                  hintText: 'e.g., General Dentist, Dental Assistant',
+                  hintText: 'เช่น รับสมัครทันตแพทย์ประจำ(สามารถเลือกวันลงตรวจได้)',
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Job title is required';
+                    return 'ต้องระบุหัวข้อ';
                   }
                   return null;
                 },
@@ -222,40 +315,24 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _selectedJobCategory,
+                      isExpanded: true,
                       decoration: const InputDecoration(
-                        labelText: 'Job Category *',
+                        labelText: 'หมวดหมู่งาน *',
                         border: OutlineInputBorder(),
                       ),
                       items: JobProvider.jobCategories.map((category) {
                         return DropdownMenuItem(
                           value: category,
-                          child: Text(category),
+                          child: Text(
+                            category,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         );
                       }).toList(),
                       onChanged: (value) {
                         setState(() {
                           _selectedJobCategory = value!;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedJobType,
-                      decoration: const InputDecoration(
-                        labelText: 'Job Type *',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: JobProvider.jobTypes.map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(type.toUpperCase()),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedJobType = value!;
                         });
                       },
                     ),
@@ -269,13 +346,13 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                 controller: _descriptionController,
                 maxLines: 5,
                 decoration: const InputDecoration(
-                  labelText: 'Job Description *',
+                  labelText: 'รายละเอียดงาน *',
                   border: OutlineInputBorder(),
-                  hintText: 'Describe the role, responsibilities, and requirements...',
+                  hintText: 'อธิบายลักษณะงาน และข้อมูลการติดต่อ...',
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Job description is required';
+                    return 'ต้องระบุรายละเอียดงาน';
                   }
                   return null;
                 },
@@ -283,94 +360,72 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
               const SizedBox(height: 24),
 
               // Location Information Section
-              _buildSectionHeader('Location Information'),
+              _buildSectionHeader('ข้อมูลสถานที่'),
               const SizedBox(height: 16),
 
               // Province and City
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedProvince,
-                      decoration: const InputDecoration(
-                        labelText: 'Province *',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: _thaiProvinces.map((province) {
-                        return DropdownMenuItem(
-                          value: province,
-                          child: Text(province),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedProvince = value!;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _cityController,
-                      decoration: const InputDecoration(
-                        labelText: 'City/District *',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'City is required';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Address
-              TextFormField(
-                controller: _addressController,
+              DropdownButtonFormField<String>(
+                value: _selectedProvinceZones,
+                isExpanded: true,
                 decoration: const InputDecoration(
-                  labelText: 'Full Address',
+                  labelText: 'โซนที่ตั้ง *',
                   border: OutlineInputBorder(),
-                  hintText: 'Street address, building, floor, etc.',
                 ),
+                items: _thaiProvinceZones.map((province) {
+                  return DropdownMenuItem(
+                    value: province,
+                    child: Text(
+                      province,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    // Defer the setState call to avoid "setState called during build" error
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        _selectedProvinceZones = value;
+                        // Reset location when province changes
+                        final newLocations = _getCurrentLocationZones();
+                        if (newLocations.isNotEmpty) {
+                          _selectedLocationZones = newLocations.first;
+                        }
+                      });
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _getValidLocationZone(),
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'จังหวัด/โซนในจังหวัด *',
+                  border: OutlineInputBorder(),
+                ),
+                items: _getCurrentLocationZones().map((location) {
+                  return DropdownMenuItem(
+                    value: location,
+                    child: Text(
+                      location,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedLocationZones = value;
+                    });
+                  }
+                },
               ),
               const SizedBox(height: 16),
 
-              // Remote work and Travel required
-              Row(
-                children: [
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: const Text('Remote Work Available'),
-                      value: _isRemote,
-                      onChanged: (value) {
-                        setState(() {
-                          _isRemote = value ?? false;
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: const Text('Travel Required'),
-                      value: _travelRequired,
-                      onChanged: (value) {
-                        setState(() {
-                          _travelRequired = value ?? false;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Experience Requirements Section
-              _buildSectionHeader('Experience Requirements'),
+              _buildSectionHeader('ข้อกำหนดประสบการณ์'),
               const SizedBox(height: 16),
 
               // Experience Level and Minimum Years
@@ -379,14 +434,19 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _selectedExperienceLevel,
+                      isExpanded: true,
                       decoration: const InputDecoration(
-                        labelText: 'Experience Level *',
+                        labelText: 'ประสบการณ์(กี่ปี) *',
                         border: OutlineInputBorder(),
                       ),
                       items: JobProvider.experienceLevels.map((level) {
                         return DropdownMenuItem(
                           value: level,
-                          child: Text(level.toUpperCase()),
+                          child: Text(
+                            level,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -396,85 +456,29 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Min. Years of Experience',
-                        border: OutlineInputBorder(),
-                        hintText: 'e.g., 2',
-                      ),
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        _minExperienceYears = int.tryParse(value);
-                      },
-                      initialValue: _minExperienceYears?.toString(),
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 16),
 
-              // Required Skills
-              _buildMultiSelectField(
-                'Required Skills',
-                _dentalSkills,
-                _selectedRequiredSkills,
-                (values) => setState(() => _selectedRequiredSkills = values),
-              ),
-              const SizedBox(height: 16),
-
-              // Required Specialties
-              _buildMultiSelectField(
-                'Required Specialties',
-                _dentalSpecialties,
-                _selectedRequiredSpecialties,
-                (values) => setState(() => _selectedRequiredSpecialties = values),
-              ),
-              const SizedBox(height: 16),
-
-              // Required Certifications
-              _buildMultiSelectField(
-                'Required Certifications',
-                _certifications,
-                _selectedRequiredCertifications,
-                (values) => setState(() => _selectedRequiredCertifications = values),
-              ),
-              const SizedBox(height: 16),
-
-              // Required Languages
-              _buildMultiSelectField(
-                'Required Languages',
-                _languages,
-                _selectedRequiredLanguages,
-                (values) => setState(() => _selectedRequiredLanguages = values),
-              ),
-              const SizedBox(height: 16),
-
-              // Required Software
-              _buildMultiSelectField(
-                'Required Software',
-                _dentalSoftware,
-                _selectedRequiredSoftware,
-                (values) => setState(() => _selectedRequiredSoftware = values),
-              ),
-              const SizedBox(height: 24),
-
-              // Salary Information Section
-              _buildSectionHeader('Salary Information'),
+              _buildSectionHeader('ข้อมูลรายได้'),
               const SizedBox(height: 16),
 
               // Salary Type
               DropdownButtonFormField<String>(
                 value: _selectedSalaryType,
+                isExpanded: true,
                 decoration: const InputDecoration(
-                  labelText: 'Salary Type *',
+                  labelText: 'Doctor Fee *',
                   border: OutlineInputBorder(),
                 ),
                 items: JobProvider.salaryTypes.map((type) {
                   return DropdownMenuItem(
                     value: type,
-                    child: Text(type.toUpperCase()),
+                    child: Text(
+                      type,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -492,21 +496,9 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                     child: TextFormField(
                       controller: _minSalaryController,
                       decoration: const InputDecoration(
-                        labelText: 'Min Salary (THB)',
+                        labelText: 'ประกันรายได้ขั้นต่ำ (บาท/วัน)',
                         border: OutlineInputBorder(),
-                        hintText: '25000',
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _maxSalaryController,
-                      decoration: const InputDecoration(
-                        labelText: 'Max Salary (THB)',
-                        border: OutlineInputBorder(),
-                        hintText: '40000',
+                        hintText: '2500',
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -515,51 +507,39 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Salary Details
-              TextFormField(
-                controller: _salaryDetailsController,
-                decoration: const InputDecoration(
-                  labelText: 'Salary Details',
-                  border: OutlineInputBorder(),
-                  hintText: 'Additional compensation details...',
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Benefits
-              TextFormField(
-                controller: _benefitsController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Benefits',
-                  border: OutlineInputBorder(),
-                  hintText: 'Health insurance, dental coverage, etc...',
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Perks
+              // Other Benefits
               TextFormField(
                 controller: _perksController,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  labelText: 'Perks',
+                  labelText: 'อื่นๆ',
                   border: OutlineInputBorder(),
-                  hintText: 'Flexible hours, team building, etc...',
+                  hintText: 'สิทธิพิเศษ, เวลางานยืดหยุ่น ฯลฯ',
                 ),
               ),
               const SizedBox(height: 24),
 
               // Schedule Information Section
-              _buildSectionHeader('Schedule Information'),
+              _buildSectionHeader('ข้อมูลตารางงาน'),
               const SizedBox(height: 16),
 
               // Working Days
               _buildMultiSelectField(
-                'Working Days',
-                _workingDays,
-                _selectedWorkingDays,
-                (values) => setState(() => _selectedWorkingDays = values),
+                'ประจำ หรือ part-time',
+                _workingType,
+                _selectedWorkingType,
+                (values) => setState(() => _selectedWorkingType = values),
+              ),
+              const SizedBox(height: 16),
+
+              // Working Days
+              TextFormField(
+                controller: _workingDaysController,
+                decoration: const InputDecoration(
+                  labelText: 'วัน ทำงาน',
+                  border: OutlineInputBorder(),
+                  hintText: 'เช่น จันทร์-ศุกร์',
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -567,74 +547,14 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
               TextFormField(
                 controller: _workingHoursController,
                 decoration: const InputDecoration(
-                  labelText: 'Working Hours',
+                  labelText: 'เวลา ทำงาน',
                   border: OutlineInputBorder(),
-                  hintText: 'e.g., 9:00 AM - 6:00 PM',
+                  hintText: 'เช่น 09:00น.-18:00น.',
                 ),
               ),
               const SizedBox(height: 16),
 
-              // Date Range (for freelance/locum positions)
-              if (_selectedJobType == 'freelance' || _selectedJobType == 'locum') ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => _selectDate(context, true),
-                        child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'Start Date',
-                            border: OutlineInputBorder(),
-                          ),
-                          child: Text(
-                            _startDate != null 
-                                ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
-                                : 'Select start date',
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => _selectDate(context, false),
-                        child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'End Date',
-                            border: OutlineInputBorder(),
-                          ),
-                          child: Text(
-                            _endDate != null 
-                                ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
-                                : 'Select end date',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // Application Deadline
-              InkWell(
-                onTap: () => _selectDeadline(context),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Application Deadline',
-                    border: OutlineInputBorder(),
-                  ),
-                  child: Text(
-                    _deadline != null 
-                        ? '${_deadline!.day}/${_deadline!.month}/${_deadline!.year}'
-                        : 'Select deadline (optional)',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Additional Information Section
-              _buildSectionHeader('Additional Information'),
+              _buildSectionHeader('ข้อมูลเพิ่มเติม'),
               const SizedBox(height: 16),
 
               // Additional Requirements
@@ -642,25 +562,12 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                 controller: _additionalRequirementsController,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  labelText: 'Additional Requirements',
+                  labelText: 'ข้อกำหนดเพิ่มเติม',
                   border: OutlineInputBorder(),
-                  hintText: 'Any other specific requirements...',
+                  hintText: 'ข้อกำหนดเฉพาะอื่นๆ...',
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Urgent Hiring
-              CheckboxListTile(
-                title: const Text('Urgent Hiring'),
-                subtitle: const Text('Mark this job as urgent to increase visibility'),
-                value: _isUrgent,
-                onChanged: (value) {
-                  setState(() {
-                    _isUrgent = value ?? false;
-                  });
-                },
-              ),
-              const SizedBox(height: 32),
 
               // Post/Update Button
               Consumer<JobProvider>(
@@ -673,7 +580,7 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                       child: jobProvider.isLoading
                           ? const CircularProgressIndicator()
                           : Text(
-                              widget.jobToEdit != null ? 'Update Job Posting' : 'Post Job',
+                              widget.jobToEdit != null ? 'อัปเดตโพสต์งาน' : 'โพสต์งาน',
                               style: const TextStyle(fontSize: 16),
                             ),
                     ),
@@ -715,47 +622,15 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
       buttonIcon: const Icon(Icons.arrow_drop_down),
       buttonText: Text(
         selectedValues.isEmpty 
-            ? 'Select $title' 
-            : '${selectedValues.length} selected',
+            ? 'เลือก$title' 
+            : 'เลือก ${selectedValues.length} รายการ',
       ),
       onConfirm: onConfirm,
       initialValue: selectedValues,
     );
   }
 
-  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: isStartDate 
-          ? (_startDate ?? DateTime.now())
-          : (_endDate ?? DateTime.now().add(const Duration(days: 30))),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isStartDate) {
-          _startDate = picked;
-        } else {
-          _endDate = picked;
-        }
-      });
-    }
-  }
 
-  Future<void> _selectDeadline(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _deadline ?? DateTime.now().add(const Duration(days: 14)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null) {
-      setState(() {
-        _deadline = picked;
-      });
-    }
-  }
 
   Future<void> _postJob() async {
     if (!_formKey.currentState!.validate()) {
@@ -769,7 +644,7 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
 
     if (authProvider.userModel == null) {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('User information not available')),
+        const SnackBar(content: Text('ข้อมูลผู้ใช้ไม่พร้อมใช้งาน')),
       );
       return;
     }
@@ -777,42 +652,26 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     final user = authProvider.userModel!;
     final now = DateTime.now();
 
-    final job = JobModel(
+        final job = JobModel(
       jobId: widget.jobToEdit?.jobId ?? DateTime.now().millisecondsSinceEpoch.toString(),
       clinicId: user.userId,
       clinicName: user.clinicName ?? user.userName,
-      branchId: _selectedBranchId,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
-      jobType: _selectedJobType,
       jobCategory: _selectedJobCategory,
-      requiredSkills: _selectedRequiredSkills,
-      requiredSpecialties: _selectedRequiredSpecialties,
       experienceLevel: _selectedExperienceLevel,
-      minExperienceYears: _minExperienceYears,
       salaryType: _selectedSalaryType,
       minSalary: _minSalaryController.text.isNotEmpty ? double.tryParse(_minSalaryController.text) : null,
-      maxSalary: _maxSalaryController.text.isNotEmpty ? double.tryParse(_maxSalaryController.text) : null,
-      salaryDetails: _salaryDetailsController.text.trim().isNotEmpty ? _salaryDetailsController.text.trim() : null,
-      benefits: _benefitsController.text.trim().isNotEmpty ? _benefitsController.text.trim() : null,
       perks: _perksController.text.trim().isNotEmpty ? _perksController.text.trim() : null,
-      province: _selectedProvince,
-      city: _cityController.text.trim(),
-      address: _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
-      startDate: _startDate,
-      endDate: _endDate,
-      workingDays: _selectedWorkingDays.isEmpty ? null : _selectedWorkingDays,
+      province: _selectedProvinceZones,
+      city: _selectedLocationZones,
+      workingDays: _workingDaysController.text.trim().isNotEmpty 
+          ? _workingDaysController.text.trim().split(',').map((day) => day.trim()).where((day) => day.isNotEmpty).toList()
+          : (_selectedWorkingType.isEmpty ? null : _selectedWorkingType),
       workingHours: _workingHoursController.text.trim().isNotEmpty ? _workingHoursController.text.trim() : null,
-      isUrgent: _isUrgent,
-      isRemote: _isRemote,
-      requiredCertifications: _selectedRequiredCertifications.isEmpty ? null : _selectedRequiredCertifications,
-      requiredLanguages: _selectedRequiredLanguages.isEmpty ? null : _selectedRequiredLanguages,
       additionalRequirements: _additionalRequirementsController.text.trim().isNotEmpty ? _additionalRequirementsController.text.trim() : null,
-      travelRequired: _travelRequired,
-      requiredSoftware: _selectedRequiredSoftware.isEmpty ? null : _selectedRequiredSoftware,
       createdAt: widget.jobToEdit?.createdAt ?? now,
       updatedAt: now,
-      deadline: _deadline,
     );
 
     bool success;
@@ -828,8 +687,8 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
           SnackBar(
             content: Text(
               widget.jobToEdit != null 
-                  ? 'Job updated successfully!' 
-                  : 'Job posted successfully!',
+                  ? 'อัปเดตงานสำเร็จแล้ว!' 
+                  : 'โพสต์งานสำเร็จแล้ว!',
             ),
           ),
         );
@@ -838,7 +697,7 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     } else {
       if (context.mounted) {
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text(jobProvider.error ?? 'Failed to post job')),
+          SnackBar(content: Text(jobProvider.error ?? 'โพสต์งานไม่สำเร็จ')),
         );
       }
     }

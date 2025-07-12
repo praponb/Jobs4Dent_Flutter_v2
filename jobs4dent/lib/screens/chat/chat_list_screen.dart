@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../models/chat_model.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/auth_provider.dart';
-// import 'chat_room_screen.dart'; // TODO: Create chat room screen
+// import 'chat_room_screen.dart'; // Note: Chat room screen implementation pending
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -41,7 +41,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
+        title: const Text('ข้อความ'),
         backgroundColor: const Color(0xFF1976D2),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -60,7 +60,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
           final user = authProvider.userModel;
           if (user == null) {
-            return const Center(child: Text('Please log in to view messages'));
+            return const Center(child: Text('กรุณาเข้าสู่ระบบเพื่อดูข้อความ'));
           }
 
           final filteredChatRooms = _getFilteredChatRooms(chatProvider.chatRooms);
@@ -100,7 +100,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           const Icon(Icons.search, color: Colors.grey),
           const SizedBox(width: 8),
           Text(
-            'Searching for "$_searchQuery"',
+            'กำลังค้นหา "$_searchQuery"',
             style: TextStyle(
               color: Colors.grey[600],
               fontStyle: FontStyle.italic,
@@ -133,7 +133,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            _searchQuery.isNotEmpty ? 'No messages found' : 'No messages yet',
+            _searchQuery.isNotEmpty ? 'ไม่พบข้อความ' : 'ยังไม่มีข้อความ',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -143,8 +143,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
           const SizedBox(height: 8),
           Text(
             _searchQuery.isNotEmpty 
-                ? 'Try adjusting your search terms'
-                : 'Start chatting by applying to jobs',
+                ? 'ลองปรับเปลี่ยนคำค้นหา'
+                : 'เริ่มแชทโดยการสมัครงาน',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[500],
@@ -164,7 +164,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 backgroundColor: const Color(0xFF1976D2),
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Clear Search'),
+              child: const Text('ล้างการค้นหา'),
             ),
           ],
         ],
@@ -298,11 +298,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Search Messages'),
+        title: const Text('ค้นหาข้อความ'),
         content: TextField(
           controller: _searchController,
           decoration: const InputDecoration(
-            hintText: 'Search by name or job title...',
+            hintText: 'ค้นหาด้วยชื่อหรือตำแหน่งงาน...',
             prefixIcon: Icon(Icons.search),
             border: OutlineInputBorder(),
           ),
@@ -311,7 +311,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text('ยกเลิก'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -324,7 +324,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               backgroundColor: const Color(0xFF1976D2),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Search'),
+            child: const Text('ค้นหา'),
           ),
         ],
       ),
@@ -344,9 +344,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
     
     if (mounted) {
-      // TODO: Navigate to chat room screen
+              // Note: Chat room screen navigation pending implementation
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chat feature coming soon!')),
+        const SnackBar(content: Text('ฟีเจอร์แชทจะมาเร็วๆ นี้!')),
       );
     }
   }
@@ -372,7 +372,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     if (messageDate == today) {
       return DateFormat('HH:mm').format(timestamp);
     } else if (messageDate == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday';
+      return 'เมื่อวาน';
     } else if (now.difference(timestamp).inDays < 7) {
       return DateFormat('EEE').format(timestamp);
     } else {
@@ -411,13 +411,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
       case MessageType.text:
         return message.content;
       case MessageType.image:
-        return '📷 Image';
+        return '📷 รูปภาพ';
       case MessageType.file:
-        return '📎 File';
+        return '📎 ไฟล์';
       case MessageType.voice:
-        return '🎤 Voice message';
+        return '🎤 ข้อความเสียง';
       case MessageType.appointment:
-        return '📅 Appointment';
+        return '📅 การนัดหมาย';
       case MessageType.system:
         return message.content;
     }

@@ -8,7 +8,7 @@ import '../../models/user_model.dart';
 import '../../providers/appointment_provider.dart';
 import '../../providers/auth_provider.dart';
 import 'appointment_detail_screen.dart';
-// import 'availability_setup_screen.dart'; // TODO: Complete availability setup screen
+// import 'availability_setup_screen.dart'; // Note: Availability setup screen implementation pending
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -51,7 +51,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendar'),
+        title: const Text('ปฏิทิน'),
         backgroundColor: const Color(0xFF1976D2),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -70,7 +70,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
           final user = authProvider.userModel;
           if (user == null) {
-            return const Center(child: Text('Please log in to view calendar'));
+            return const Center(child: Text('กรุณาเข้าสู่ระบบเพื่อดูปฏิทิน'));
           }
 
           return Column(
@@ -230,14 +230,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (appointments.isNotEmpty) ...[
-                            _buildSectionHeader('Appointments', Icons.event),
+                            _buildSectionHeader('นัดหมาย', Icons.event),
                             const SizedBox(height: 8),
                             ...appointments.map((appointment) => 
                                 _buildAppointmentCard(appointment)),
                             const SizedBox(height: 16),
                           ],
                           if (availability.isNotEmpty) ...[
-                            _buildSectionHeader('Availability', Icons.schedule),
+                            _buildSectionHeader('ความพร้อม', Icons.schedule),
                             const SizedBox(height: 8),
                             ...availability.map((avail) => 
                                 _buildAvailabilityCard(avail)),
@@ -264,7 +264,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No events for this day',
+            'ไม่มีกิจกรรมในวันนี้',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
@@ -272,7 +272,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tap the + button to add availability',
+            'แตะปุ่ม + เพื่อเพิ่มช่วงเวลาว่าง',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[500],
@@ -324,7 +324,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               '${DateFormat('HH:mm').format(appointment.scheduledDateTime.add(appointment.duration))}',
             ),
             Text(
-              appointment.isVirtual ? 'Virtual Meeting' : appointment.location,
+              appointment.isVirtual ? 'ประชุมออนไลน์' : appointment.location,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ],
@@ -356,11 +356,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Icon(Icons.schedule, color: Colors.white, size: 20),
         ),
         title: Text(
-          'Available Time Slots (${availability.timeSlots.length})',
+                      'ช่วงเวลาที่ว่าง (${availability.timeSlots.length})',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          'Total: ${_formatDuration(availability.getTotalAvailableTime())}',
+                          'รวม: ${_formatDuration(availability.getTotalAvailableTime())}',
           style: TextStyle(color: Colors.grey[600]),
         ),
         children: availability.timeSlots.map((slot) {
@@ -394,7 +394,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       onPressed: () => _showAddOptionsDialog(),
       backgroundColor: const Color(0xFF1976D2),
       icon: const Icon(Icons.add),
-      label: const Text('Add'),
+                          label: const Text('เพิ่ม'),
     );
   }
 
@@ -402,26 +402,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add to Calendar'),
+                      title: const Text('เพิ่มลงในปฏิทิน'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.schedule, color: Color(0xFF1976D2)),
-              title: const Text('Set Availability'),
-              subtitle: const Text('Mark when you\'re available'),
+              title: const Text('ตั้งค่าความพร้อม'),
+              subtitle: const Text('ทำเครื่องหมายเวลาที่คุณว่าง'),
               onTap: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Availability setup coming soon!')),
+                  const SnackBar(content: Text('การตั้งค่าความพร้อม เร็วๆ นี้!')),
                 );
               },
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.event, color: Color(0xFF1976D2)),
-              title: const Text('Create Appointment'),
-              subtitle: const Text('Schedule a meeting'),
+              title: const Text('สร้างนัดหมาย'),
+              subtitle: const Text('กำหนดการประชุม'),
               onTap: () {
                 Navigator.of(context).pop();
                 _showCreateAppointmentDialog();
@@ -439,12 +439,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Create Appointment'),
-        content: const Text('This feature will be available when integrated with job applications.'),
+                    title: const Text('สร้างนัดหมาย'),
+            content: const Text('ฟีเจอร์นี้จะพร้อมใช้งานเมื่อรวมกับการสมัครงาน'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+                          child: const Text('ตกลง'),
           ),
         ],
       ),
@@ -455,26 +455,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Calendar Settings'),
+                    title: const Text('การตั้งค่าปฏิทิน'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SwitchListTile(
-              title: const Text('Show weekends'),
+              title: const Text('แสดงวันเสาร์-อาทิตย์'),
               value: true,
               onChanged: (value) {
                 // Implement weekend visibility toggle
               },
             ),
             SwitchListTile(
-              title: const Text('24-hour format'),
+              title: const Text('รูปแบบ 24 ชั่วโมง'),
               value: true,
               onChanged: (value) {
                 // Implement time format toggle
               },
             ),
             ListTile(
-              title: const Text('Notification settings'),
+              title: const Text('การตั้งค่าการแจ้งเตือน'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 // Navigate to notification settings
@@ -485,7 +485,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+                          child: const Text('ปิด'),
           ),
         ],
       ),
@@ -551,13 +551,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
   String _getAvailabilityTypeName(AvailabilityType type) {
     switch (type) {
       case AvailabilityType.available:
-        return 'Available';
+        return 'ว่าง';
       case AvailabilityType.busy:
-        return 'Busy';
+                  return 'ไม่ว่าง';
       case AvailabilityType.unavailable:
-        return 'Unavailable';
+        return 'ไม่ว่าง';
       case AvailabilityType.preferred:
-        return 'Preferred';
+                  return 'ต้องการ';
     }
   }
 
@@ -566,9 +566,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final minutes = duration.inMinutes % 60;
     
     if (hours > 0) {
-      return '${hours}h ${minutes}m';
+      return '$hours ชม. $minutes นาที';
     } else {
-      return '${minutes}m';
+      return '$minutes นาที';
     }
   }
 } 

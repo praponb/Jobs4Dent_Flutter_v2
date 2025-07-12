@@ -422,7 +422,7 @@ class AppointmentProvider with ChangeNotifier {
     AppointmentModel appointment,
     String action,
   ) async {
-    // TODO: Implement actual notification system
+            // Note: Notification system integration pending
     // This could integrate with Firebase Cloud Messaging, email service, etc.
     debugPrint('Notification: Appointment $action for ${appointment.title}');
   }

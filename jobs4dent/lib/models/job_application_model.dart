@@ -138,23 +138,23 @@ class JobApplicationModel {
   String getStatusDisplayName() {
     switch (status) {
       case 'submitted':
-        return 'Submitted';
+        return 'ส่งใบสมัครแล้ว';
       case 'under_review':
-        return 'Under Review';
+        return 'กำลังพิจารณา';
       case 'shortlisted':
-        return 'Shortlisted';
+        return 'คัดเลือกแล้ว';
       case 'interview_scheduled':
-        return 'Interview Scheduled';
+        return 'นัดสัมภาษณ์แล้ว';
       case 'interview_completed':
-        return 'Interview Completed';
+        return 'สัมภาษณ์เสร็จสิ้น';
       case 'offered':
-        return 'Job Offered';
+        return 'ได้รับข้อเสนองาน';
       case 'hired':
-        return 'Hired';
+        return 'ได้งานแล้ว';
       case 'rejected':
-        return 'Rejected';
+        return 'ไม่ได้รับคัดเลือก';
       default:
-        return 'Unknown';
+        return 'ไม่ทราบสถานะ';
     }
   }
 
