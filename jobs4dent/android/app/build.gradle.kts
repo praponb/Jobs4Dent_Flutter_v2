@@ -25,7 +25,17 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "11"
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-Xlint:-options",
+            "-Xlint:-deprecation",
+            "-Xsuppress-version-warnings"
+        )
+    }
+
+    // Build features configuration
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -46,6 +56,17 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
+
+// Add compiler args to suppress warnings for all build types
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.addAll(listOf("-Xlint:-deprecation", "-Xlint:-options"))
+    options.isDeprecation = false
+}
+
+// Suppress warnings in Kotlin compilation for all build types
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions.suppressWarnings = true
 }
 
 flutter {

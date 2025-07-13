@@ -181,18 +181,20 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      // Use a simple query that only requires a basic composite index
-      // This avoids the need for complex composite indexes for every filter combination
+      // Use a simple query without composite index requirements
+      // Only filter by isActive and do all other filtering client-side
       Query query = _firestore.collection('job_posts')
           .where('isActive', isEqualTo: true)
-          .orderBy('createdAt', descending: true)
-          .limit(100); // Increase limit to ensure we have enough results after filtering
+          .limit(500); // Increase limit to get more results for client-side filtering
 
       final querySnapshot = await query.get();
 
       _jobs = querySnapshot.docs
           .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
+
+      // Sort by createdAt descending (client-side)
+      _jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       // Apply all filters client-side to avoid composite index issues
       if (keyword != null && keyword.isNotEmpty) {
@@ -234,15 +236,107 @@ class JobProvider with ChangeNotifier {
         _jobs = _jobs.where((job) => job.maxSalary != null && job.maxSalary! <= maxSalary).toList();
       }
 
-      // if (requiredSkills != null && requiredSkills.isNotEmpty) {
-      //   _jobs = _jobs.where((job) =>
-      //       requiredSkills.any((skill) => job.requiredSkills.contains(skill))).toList();
-      // }
+      if (startDate != null) {
+        _jobs = _jobs.where((job) =>
+            job.startDate == null || job.startDate!.isAfter(startDate) || job.startDate!.isAtSameMomentAs(startDate)).toList();
+      }
 
-      // if (requiredSpecialties != null && requiredSpecialties.isNotEmpty) {
-      //   _jobs = _jobs.where((job) =>
-      //       requiredSpecialities.any((specialty) => job.requiredSpecialties.contains(specialty))).toList();
-      // }
+      if (endDate != null) {
+        _jobs = _jobs.where((job) =>
+            job.endDate == null || job.endDate!.isBefore(endDate) || job.endDate!.isAtSameMomentAs(endDate)).toList();
+      }
+
+      // Limit results to 50 after filtering
+      if (_jobs.length > 50) {
+        _jobs = _jobs.take(50).toList();
+      }
+
+      // Calculate matching scores if userId is provided
+      if (userId != null) {
+        await _calculateMatchingScores(userId);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      _setError('การค้นหางานไม่สำเร็จ: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Search jobs with filters - Alternative approach without composite indexes
+  Future<void> searchJobsAlternative({
+    String? keyword,
+    String? province,
+    String? city,
+    String? jobCategory,
+    String? experienceLevel,
+    double? minSalary,
+    double? maxSalary,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isRemote,
+    bool? isUrgent,
+    String? userId, // For matching calculation
+  }) async {
+    try {
+      _setLoading(true);
+      _setError(null);
+
+      // Use the simplest possible query - no composite indexes required
+      Query query = _firestore.collection('job_posts').limit(1000);
+
+      final querySnapshot = await query.get();
+
+      _jobs = querySnapshot.docs
+          .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      // Filter by isActive first (client-side)
+      _jobs = _jobs.where((job) => job.isActive).toList();
+
+      // Sort by createdAt descending (client-side)
+      _jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // Apply all filters client-side
+      if (keyword != null && keyword.isNotEmpty) {
+        _jobs = _jobs.where((job) =>
+            job.title.toLowerCase().contains(keyword.toLowerCase()) ||
+            job.description.toLowerCase().contains(keyword.toLowerCase()) ||
+            job.clinicName.toLowerCase().contains(keyword.toLowerCase())).toList();
+      }
+
+      if (province != null && province.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.province == province).toList();
+      }
+      
+      if (city != null && city.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.city == city).toList();
+      }
+      
+      if (jobCategory != null && jobCategory.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.jobCategory == jobCategory).toList();
+      }
+      
+      if (experienceLevel != null && experienceLevel.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.experienceLevel == experienceLevel).toList();
+      }
+      
+      if (isRemote != null) {
+        _jobs = _jobs.where((job) => job.isRemote == isRemote).toList();
+      }
+      
+      if (isUrgent != null) {
+        _jobs = _jobs.where((job) => job.isUrgent == isUrgent).toList();
+      }
+
+      if (minSalary != null) {
+        _jobs = _jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
+      }
+
+      if (maxSalary != null) {
+        _jobs = _jobs.where((job) => job.maxSalary != null && job.maxSalary! <= maxSalary).toList();
+      }
 
       if (startDate != null) {
         _jobs = _jobs.where((job) =>

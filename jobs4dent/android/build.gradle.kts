@@ -9,6 +9,25 @@ allprojects {
     }
 }
 
+// Configure Java globally
+subprojects {
+    afterEvaluate {
+        if (project.hasProperty("android")) {
+            extensions.configure<com.android.build.gradle.BaseExtension> {
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_11
+                    targetCompatibility = JavaVersion.VERSION_11
+                }
+            }
+        }
+        
+        // Add compiler args to suppress warnings
+        tasks.withType<JavaCompile>().configureEach {
+            options.compilerArgs.addAll(listOf("-Xlint:-deprecation", "-Xlint:-options"))
+        }
+    }
+}
+
 val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
 rootProject.layout.buildDirectory.value(newBuildDir)
 

@@ -587,138 +587,138 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'รายละเอียดงาน',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: scrollController,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            job.title,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+        return Scaffold(
+          appBar: AppBar(
+            title: Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: const Text('รายละเอียดงาน'),
+            ),
+            leading: const SizedBox(), // Remove default back button
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ),
+            ],
+            elevation: 1,
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          job.title,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            job.clinicName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          job.clinicName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w500,
                           ),
-                          const SizedBox(height: 16),
-                          
-                          _buildDetailRow('หมวดหมู่', job.jobCategory),
-                          _buildDetailRow('ประสบการณ์', job.experienceLevel),
-                          _buildDetailRow('ประเภทเงินเดือน', job.salaryType),
-                          if (job.minSalary != null || job.maxSalary != null)
-                            _buildDetailRow('เงินเดือน', _formatSalary(job)),
-                          _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
-                          if (job.trainLine != null && job.trainStation != null)
-                            _buildDetailRow('รถไฟฟ้า', '${job.trainLine} - ${job.trainStation}'),
-                          if (job.workingDays != null && job.workingDays!.isNotEmpty)
-                            _buildDetailRow('วันทำงาน', job.workingDays!.join(', ')),
-                          if (job.workingHours != null)
-                            _buildDetailRow('เวลาทำงาน', job.workingHours!),
-                          if (job.perks != null && job.perks!.isNotEmpty)
-                            _buildDetailRow('สิทธิพิเศษ', job.perks!),
-                          
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        _buildDetailRow('หมวดหมู่', job.jobCategory),
+                        _buildDetailRow('ประสบการณ์', job.experienceLevel),
+                        _buildDetailRow('ประเภทเงินเดือน', job.salaryType),
+                        if (job.minSalary != null || job.maxSalary != null)
+                          _buildDetailRow('เงินเดือน', _formatSalary(job)),
+                        _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
+                        if (job.trainLine != null && job.trainStation != null)
+                          _buildDetailRow('รถไฟฟ้า', '${job.trainLine} - ${job.trainStation}'),
+                        if (job.workingDays != null && job.workingDays!.isNotEmpty)
+                          _buildDetailRow('วันทำงาน', job.workingDays!.join(', ')),
+                        if (job.workingHours != null)
+                          _buildDetailRow('เวลาทำงาน', job.workingHours!),
+                        if (job.perks != null && job.perks!.isNotEmpty)
+                          _buildDetailRow('สิทธิพิเศษ', job.perks!),
+                        
+                        const SizedBox(height: 16),
+                        const Text(
+                          'รายละเอียดงาน',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          job.description,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        
+                        if (job.additionalRequirements != null && job.additionalRequirements!.isNotEmpty) ...[
                           const SizedBox(height: 16),
                           const Text(
-                            'รายละเอียดงาน',
+                            'ข้อกำหนดเพิ่มเติม',
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            job.description,
+                            job.additionalRequirements!,
                             style: const TextStyle(fontSize: 14),
                           ),
-                          
-                          if (job.additionalRequirements != null && job.additionalRequirements!.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            const Text(
-                              'ข้อกำหนดเพิ่มเติม',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              job.additionalRequirements!,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ],
-                          
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              if (job.isUrgent)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Text(
-                                    'ด่วน',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                  ),
-                                ),
-                              if (job.isRemote) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.shade50,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    'ทำงานระยะไกล',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.orange.shade700,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          Text(
-                            'โพสต์เมื่อ ${_formatDate(job.createdAt)}',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
                         ],
-                      ),
+                        
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            if (job.isUrgent)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'ด่วน',
+                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                ),
+                              ),
+                            if (job.isRemote) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.shade50,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'ทำงานระยะไกล',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        Text(
+                          'โพสต์เมื่อ ${_formatDate(job.createdAt)}',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  SizedBox(
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 30),
+                  child: SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
@@ -729,10 +729,10 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                       child: const Text('สมัครงาน'),
                     ),
                   ),
-                ],
-              ),
-            );
-          },
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
