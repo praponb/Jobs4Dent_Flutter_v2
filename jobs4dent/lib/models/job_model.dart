@@ -17,6 +17,8 @@ class JobModel {
   // Location Information  
   final String province;
   final String city;
+  final String? trainLine;
+  final String? trainStation;
   
   // Time Information
   final DateTime? startDate;
@@ -55,6 +57,8 @@ class JobModel {
     this.perks,
     required this.province,
     required this.city,
+    this.trainLine,
+    this.trainStation,
     this.startDate,
     this.endDate,
     this.workingDays,
@@ -87,6 +91,8 @@ class JobModel {
       perks: map['perks'],
       province: map['province'] ?? '',
       city: map['city'] ?? '',
+      trainLine: map['trainLine'],
+      trainStation: map['trainStation'],
       startDate: map['startDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['startDate']) : null,
       endDate: map['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endDate']) : null,
       workingDays: List<String>.from(map['workingDays'] ?? []),
@@ -120,6 +126,8 @@ class JobModel {
       'perks': perks,
       'province': province,
       'city': city,
+      'trainLine': trainLine,
+      'trainStation': trainStation,
       'startDate': startDate?.millisecondsSinceEpoch,
       'endDate': endDate?.millisecondsSinceEpoch,
       'workingDays': workingDays,
@@ -152,6 +160,8 @@ class JobModel {
     String? perks,
     String? province,
     String? city,
+    String? trainLine,
+    String? trainStation,
     DateTime? startDate,
     DateTime? endDate,
     List<String>? workingDays,
@@ -182,6 +192,8 @@ class JobModel {
       perks: perks ?? this.perks,
       province: province ?? this.province,
       city: city ?? this.city,
+      trainLine: trainLine ?? this.trainLine,
+      trainStation: trainStation ?? this.trainStation,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       workingDays: workingDays ?? this.workingDays,

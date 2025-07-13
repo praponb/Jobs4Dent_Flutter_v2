@@ -29,6 +29,8 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
   String _selectedSalaryType = '50:50';
   String _selectedProvinceZones = 'กรุงเทพฯ ในเมือง';
   String _selectedLocationZones = 'พระราม 8 สามเสน ราชวัตร ศรีย่าน ดุสิต';
+  String _selectedTrainLine = 'ไม่ใกล้รถไฟฟ้า';
+  String _selectedTrainStation = 'ไม่ใกล้รถไฟฟ้า';
 
   List<String> _selectedWorkingType = [];
 
@@ -36,6 +38,7 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     'ประจำ', 'Part-time'
   ];
 
+  //------------------------------------------------------------------------------------------------
   // Thai provinces
   final List<String> _thaiProvinceZones = [
     'กรุงเทพฯ ในเมือง',
@@ -44,7 +47,12 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     'กรุงเทพฯ ธนบุรี',
     'กรุงเทพฯ นนทบุรี',
     'กรุงเทพฯ ปทุมธานี',
-    'ต่างจังหวัด',
+    'ภาคกลาง',
+    'ภาคเหนือ',
+    'ภาคตะวันตก',
+    'ภาคตะวันออก',
+    'ภาคตะวันออกเฉียงเหนือ',
+    'ภาคใต้',
   ];
 
   final List<List<String>> _thaiLocationZones = [
@@ -89,11 +97,11 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     ],
     //กรุงเทพฯ ธนบุรี
     ['วงเวียนใหญ่ เจริญนคร กรุงธนบุรี ตากสิน อิสรภาพ',
-    'กัลปพฤกษ์ ท่าพระ ตลาดพลู โพธิ์นิมิตร วุฒากาศ บางหว้า เทอดไท',
-    'ตลิ่งชัน ปิ่นเกล้า จรัญสนิทวงศ์ บางอ้อ บางพลัด บรมราชชนนี อรุณอัมรินทร์ ราชพฤกษ์',
     'บางบอน ดาวคะนอง จอมทอง เอกชัย กัลปพฤกษ์',
-    'ราษฎร์บูรณะ สุขสวัสดิ์ ประชาอุทิศ พระประแดง พุทธบูชา ทุ่งครุ',
     'พระราม 2 บางขุนเทียน ท่าข้าม เทียนทะเล',
+    'ตลิ่งชัน ปิ่นเกล้า จรัญสนิทวงศ์ บางอ้อ บางพลัด บรมราชชนนี อรุณอัมรินทร์ ราชพฤกษ์',
+    'กัลปพฤกษ์ ท่าพระ ตลาดพลู โพธิ์นิมิตร วุฒากาศ บางหว้า เทอดไท',
+    'ราษฎร์บูรณะ สุขสวัสดิ์ ประชาอุทิศ พระประแดง พุทธบูชา ทุ่งครุ',
     'บางแค เพชรเกษม ภาษีเจริญ หนองแขม',
     ],
     //กรุงเทพฯ นนทบุรี
@@ -105,12 +113,13 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     ],
     //กรงเทพฯ ปทุมธานี
     ['รังสิต ลำลูกกา ปทุมธานี คลองหลวง'],
-    //ต่างจังหวัด
+    // ภาคกลาง
     ['นครปฐม',
     'อยุธยา',
     'กำแพงเพชร',
     'ชัยนาท',
     'นครนายก',
+    'นครปฐม',
     'นครสวรรค์',
     'พิจิตร',
     'พิษณุโลก',
@@ -124,7 +133,9 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     'สระบุรี',
     'อ่างทอง',
     'อุทัยธานี',
-    'เชียงใหม่',
+    ],
+    // ภาคเหนือ
+    ['เชียงใหม่',
     'เชียงราย',
     'น่าน',
     'พะเยา',
@@ -133,20 +144,25 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     'ลำปาง',
     'ลำพูน',
     'อุตรดิตถ์',
-    'ประจวบคีรีขันธ์',
+    ],
+    // ภาคตะวันตก
+    ['ประจวบคีรีขันธ์',
     'กาญจนบุรี',
     'ตาก',
     'เพชรบุรี',
     'ราชบุรี',
-    'ชลบุรี',
+    ],
+    // ภาคตะวันออก
+    ['ชลบุรี',
     'จันทบุรี',
     'ฉะเชิงเทรา',
     'ตราด',
     'ปราจีนบุรี',
     'ระยอง',
     'สระแก้ว',
-    'ชลบุรี',
-    'นครราชสีมา',
+    ],
+    // ภาคตะวันออกเฉียงเหนือ
+    ['นครราชสีมา',
     'ขอนแก่น',
     'กาฬสินธุ์',
     'ชัยภูมิ',
@@ -166,7 +182,9 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     'อำนาจเจริญ',
     'อุดรธานี',
     'อุบลราชธานี',
-    'ภูเก็ต',
+    ],
+    // ภาคใต้
+    ['ภูเก็ต',
     'กระบี่',
     'ชุมพร',
     'ตรัง',
@@ -182,6 +200,249 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     'สุราษฎร์ธานี',
     ],
   ];
+
+  // Thai train lines
+  final List<String> _thaiTrainLines = [
+    'BTS สายสุขุมวิท',
+    'BTS สายสีลม',
+    'BTS สายสีทอง',
+    'Airport Rail Link',
+    'MRT สายสีน้ำเงิน',
+    'MRT สายสีม่วง',
+    'MRT สายสีชมพู',
+    'MRT สายสีเหลือง',
+    'BRT',
+    'SRT สายสีแดง',
+    'ไม่ใกล้รถไฟฟ้า'
+  ];
+
+  final List<List<String>> _thaiTrainStations = [
+    // BTS สายสุขุมวิท
+    ['หมอชิต',
+    'สะพานควาย',
+    'อารีย์',
+    'สนามเป้า',
+    'อนุสาวรีย์ชัยสมรภูมิ',
+    'พญาไท',
+    'ราชเทวี',
+    'สยาม',
+    'ชิดลม',
+    'เพลินจิต',
+    'นานา',
+    'อโศก',
+    'พร้อมพงษ์',
+    'ทองหล่อ',
+    'เอกมัย',
+    'พระโขนง',
+    'อ่อนนุช',
+    'บางจาก',
+    'ปุณณวิถี',
+    'อุดมสุข',
+    'บางนา',
+    'แบริ่ง',
+    'สำโรง',
+    'ปู่เจ้าสมิงพราย',
+    'ช้างเอราวัณ',
+    'โรงเรียนนายเรือ',
+    'ปากน้ำ',
+    'ศรีนครินทร์',
+    'แพรกษา',
+    'สายลวด',
+    'เคหะสมุทรปราการ',
+    'ห้าแยกลาดพร้าว',
+    'พหลโยธิน 24',
+    'รัชโยธิน',
+    'เสนานิคม',
+    'ม.เกษตรศาสตร์',
+    'กรมป่าไม้',
+    'ศรีปทุม (บางบัว)',
+    'กรมทหารราบที่ 11',
+    'วัดพระศรีมหาธาตุ',
+    'พหลโยธิน 59',
+    'สายหยุด',
+    'สะพานใหม่',
+    'คูคต',
+    ],
+    // BTS สายสีลม
+    ['สนามกีฬาแห่งชาติ',
+    'ราชดำริ',
+    'ศาลาแดง',
+    'ช่องนนทรี',
+    'สุรศักดิ์',
+    'สะพานตากสิน',
+    'กรุงธนบุรี',
+    'วงเวียนใหญ่',
+    'โพธิ์นิมิตร',
+    'ตลาดพลู',
+    'วุฒากาศ',
+    'บางหว้า',
+    ],
+    // BTS สายสีทอง
+    ['กรุงธนบุรี',
+    'เจริญนคร',
+    'คลองสาน',
+    ],
+    // Airport Rail Link
+    ['พญาไท',
+    'ราชปรารภ',
+    'มักกะสัน',
+    'รามคำแหง',
+    'หัวหมาก',
+    'บ้านทับช้าง',
+    'ลาดกระบัง',
+    'สุวรรณภูมิ',
+    ],
+    // MRT สายสีน้ำเงิน
+    ['หัวลำโพง',
+    'สามย่าน',
+    'สีลม',
+    'ลุมพินี',
+    'คลองเตย',
+    'ศูนย์การประชุมแห่งชาติสิริกิติ์',
+    'สุขุมวิท',
+    'เพชรบุรี',
+    'พระราม 9',
+    'ศูนย์วัฒนธรรมแห่งประเทศไทย',
+    'ห้วยขวาง',
+    'สุทธิสาร',
+    'รัชดาภิเษก',
+    'ลาดพร้าว',
+    'พหลโยธิน',
+    'จตุจักร',
+    'กำแพงเพชร',
+    'บางซื่อ',
+    'เตาปูน',
+    'บางโพ',
+    'บางอ้อ',
+    'บางพลัด',
+    'สิรินธร',
+    'บางยี่ขัน',
+    'บางขุนนนท์',
+    'แยกไฟฉาย',
+    'จรัญสนิทวงศ์ 13',
+    'ท่าพระ',
+    'บางไผ่',
+    'บางหว้า',
+    'เพชรเกษม 48',
+    'ภาษีเจริญ',
+    'บางแค',
+    'หลักสอง',
+    'วัดมังกร',
+    'สามยอด',
+    'สนามไชย',
+    'อิสรภาพ',
+    ],
+    // MRT สายสีม่วง
+    ['คลองบางไผ่',
+    'ตลาดบางใหญ่',
+    'สามแยกบางใหญ่',
+    'บางพลู',
+    'บางรักใหญ่',
+    'บางรักน้อยท่าอิฐ',
+    'ไทรม้า',
+    'สะพานพระนั่งเกล้า',
+    'แยกนนทบุรี 1',
+    'บางกระสอ',
+    'ศูนย์ราชการนนทบุรี',
+    'กระทรวงสาธารณสุข',
+    'แยกติวานนท์',
+    'วงศ์สว่าง',
+    'บางซ่อน',
+    'เตาปูน',
+    ],
+    // MRT สายสีชมพู
+    ['ศูนย์ราชการนนทบุรี',
+    'แคราย',
+    'สนามบินน้ำ',
+    'สามัคคี',
+    'กรมชลประทาน',
+    'แยกปากเกร็ด',
+    'เลี่ยงเมืองปากเกร็ด',
+    'แจ้งวัฒนะ-ปากเกร็ด 28',
+    'ศรีรัช',
+    'เมืองทองธานี',
+    'แจ้งวัฒนะ 14',
+    'ศูนย์ราชการเฉลิมพระเกียรติ',
+    'โทรคมนาคมแห่งชาติ',
+    'หลักสี่',
+    'ราชภัฏพระนคร',
+    'วัดพระศรีมหาธาตุ',
+    'รามอินทรา 3',
+    'ลาดปลาเค้า',
+    'รามอินทรา กม.4',
+    'มัยลาภ',
+    'วัชรพล',
+    'รามอินทรา กม.6',
+    'คู้บอน',
+    'รามอินทรา กม.9',
+    'วงแหวนรามอินทรา',
+    'นพรัตน์',
+    'บางชัน',
+    'เศรษฐบุตรบำเพ็ญ',
+    'ตลาดมีนบุรี',
+    'มีนบุรี',
+    'อิมแพ็ค เมืองทองธานี',
+    'ทะเลสาปเมืองทอง',
+    ],
+    // MRT สายสีเหลือง
+    ['ลาดพร้าว',
+    'ภาวนา',
+    'โชคชัย 4',
+    'ลาดพร้าว 71',
+    'ลาดพร้าว 83',
+    'มหาดไทย',
+    'ลาดพร้าว 101',
+    'บางกะปิ',
+    'แยกลำสาลี',
+    'ศรีกรีฑา',
+    'หัวหมาก',
+    'กลันตัน',
+    'ศรีนุช',
+    'ศรีนครินทร์ 38',
+    'สวนหลวง ร.9',
+    'ศรีอุดม',
+    'ศรีเอี่ยม',
+    'ศรีลาซาล',
+    'ศรีแบริ่ง',
+    'ศรีด่าน',
+    'ศรีเทพา',
+    'ทิพวัล',
+    'สำโรง',
+    ],
+    // BRT
+    ['สาทร',
+    'อาคารสงเคราะห์',
+    'เทคนิคกรุงเทพ',
+    'ถนนจันทน์',
+    'นราราม 3',
+    'วัดด่าน',
+    'วัดปริวาส',
+    'วัดดอกไม้',
+    'สะพานพระราม 9',
+    'เจริญราษฎร์',
+    'สะพานพระราม 3',
+    'ราชพฤกษ์',
+    ],
+    // SRT สายสีแดง
+    ['สถานีกลางบางซื่อ',
+    'จตุจักร',
+    'วัดเสมียนนารี',
+    'บางเขน',
+    'ทุ่งสองห้อง',
+    'หลักสี่',
+    'การเคหะ',
+    'ดอนเมือง',
+    'หลักหก',
+    'รังสิต',
+    'บางซ่อน',
+    'บางบำหรุ',
+    'ตลิ่งชัน',
+    ],
+    //ไม่ใกล้รถไฟฟ้า
+    ['ไม่ใกล้รถไฟฟ้า'],
+  ];
+
+//---------------------------------------------------------------------
 
   @override
   void initState() {
@@ -203,6 +464,20 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
         : ['กรุงเทพฯ']; // Ultimate fallback
   }
 
+  List<String> _getCurrentTrainStations() {
+    int trainLineIndex = _thaiTrainLines.indexOf(_selectedTrainLine);
+    if (trainLineIndex >= 0 && trainLineIndex < _thaiTrainStations.length) {
+      final trainStations = _thaiTrainStations[trainLineIndex];
+      if (trainStations.isNotEmpty) {
+        return trainStations;
+      }
+    }
+    // Default to first station if not found or empty
+    return _thaiTrainStations.isNotEmpty && _thaiTrainStations.first.isNotEmpty 
+        ? _thaiTrainStations.first 
+        : ['ไม่ใกล้รถไฟฟ้า']; // Ultimate fallback
+  }
+
   String _getValidLocationZone() {
     final availableLocations = _getCurrentLocationZones();
     if (availableLocations.contains(_selectedLocationZones)) {
@@ -215,6 +490,20 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     }
     // Ultimate fallback
     return 'กรุงเทพฯ';
+  }
+
+  String _getValidTrainStation() {
+    final availableStations = _getCurrentTrainStations();
+    if (availableStations.contains(_selectedTrainStation)) {
+      return _selectedTrainStation;
+    }
+    // If current selection is not valid, update it and return first option
+    if (availableStations.isNotEmpty) {
+      _selectedTrainStation = availableStations.first;
+      return _selectedTrainStation;
+    }
+    // Ultimate fallback
+    return 'ไม่ใกล้รถไฟฟ้า';
   }
 
   void _initializeForm() {
@@ -232,6 +521,20 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
         _selectedLocationZones = job.city;
       } else {
         _selectedLocationZones = availableLocations.first;
+      }
+      
+      // Handle train line and station
+      if (job.trainLine != null && _thaiTrainLines.contains(job.trainLine)) {
+        _selectedTrainLine = job.trainLine!;
+      } else {
+        _selectedTrainLine = _thaiTrainLines.first;
+      }
+      
+      final availableStations = _getCurrentTrainStations();
+      if (job.trainStation != null && availableStations.contains(job.trainStation)) {
+        _selectedTrainStation = job.trainStation!;
+      } else {
+        _selectedTrainStation = availableStations.first;
       }
       
       _minSalaryController.text = job.minSalary?.toString() ?? '';
@@ -419,6 +722,68 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                   if (value != null) {
                     setState(() {
                       _selectedLocationZones = value;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Train Line
+              DropdownButtonFormField<String>(
+                value: _selectedTrainLine,
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'รถไฟฟ้า *',
+                  border: OutlineInputBorder(),
+                ),
+                items: _thaiTrainLines.map((trainLine) {
+                  return DropdownMenuItem(
+                    value: trainLine,
+                    child: Text(
+                      trainLine,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    // Defer the setState call to avoid "setState called during build" error
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        _selectedTrainLine = value;
+                        // Reset train station when line changes
+                        final newStations = _getCurrentTrainStations();
+                        if (newStations.isNotEmpty) {
+                          _selectedTrainStation = newStations.first;
+                        }
+                      });
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _getValidTrainStation(),
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'สถานีรถไฟฟ้า *',
+                  border: OutlineInputBorder(),
+                ),
+                items: _getCurrentTrainStations().map((station) {
+                  return DropdownMenuItem(
+                    value: station,
+                    child: Text(
+                      station,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedTrainStation = value;
                     });
                   }
                 },
@@ -665,6 +1030,8 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
       perks: _perksController.text.trim().isNotEmpty ? _perksController.text.trim() : null,
       province: _selectedProvinceZones,
       city: _selectedLocationZones,
+      trainLine: _selectedTrainLine != 'ไม่ใกล้รถไฟฟ้า' ? _selectedTrainLine : null,
+      trainStation: _selectedTrainStation != 'ไม่ใกล้รถไฟฟ้า' ? _selectedTrainStation : null,
       workingDays: _workingDaysController.text.trim().isNotEmpty 
           ? _workingDaysController.text.trim().split(',').map((day) => day.trim()).where((day) => day.isNotEmpty).toList()
           : (_selectedWorkingType.isEmpty ? null : _selectedWorkingType),

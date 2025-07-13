@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_model.dart';
+import 'job_application_screen.dart';
 
 class JobSearchScreen extends StatefulWidget {
   const JobSearchScreen({super.key});
@@ -229,7 +230,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                                       value: category,
                                       child: Text(category),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                                 onChanged: (value) {
                                   setModalState(() {
@@ -257,7 +258,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                                       value: level,
                                       child: Text(level),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                                 onChanged: (value) {
                                   setModalState(() {
@@ -285,7 +286,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                                       value: type,
                                       child: Text(type),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                                 onChanged: (value) {
                                   setModalState(() {
@@ -639,6 +640,8 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                           if (job.minSalary != null || job.maxSalary != null)
                             _buildDetailRow('เงินเดือน', _formatSalary(job)),
                           _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
+                          if (job.trainLine != null && job.trainStation != null)
+                            _buildDetailRow('รถไฟฟ้า', '${job.trainLine} - ${job.trainStation}'),
                           if (job.workingDays != null && job.workingDays!.isNotEmpty)
                             _buildDetailRow('วันทำงาน', job.workingDays!.join(', ')),
                           if (job.workingHours != null)
@@ -766,9 +769,11 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
       return;
     }
 
-    // TODO: Navigate to job application screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('หน้าจอสมัครงานจะเปิดให้ใช้งานเร็วๆ นี้')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JobApplicationScreen(job: job),
+      ),
     );
   }
 } 
