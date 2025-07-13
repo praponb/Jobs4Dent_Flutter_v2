@@ -428,12 +428,14 @@ class JobProvider with ChangeNotifier {
       final querySnapshot = await _firestore
           .collection('job_applications')
           .where('applicantId', isEqualTo: applicantId)
-          .orderBy('appliedAt', descending: true)
           .get();
 
       _myApplications = querySnapshot.docs
           .map((doc) => JobApplicationModel.fromMap(doc.data()))
           .toList();
+      
+      // Sort by appliedAt in descending order on the client side
+      _myApplications.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
 
       notifyListeners();
     } catch (e) {
@@ -452,12 +454,14 @@ class JobProvider with ChangeNotifier {
       final querySnapshot = await _firestore
           .collection('job_applications')
           .where('clinicId', isEqualTo: clinicId)
-          .orderBy('appliedAt', descending: true)
           .get();
 
       _applicantsForMyJobs = querySnapshot.docs
           .map((doc) => JobApplicationModel.fromMap(doc.data()))
           .toList();
+      
+      // Sort by appliedAt in descending order on the client side
+      _applicantsForMyJobs.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
 
       notifyListeners();
     } catch (e) {
@@ -545,7 +549,6 @@ class JobProvider with ChangeNotifier {
       final querySnapshot = await _firestore
           .collection('applications')
           .where('applicantId', isEqualTo: userId)
-          .orderBy('appliedAt', descending: true)
           .get();
 
       _myApplications = querySnapshot.docs
@@ -554,6 +557,9 @@ class JobProvider with ChangeNotifier {
                 'applicationId': doc.id,
               }))
           .toList();
+      
+      // Sort by appliedAt in descending order on the client side
+      _myApplications.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
 
       notifyListeners();
     } catch (e) {
@@ -573,7 +579,6 @@ class JobProvider with ChangeNotifier {
       final querySnapshot = await _firestore
           .collection('job_posts')
           .where('clinicId', isEqualTo: clinicId)
-          .orderBy('createdAt', descending: true)
           .get();
 
       _myPostedJobs = querySnapshot.docs
@@ -582,6 +587,9 @@ class JobProvider with ChangeNotifier {
                 'jobId': doc.id,
               }))
           .toList();
+
+      // Sort by createdAt in descending order on the client side
+      _myPostedJobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       notifyListeners();
     } catch (e) {
@@ -601,7 +609,6 @@ class JobProvider with ChangeNotifier {
       final querySnapshot = await _firestore
           .collection('applications')
           .where('clinicId', isEqualTo: clinicId)
-          .orderBy('appliedAt', descending: true)
           .get();
 
       _applicantsForMyJobs = querySnapshot.docs
@@ -610,6 +617,9 @@ class JobProvider with ChangeNotifier {
                 'applicationId': doc.id,
               }))
           .toList();
+      
+      // Sort by appliedAt in descending order on the client side
+      _applicantsForMyJobs.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
 
       notifyListeners();
     } catch (e) {

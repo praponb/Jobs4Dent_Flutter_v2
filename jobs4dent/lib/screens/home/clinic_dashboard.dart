@@ -8,6 +8,7 @@ import '../../models/job_model.dart';
 import '../../models/job_application_model.dart';
 import '../jobs/job_posting_screen.dart';
 import '../jobs/applicant_management_screen.dart';
+import '../jobs/my_posted_jobs_screen.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../profile/profile_screen.dart';
 import '../profile/sub_user_management_screen.dart';
@@ -606,7 +607,12 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
             ),
             TextButton(
               onPressed: () {
-                // Navigate to full jobs list
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyPostedJobsScreen(),
+                  ),
+                );
               },
               child: const Text('ดูทั้งหมด'),
             ),
@@ -726,11 +732,14 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
             children: [
               Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
               const SizedBox(width: 4),
-              Text(
-                '${job.city}, ${job.province}',
-                style: const TextStyle(color: Colors.grey),
+              Expanded(
+                child: Text(
+                  '${job.city}, ${job.province}',
+                  style: const TextStyle(color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               Icon(Icons.people, size: 16, color: Colors.grey[600]),
               const SizedBox(width: 4),
               Text(
