@@ -94,7 +94,7 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      await _firestore.collection('jobPostings').doc(job.jobId).set(job.toMap());
+      await _firestore.collection('job_posts').doc(job.jobId).set(job.toMap());
       
       // Add to local list
       _myPostedJobs.insert(0, job);
@@ -115,7 +115,7 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      await _firestore.collection('jobPostings').doc(updatedJob.jobId).update(
+      await _firestore.collection('job_posts').doc(updatedJob.jobId).update(
         updatedJob.copyWith(updatedAt: DateTime.now()).toMap(),
       );
       
@@ -146,7 +146,7 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      await _firestore.collection('jobPostings').doc(jobId).delete();
+      await _firestore.collection('job_posts').doc(jobId).delete();
       
       // Remove from local lists
       _myPostedJobs.removeWhere((job) => job.jobId == jobId);
@@ -183,7 +183,7 @@ class JobProvider with ChangeNotifier {
 
       // Use a simple query that only requires a basic composite index
       // This avoids the need for complex composite indexes for every filter combination
-      Query query = _firestore.collection('jobPostings')
+      Query query = _firestore.collection('job_posts')
           .where('isActive', isEqualTo: true)
           .orderBy('createdAt', descending: true)
           .limit(100); // Increase limit to ensure we have enough results after filtering
@@ -326,7 +326,7 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       // Get job details
-      final jobDoc = await _firestore.collection('jobPostings').doc(jobId).get();
+      final jobDoc = await _firestore.collection('job_posts').doc(jobId).get();
       if (!jobDoc.exists) {
         _setError('ไม่พบงาน');
         return false;
@@ -377,7 +377,7 @@ class JobProvider with ChangeNotifier {
       await _firestore.collection('job_applications').doc(applicationId).set(application.toMap());
 
       // Update job application count
-      await _firestore.collection('jobPostings').doc(jobId).update({
+      await _firestore.collection('job_posts').doc(jobId).update({
         'applicationCount': FieldValue.increment(1),
         'applicationIds': FieldValue.arrayUnion([applicationId]),
       });
@@ -402,7 +402,7 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       final querySnapshot = await _firestore
-          .collection('jobPostings')
+          .collection('job_posts')
           .where('clinicId', isEqualTo: clinicId)
           .orderBy('createdAt', descending: true)
           .get();
@@ -515,7 +515,7 @@ class JobProvider with ChangeNotifier {
   // Get job by ID
   Future<JobModel?> getJobById(String jobId) async {
     try {
-      final doc = await _firestore.collection('jobPostings').doc(jobId).get();
+      final doc = await _firestore.collection('job_posts').doc(jobId).get();
       if (doc.exists) {
         return JobModel.fromMap(doc.data()!);
       }
@@ -571,7 +571,7 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       final querySnapshot = await _firestore
-          .collection('jobPostings')
+          .collection('job_posts')
           .where('clinicId', isEqualTo: clinicId)
           .orderBy('createdAt', descending: true)
           .get();
@@ -635,7 +635,7 @@ class JobProvider with ChangeNotifier {
 
       // Store application under jobPosting
       await _firestore
-          .collection('jobPostings')
+          .collection('job_posts')
           .doc(jobId)
           .collection('applications')
           .doc(applicationId)
@@ -650,7 +650,7 @@ class JobProvider with ChangeNotifier {
           .set(application.toMap());
 
       // Update job application count
-      await _firestore.collection('jobPostings').doc(jobId).update({
+      await _firestore.collection('job_posts').doc(jobId).update({
         'applicationCount': FieldValue.increment(1),
         'applicationIds': FieldValue.arrayUnion([applicationId]),
       });
@@ -671,7 +671,7 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       final querySnapshot = await _firestore
-          .collection('jobPostings')
+          .collection('job_posts')
           .doc(jobId)
           .collection('applications')
           .orderBy('appliedAt', descending: true)
@@ -745,9 +745,9 @@ class JobProvider with ChangeNotifier {
       if (interviewDate != null) updateData['interviewDate'] = interviewDate.millisecondsSinceEpoch;
       if (interviewLocation != null) updateData['interviewLocation'] = interviewLocation;
 
-      // Update in jobPostings sub-collection
+      // Update in job_posts sub-collection
       await _firestore
-          .collection('jobPostings')
+          .collection('job_posts')
           .doc(jobId)
           .collection('applications')
           .doc(applicationId)
