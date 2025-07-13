@@ -7,7 +7,9 @@ import '../models/user_model.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   User? _user;
@@ -251,25 +253,53 @@ class AuthProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
+      debugPrint('🔄 Starting Google Sign-In process...');
+
+      // Check if Google Play Services is available
+      final bool isAvailable = await _googleSignIn.isSignedIn();
+      debugPrint('📱 Google Play Services available: $isAvailable');
+
+      // Sign out first to ensure clean state
+      await _googleSignIn.signOut();
+      debugPrint('🔄 Signed out from previous session');
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
+        debugPrint('❌ User cancelled Google Sign-In');
         _isLoading = false;
         notifyListeners();
         return false;
       }
 
+      debugPrint('✅ Google user selected: ${googleUser.email}');
+
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        throw Exception('Failed to get Google authentication tokens');
+      }
+
+      debugPrint('✅ Got Google authentication tokens');
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      debugPrint('🔄 Signing in with Firebase...');
       UserCredential userCredential = await _auth.signInWithCredential(credential);
+      
+      if (userCredential.user == null) {
+        throw Exception('Failed to sign in with Firebase');
+      }
+
+      debugPrint('✅ Firebase sign-in successful: ${userCredential.user!.email}');
       
       // Check if user exists in Firestore, if not create a new user document
       bool isNewUser = userCredential.additionalUserInfo?.isNewUser == true;
       
       if (isNewUser) {
+        debugPrint('🔄 Creating new user document in Firestore...');
         await _createUserDocument(
           userCredential.user!,
           authProvider: 'google',
@@ -285,6 +315,7 @@ class AuthProvider with ChangeNotifier {
         );
         debugPrint('✅ New Google user created in Firestore: ${userCredential.user!.email}');
       } else {
+        debugPrint('🔄 Loading existing user data from Firestore...');
         // Load existing user data from Firestore
         await _loadUserModel();
         
@@ -297,6 +328,7 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      debugPrint('❌ Google Sign-In Error: $e');
       _error = 'Error signing in with Google: $e';
       _isLoading = false;
       notifyListeners();
