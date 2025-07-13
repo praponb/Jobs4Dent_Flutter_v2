@@ -1,7 +1,7 @@
 {
   "indexes": [
     {
-      "collectionGroup": "jobPostings",
+      "collectionGroup": "job_posts",
       "queryScope": "COLLECTION",
       "fields": [
         {
