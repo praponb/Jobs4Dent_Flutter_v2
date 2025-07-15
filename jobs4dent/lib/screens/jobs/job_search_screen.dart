@@ -22,9 +22,6 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
   
   String? _selectedCategory;
   String? _selectedExperienceLevel;
-  String? _selectedSalaryType;
-  bool _isUrgent = false;
-  bool _isRemote = false;
 
   @override
   void initState() {
@@ -57,37 +54,17 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
       province: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
       minSalary: _minSalaryController.text.trim().isEmpty ? null : double.tryParse(_minSalaryController.text.trim()),
       maxSalary: _maxSalaryController.text.trim().isEmpty ? null : double.tryParse(_maxSalaryController.text.trim()),
-      isUrgent: _isUrgent ? true : null,
-      isRemote: _isRemote ? true : null,
     );
   }
 
-  void _clearFilters() {
-    setState(() {
-      _keywordController.clear();
-      _locationController.clear();
-      _minSalaryController.clear();
-      _maxSalaryController.clear();
-      _selectedCategory = null;
-      _selectedExperienceLevel = null;
-      _selectedSalaryType = null;
-      _isUrgent = false;
-      _isRemote = false;
-    });
-    _loadJobs();
-  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ค้นหางาน'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: _showFilters,
-          ),
-        ],
+        actions: [],
       ),
       body: Column(
         children: [
@@ -153,6 +130,68 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
             ),
           ),
           
+          // Search Criteria Display
+          Consumer<JobProvider>(
+            builder: (context, jobProvider, child) {
+              final searchCriteria = jobProvider.getFormattedSearchCriteria();
+              if (searchCriteria.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              
+              return Container(
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.search, size: 16, color: Colors.blue.shade700),
+                        const SizedBox(width: 4),
+                        Text(
+                          'เงื่อนไขการค้นหา',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: searchCriteria.map((criteria) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.blue.shade300),
+                          ),
+                          child: Text(
+                            criteria,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue.shade800,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          
           // Results
           Expanded(
             child: Consumer<JobProvider>(
@@ -202,225 +241,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
     );
   }
 
-  void _showFilters() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return DraggableScrollableSheet(
-              initialChildSize: 0.7,
-              minChildSize: 0.5,
-              maxChildSize: 0.9,
-              builder: (context, scrollController) {
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'กรองการค้นหา',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              _clearFilters();
-                              Navigator.pop(context);
-                            },
-                            child: const Text('ล้างทั้งหมด'),
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: scrollController,
-                          child: Column(
-                            children: [
-                              // Location
-                              TextField(
-                                controller: _locationController,
-                                decoration: const InputDecoration(
-                                  labelText: 'สถานที่',
-                                  border: OutlineInputBorder(),
-                                  hintText: 'เช่น กรุงเทพมหานคร',
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              
-                              // Job Category
-                              DropdownButtonFormField<String>(
-                                value: _selectedCategory,
-                                isExpanded: true,
-                                decoration: const InputDecoration(
-                                  labelText: 'หมวดหมู่งาน',
-                                  border: OutlineInputBorder(),
-                                ),
-                                items: [
-                                  const DropdownMenuItem(
-                                    value: null,
-                                    child: Text('ทั้งหมด'),
-                                  ),
-                                  ...JobProvider.jobCategories.map((category) {
-                                    return DropdownMenuItem(
-                                      value: category,
-                                      child: Text(category),
-                                    );
-                                  }),
-                                ],
-                                onChanged: (value) {
-                                  setModalState(() {
-                                    _selectedCategory = value;
-                                  });
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              
-                              // Experience Level
-                              DropdownButtonFormField<String>(
-                                value: _selectedExperienceLevel,
-                                isExpanded: true,
-                                decoration: const InputDecoration(
-                                  labelText: 'ระดับประสบการณ์',
-                                  border: OutlineInputBorder(),
-                                ),
-                                items: [
-                                  const DropdownMenuItem(
-                                    value: null,
-                                    child: Text('ทั้งหมด'),
-                                  ),
-                                  ...JobProvider.experienceLevels.map((level) {
-                                    return DropdownMenuItem(
-                                      value: level,
-                                      child: Text(level),
-                                    );
-                                  }),
-                                ],
-                                onChanged: (value) {
-                                  setModalState(() {
-                                    _selectedExperienceLevel = value;
-                                  });
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              
-                              // Salary Type
-                              DropdownButtonFormField<String>(
-                                value: _selectedSalaryType,
-                                isExpanded: true,
-                                decoration: const InputDecoration(
-                                  labelText: 'ประเภทเงินเดือน',
-                                  border: OutlineInputBorder(),
-                                ),
-                                items: [
-                                  const DropdownMenuItem(
-                                    value: null,
-                                    child: Text('ทั้งหมด'),
-                                  ),
-                                  ...JobProvider.salaryTypes.map((type) {
-                                    return DropdownMenuItem(
-                                      value: type,
-                                      child: Text(type),
-                                    );
-                                  }),
-                                ],
-                                onChanged: (value) {
-                                  setModalState(() {
-                                    _selectedSalaryType = value;
-                                  });
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              
-                              // Salary Range
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _minSalaryController,
-                                      decoration: const InputDecoration(
-                                        labelText: 'เงินเดือนต่ำสุด',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      keyboardType: TextInputType.number,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _maxSalaryController,
-                                      decoration: const InputDecoration(
-                                        labelText: 'เงินเดือนสูงสุด',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      keyboardType: TextInputType.number,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              
-                              // Checkboxes
-                              CheckboxListTile(
-                                title: const Text('งานด่วน'),
-                                value: _isUrgent,
-                                onChanged: (value) {
-                                  setModalState(() {
-                                    _isUrgent = value ?? false;
-                                  });
-                                },
-                              ),
-                              CheckboxListTile(
-                                title: const Text('ทำงานจากที่ไหนก็ได้'),
-                                value: _isRemote,
-                                onChanged: (value) {
-                                  setModalState(() {
-                                    _isRemote = value ?? false;
-                                  });
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('ยกเลิก'),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  // Update the main state with modal state
-                                });
-                                Navigator.pop(context);
-                                _searchJobs();
-                              },
-                              child: const Text('ใช้ตัวกรอง'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
+
 
   Widget _buildJobCard(JobModel job) {
     return Card(
