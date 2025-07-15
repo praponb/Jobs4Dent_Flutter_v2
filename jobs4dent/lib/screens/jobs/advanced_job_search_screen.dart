@@ -460,6 +460,69 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
 
 
   @override
+  void initState() {
+    super.initState();
+    _loadSavedSearchState();
+  }
+
+  void _loadSavedSearchState() {
+    final jobProvider = Provider.of<JobProvider>(context, listen: false);
+    final savedState = jobProvider.savedAdvancedSearchState;
+    
+    if (savedState != null) {
+      // Restore text controllers
+      _keywordController.text = savedState['keyword'] ?? '';
+      _minSalaryController.text = savedState['minSalary'] ?? '';
+      _maxSalaryController.text = savedState['maxSalary'] ?? '';
+      _workingHoursController.text = savedState['workingHours'] ?? '';
+      _additionalRequirementsController.text = savedState['additionalRequirements'] ?? '';
+      
+      // Restore dropdown selections
+      _selectedJobCategory = savedState['selectedJobCategory'];
+      _selectedExperienceLevel = savedState['selectedExperienceLevel'];
+      _selectedSalaryType = savedState['selectedSalaryType'];
+      _selectedWorkingType = savedState['selectedWorkingType'];
+      
+      // Restore location selections
+      _selectedProvinceZoneIndex = savedState['selectedProvinceZoneIndex'];
+      _selectedLocation = savedState['selectedLocation'];
+      
+      // Restore train selections
+      _selectedTrainLineIndex = savedState['selectedTrainLineIndex'];
+      _selectedTrainStation = savedState['selectedTrainStation'];
+      
+      // Restore working days
+      final workingDays = savedState['selectedWorkingDays'];
+      if (workingDays != null && workingDays is List) {
+        _selectedWorkingDays.clear();
+        _selectedWorkingDays.addAll(List<String>.from(workingDays));
+      }
+      
+      // Restore dates
+      if (savedState['startDate'] != null) {
+        _startDate = DateTime.parse(savedState['startDate']);
+      }
+      if (savedState['endDate'] != null) {
+        _endDate = DateTime.parse(savedState['endDate']);
+      }
+      
+      // Update province and city controllers based on selections
+      if (_selectedProvinceZoneIndex != null) {
+        _provinceController.text = _thaiProvinceZones[_selectedProvinceZoneIndex!];
+      }
+      if (_selectedLocation != null) {
+        _cityController.text = _selectedLocation!;
+      }
+      if (_selectedTrainLineIndex != null) {
+        _trainLineController.text = _thaiTrainLines[_selectedTrainLineIndex!];
+      }
+      if (_selectedTrainStation != null) {
+        _trainStationController.text = _selectedTrainStation!;
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _keywordController.dispose();
     _provinceController.dispose();
@@ -477,7 +540,28 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    jobProvider.searchJobs(
+    // Save current search form state before performing search
+    jobProvider.saveAdvancedSearchState(
+      keyword: _keywordController.text,
+      selectedProvinceZoneIndex: _selectedProvinceZoneIndex,
+      selectedLocation: _selectedLocation,
+      selectedJobCategory: _selectedJobCategory,
+      selectedExperienceLevel: _selectedExperienceLevel,
+      selectedSalaryType: _selectedSalaryType,
+      minSalary: _minSalaryController.text,
+      maxSalary: _maxSalaryController.text,
+      selectedTrainLineIndex: _selectedTrainLineIndex,
+      selectedTrainStation: _selectedTrainStation,
+      selectedWorkingType: _selectedWorkingType,
+      selectedWorkingDays: _selectedWorkingDays,
+      workingHours: _workingHoursController.text,
+      startDate: _startDate,
+      endDate: _endDate,
+      additionalRequirements: _additionalRequirementsController.text,
+    );
+    
+    // Use AI-powered search with Gemini 1.5 Flash
+    jobProvider.searchJobsWithAI(
       keyword: _keywordController.text.trim().isEmpty ? null : _keywordController.text.trim(),
       province: _selectedProvinceZoneIndex != null ? _thaiProvinceZones[_selectedProvinceZoneIndex!] : null,
       city: _selectedLocation,
@@ -495,6 +579,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
       workingDays: _selectedWorkingDays.isEmpty ? null : _selectedWorkingDays,
       workingHours: _workingHoursController.text.trim().isEmpty ? null : _workingHoursController.text.trim(),
       additionalRequirements: _additionalRequirementsController.text.trim().isEmpty ? null : _additionalRequirementsController.text.trim(),
+      workingType: _selectedWorkingType,
       userId: authProvider.userModel?.userId,
     );
 
@@ -508,6 +593,10 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
   }
 
   void _clearFilters() {
+    // Clear the saved search state when explicitly clearing filters
+    final jobProvider = Provider.of<JobProvider>(context, listen: false);
+    jobProvider.clearAdvancedSearchState();
+    
     setState(() {
       _keywordController.clear();
       _provinceController.clear();
@@ -557,8 +646,8 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
             TextField(
               controller: _keywordController,
               decoration: const InputDecoration(
-                labelText: 'คำค้นหา',
-                hintText: 'ค้นหาชื่องาน หรือคำอธิบาย...',
+                labelText: 'ชื่อคลินิก หรือ อื่นๆ',
+                hintText: 'ค้นหาชื่อคลินิก หรือคำอธิบายงาน...',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -594,19 +683,49 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                 });
               },
             ),
+            // if (_selectedProvinceZoneIndex != null) ...[
+            //   const SizedBox(height: 16),
+            //   DropdownButtonFormField<String>(
+            //     value: _selectedLocation,
+            //     isExpanded: true,
+            //     decoration: const InputDecoration(
+            //       labelText: 'ตำแหน่งที่ตั้ง',
+            //       border: OutlineInputBorder(),
+            //     ),
+            //     items: [
+            //       const DropdownMenuItem(
+            //         value: null,
+            //         child: Text('เลือกตำแหน่งที่ตั้ง'),
+            //       ),
+            //       ..._thaiLocationZones[_selectedProvinceZoneIndex!].map((location) {
+            //         return DropdownMenuItem(
+            //           value: location,
+            //           child: Text(location),
+            //         );
+            //       }),
+            //     ],
+            //     onChanged: (value) {
+            //       setState(() {
+            //         _selectedLocation = value;
+            //         _cityController.text = value ?? '';
+            //       });
+            //     },
+            //   ),
+            // ],
+            const SizedBox(height: 16),
             if (_selectedProvinceZoneIndex != null) ...[
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _selectedLocation,
                 isExpanded: true,
                 decoration: const InputDecoration(
-                  labelText: 'ตำแหน่งที่ตั้ง',
+                  labelText: 'จังหวัด/โซนในจังหวัด',
                   border: OutlineInputBorder(),
                 ),
                 items: [
                   const DropdownMenuItem(
                     value: null,
-                    child: Text('เลือกตำแหน่งที่ตั้ง'),
+                    child: Text('เลือกโซนทำงาน'),
                   ),
                   ..._thaiLocationZones[_selectedProvinceZoneIndex!].map((location) {
                     return DropdownMenuItem(
@@ -623,15 +742,15 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                 },
               ),
             ],
-            const SizedBox(height: 16),
-            TextField(
-              controller: _cityController,
-              decoration: const InputDecoration(
-                labelText: 'เขต/อำเภอ',
-                hintText: 'เช่น วัฒนา, บางกะปิ',
-                border: OutlineInputBorder(),
-              ),
-            ),
+            const SizedBox(height: 24),
+            // TextField(
+            //   controller: _cityController,
+            //   decoration: const InputDecoration(
+            //     labelText: 'เขต/อำเภอ',
+            //     hintText: 'เช่น วัฒนา, บางกะปิ',
+            //     border: OutlineInputBorder(),
+            //   ),
+            // ),
             const SizedBox(height: 16),
             DropdownButtonFormField<int>(
               value: _selectedTrainLineIndex,
@@ -691,7 +810,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
             const SizedBox(height: 24),
 
             // Job Category and Experience
-            _buildSectionTitle('หมวดหมู่งานและประสบการณ์'),
+            _buildSectionTitle('เลือกความถนัดเฉพาะทาง หรือ ระดับประสบการณ์'),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: _selectedJobCategory,
@@ -747,7 +866,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
             const SizedBox(height: 24),
 
             // Salary Section
-            _buildSectionTitle('เงินเดือนและค่าตอบแทน'),
+            _buildSectionTitle('ประกันรายได้รายวัน หรือ เงินเดือน'),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: _selectedSalaryType,
@@ -759,7 +878,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
               items: [
                 const DropdownMenuItem(
                   value: null,
-                  child: Text('เลือกประเภทเงินเดือน'),
+                  child: Text('อัตราส่วนรายได้'),
                 ),
                 ...JobProvider.salaryTypes.map((type) {
                   return DropdownMenuItem(
@@ -781,8 +900,8 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                   child: TextField(
                     controller: _minSalaryController,
                     decoration: const InputDecoration(
-                      labelText: 'เงินเดือนต่ำสุด',
-                      hintText: '0',
+                      labelText: 'ประกันรายได้ขั้นต่ำ',
+                      hintText: '2500',
                       border: OutlineInputBorder(),
                       suffixText: 'บาท',
                     ),
@@ -794,8 +913,8 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                   child: TextField(
                     controller: _maxSalaryController,
                     decoration: const InputDecoration(
-                      labelText: 'เงินเดือนสูงสุด',
-                      hintText: '100000',
+                      labelText: 'เงินเดือนขั้นต่ำ',
+                      hintText: '25000',
                       border: OutlineInputBorder(),
                       suffixText: 'บาท',
                     ),
@@ -809,30 +928,27 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
             // Work Schedule Section
             _buildSectionTitle('ตารางงานและเวลาทำงาน'),
             const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: _selectedWorkingType,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'ประเภทการทำงาน',
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                const DropdownMenuItem(
-                  value: null,
-                  child: Text('เลือกประเภทการทำงาน'),
-                ),
-                ..._workingType.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(type),
-                  );
-                }),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedWorkingType = value;
-                });
-              },
+            const Text('ประเภทการทำงาน:', style: TextStyle(fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            Row(
+              children: _workingType.map((type) {
+                return Expanded(
+                  child: Row(
+                    children: [
+                      Radio<String>(
+                        value: type,
+                        groupValue: _selectedWorkingType,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedWorkingType = value;
+                          });
+                        },
+                      ),
+                      Text(type),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 16),
             const Text('วันทำงาน:', style: TextStyle(fontWeight: FontWeight.w500)),
@@ -860,15 +976,15 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
             TextField(
               controller: _workingHoursController,
               decoration: const InputDecoration(
-                labelText: 'เวลาทำงาน',
-                hintText: 'เช่น 08:00-17:00',
+                labelText: 'เลือกเวลาเริ่มงาน',
+                hintText: 'เช่น 08:00 น.',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 24),
 
             // Date Filters Section
-            _buildSectionTitle('ช่วงเวลา'),
+            _buildSectionTitle('ช่วงวันทำงาน'),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -937,30 +1053,30 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Work Preferences Section
-            _buildSectionTitle('ลักษณะงาน'),
-            const SizedBox(height: 8),
-            SwitchListTile(
-              title: const Text('งานด่วน'),
-              subtitle: const Text('งานที่ต้องการคนเร่งด่วน'),
-              value: _isUrgent,
-              onChanged: (value) {
-                setState(() {
-                  _isUrgent = value;
-                });
-              },
-            ),
-            SwitchListTile(
-              title: const Text('ทำงานระยะไกล'),
-              subtitle: const Text('สามารถทำงานจากที่ไหนก็ได้'),
-              value: _isRemote,
-              onChanged: (value) {
-                setState(() {
-                  _isRemote = value;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
+            // // Work Preferences Section
+            // _buildSectionTitle('ลักษณะงาน'),
+            // const SizedBox(height: 8),
+            // SwitchListTile(
+            //   title: const Text('งานด่วน'),
+            //   subtitle: const Text('งานที่ต้องการคนเร่งด่วน'),
+            //   value: _isUrgent,
+            //   onChanged: (value) {
+            //     setState(() {
+            //       _isUrgent = value;
+            //     });
+            //   },
+            // ),
+            // SwitchListTile(
+            //   title: const Text('ทำงานระยะไกล'),
+            //   subtitle: const Text('สามารถทำงานจากที่ไหนก็ได้'),
+            //   value: _isRemote,
+            //   onChanged: (value) {
+            //     setState(() {
+            //       _isRemote = value;
+            //     });
+            //   },
+            // ),
+            // const SizedBox(height: 24),
 
             // Additional Requirements Section
             _buildSectionTitle('ข้อกำหนดเพิ่มเติม'),
@@ -969,7 +1085,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
               controller: _additionalRequirementsController,
               decoration: const InputDecoration(
                 labelText: 'ข้อกำหนดพิเศษ',
-                hintText: 'เช่น ใบอนุญาต, การรับรอง, ทักษะพิเศษ',
+                hintText: 'เช่น ห้องพักแพทย์, ที่จอดรถ, wifi',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -994,6 +1110,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),

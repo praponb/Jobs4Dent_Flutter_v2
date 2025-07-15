@@ -15,6 +15,8 @@ class JobProvider with ChangeNotifier {
   List<JobApplicationModel> _applicantsForMyJobs = [];
   bool _isLoading = false;
   String? _error;
+  Map<String, dynamic>? _lastSearchCriteria;
+  Map<String, dynamic>? _savedAdvancedSearchState;
 
   // Getters
   List<JobModel> get jobs => _jobs;
@@ -24,6 +26,8 @@ class JobProvider with ChangeNotifier {
   List<JobApplicationModel> get applicantsForMyJobs => _applicantsForMyJobs;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  Map<String, dynamic>? get lastSearchCriteria => _lastSearchCriteria;
+  Map<String, dynamic>? get savedAdvancedSearchState => _savedAdvancedSearchState;
 
   // Job Categories
   static const List<String> jobCategories = [
@@ -188,6 +192,63 @@ class JobProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _setError(null);
+
+      // Build search criteria for display (same as AI search)
+      final searchCriteria = <String, dynamic>{};
+      if (keyword != null && keyword.trim().isNotEmpty) {
+        searchCriteria['keyword'] = keyword.trim();
+      }
+      if (province != null && province.trim().isNotEmpty) {
+        searchCriteria['province'] = province.trim();
+      }
+      if (city != null && city.trim().isNotEmpty) {
+        searchCriteria['city'] = city.trim();
+      }
+      if (jobCategory != null && jobCategory.trim().isNotEmpty) {
+        searchCriteria['jobCategory'] = jobCategory.trim();
+      }
+      if (experienceLevel != null && experienceLevel.trim().isNotEmpty) {
+        searchCriteria['experienceLevel'] = experienceLevel.trim();
+      }
+      if (salaryType != null && salaryType.trim().isNotEmpty) {
+        searchCriteria['salaryType'] = salaryType.trim();
+      }
+      if (minSalary != null) {
+        searchCriteria['minSalary'] = minSalary;
+      }
+      if (maxSalary != null) {
+        searchCriteria['maxSalary'] = maxSalary;
+      }
+      if (startDate != null) {
+        searchCriteria['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        searchCriteria['endDate'] = endDate.toIso8601String();
+      }
+      if (isRemote == true) {
+        searchCriteria['isRemote'] = isRemote;
+      }
+      if (isUrgent == true) {
+        searchCriteria['isUrgent'] = isUrgent;
+      }
+      if (trainLine != null && trainLine.trim().isNotEmpty && trainLine != 'ไม่ใกล้รถไฟฟ้า') {
+        searchCriteria['trainLine'] = trainLine.trim();
+      }
+      if (trainStation != null && trainStation.trim().isNotEmpty && trainStation != 'ไม่ใกล้รถไฟฟ้า') {
+        searchCriteria['trainStation'] = trainStation.trim();
+      }
+      if (workingDays != null && workingDays.isNotEmpty) {
+        searchCriteria['workingDays'] = workingDays;
+      }
+      if (workingHours != null && workingHours.trim().isNotEmpty) {
+        searchCriteria['workingHours'] = workingHours.trim();
+      }
+      if (additionalRequirements != null && additionalRequirements.trim().isNotEmpty) {
+        searchCriteria['additionalRequirements'] = additionalRequirements.trim();
+      }
+
+      // Store the search criteria for display purposes
+      _lastSearchCriteria = Map<String, dynamic>.from(searchCriteria);
 
       // Use a simple query without composite index requirements
       // Only filter by isActive and do all other filtering client-side
@@ -713,6 +774,8 @@ class JobProvider with ChangeNotifier {
     _myApplications.clear();
     _applicantsForMyJobs.clear();
     _error = null;
+    _lastSearchCriteria = null;
+    _savedAdvancedSearchState = null;
     notifyListeners();
   }
 
@@ -1087,5 +1150,384 @@ MATCHING_JOB_IDS: []
       }
       return [];
     }
+  }
+
+  // AI-powered search using Gemini 1.5 Flash
+  Future<void> searchJobsWithAI({
+    String? keyword,
+    String? province,
+    String? city,
+    String? jobCategory,
+    String? experienceLevel,
+    String? salaryType,
+    double? minSalary,
+    double? maxSalary,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isRemote,
+    bool? isUrgent,
+    String? trainLine,
+    String? trainStation,
+    List<String>? workingDays,
+    String? workingHours,
+    String? additionalRequirements,
+    String? workingType,
+    String? userId,
+  }) async {
+    try {
+      _setLoading(true);
+      _setError(null);
+
+      // Get all active jobs first
+      Query query = _firestore.collection('job_posts')
+          .where('isActive', isEqualTo: true)
+          .limit(500);
+
+      final querySnapshot = await query.get();
+      final allJobs = querySnapshot.docs
+          .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      if (allJobs.isEmpty) {
+        _jobs = [];
+        notifyListeners();
+        return;
+      }
+
+      // Build search criteria from non-empty fields only
+      final searchCriteria = <String, dynamic>{};
+      
+      if (keyword != null && keyword.trim().isNotEmpty) {
+        searchCriteria['keyword'] = keyword.trim();
+      }
+      if (province != null && province.trim().isNotEmpty) {
+        searchCriteria['province'] = province.trim();
+      }
+      if (city != null && city.trim().isNotEmpty) {
+        searchCriteria['city'] = city.trim();
+      }
+      if (jobCategory != null && jobCategory.trim().isNotEmpty) {
+        searchCriteria['jobCategory'] = jobCategory.trim();
+      }
+      if (experienceLevel != null && experienceLevel.trim().isNotEmpty) {
+        searchCriteria['experienceLevel'] = experienceLevel.trim();
+      }
+      if (salaryType != null && salaryType.trim().isNotEmpty) {
+        searchCriteria['salaryType'] = salaryType.trim();
+      }
+      if (minSalary != null) {
+        searchCriteria['minSalary'] = minSalary;
+      }
+      if (maxSalary != null) {
+        searchCriteria['maxSalary'] = maxSalary;
+      }
+      if (startDate != null) {
+        searchCriteria['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        searchCriteria['endDate'] = endDate.toIso8601String();
+      }
+      if (isRemote == true) {
+        searchCriteria['isRemote'] = isRemote;
+      }
+      if (isUrgent == true) {
+        searchCriteria['isUrgent'] = isUrgent;
+      }
+      if (trainLine != null && trainLine.trim().isNotEmpty && trainLine != 'ไม่ใกล้รถไฟฟ้า') {
+        searchCriteria['trainLine'] = trainLine.trim();
+      }
+      if (trainStation != null && trainStation.trim().isNotEmpty && trainStation != 'ไม่ใกล้รถไฟฟ้า') {
+        searchCriteria['trainStation'] = trainStation.trim();
+      }
+      if (workingDays != null && workingDays.isNotEmpty) {
+        searchCriteria['workingDays'] = workingDays;
+      }
+      if (workingHours != null && workingHours.trim().isNotEmpty) {
+        searchCriteria['workingHours'] = workingHours.trim();
+      }
+      if (additionalRequirements != null && additionalRequirements.trim().isNotEmpty) {
+        searchCriteria['additionalRequirements'] = additionalRequirements.trim();
+      }
+      if (workingType != null && workingType.trim().isNotEmpty) {
+        searchCriteria['workingType'] = workingType.trim();
+      }
+
+      // Store the search criteria for display purposes
+      _lastSearchCriteria = Map<String, dynamic>.from(searchCriteria);
+
+      // If no search criteria provided, return all jobs
+      if (searchCriteria.isEmpty) {
+        _jobs = allJobs;
+        _jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        notifyListeners();
+        return;
+      }
+
+      // Use Gemini AI for intelligent matching
+      final matchingJobs = await _performAISearch(allJobs, searchCriteria);
+      
+      _jobs = matchingJobs;
+      
+      // Calculate matching scores if userId is provided
+      if (userId != null) {
+        await _calculateMatchingScores(userId);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      _setError('การค้นหางานด้วย AI ไม่สำเร็จ: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<List<JobModel>> _performAISearch(List<JobModel> allJobs, Map<String, dynamic> searchCriteria) async {
+    try {
+      final apiKey = dotenv.env['GOOGLE_AI_STUDIO_APIKEY_AEK'] ?? '';
+      
+      if (apiKey.isEmpty) {
+        throw Exception('Google AI Studio API key not found. Please check your .env file.');
+      }
+      
+      final model = GenerativeModel(
+        model: 'gemini-1.5-flash',
+        apiKey: apiKey,
+      );
+
+      // Prepare job data for AI analysis
+      final jobData = allJobs.map((job) {
+        return {
+          'jobId': job.jobId,
+          'title': job.title,
+          'description': job.description,
+          'clinicName': job.clinicName,
+          'jobCategory': job.jobCategory,
+          'experienceLevel': job.experienceLevel,
+          'salaryType': job.salaryType,
+          'minSalary': job.minSalary?.toString() ?? '',
+          'maxSalary': job.maxSalary?.toString() ?? '',
+          'province': job.province,
+          'city': job.city,
+          'trainLine': job.trainLine ?? '',
+          'trainStation': job.trainStation ?? '',
+          'workingDays': job.workingDays?.join(', ') ?? '',
+          'workingHours': job.workingHours ?? '',
+          'additionalRequirements': job.additionalRequirements ?? '',
+          'perks': job.perks ?? '',
+          'isRemote': job.isRemote.toString(),
+          'isUrgent': job.isUrgent.toString(),
+        };
+      }).toList();
+
+      final prompt = '''
+You are an intelligent job matching AI assistant for a dental job platform in Thailand. Your task is to analyze user search criteria and match them with available job posts.
+
+User's Search Criteria:
+${searchCriteria.entries.map((entry) => '${entry.key}: ${entry.value}').join('\n')}
+
+Available Job Posts:
+${jobData.map((job) => '''
+Job ID: ${job['jobId']}
+Title: ${job['title']}
+Description: ${job['description']}
+Clinic: ${job['clinicName']}
+Category: ${job['jobCategory']}
+Experience: ${job['experienceLevel']}
+Salary Type: ${job['salaryType']}
+Min Salary: ${job['minSalary']}
+Max Salary: ${job['maxSalary']}
+Province: ${job['province']}
+City: ${job['city']}
+Train Line: ${job['trainLine']}
+Train Station: ${job['trainStation']}
+Working Days: ${job['workingDays']}
+Working Hours: ${job['workingHours']}
+Additional Requirements: ${job['additionalRequirements']}
+Perks: ${job['perks']}
+Remote: ${job['isRemote']}
+Urgent: ${job['isUrgent']}
+---''').join('\n')}
+
+Please analyze the search criteria and match them intelligently with the job posts. Consider:
+
+1. **Semantic Matching**: Match meaning, not just exact text
+2. **Location Intelligence**: Understand Thai location hierarchy and nearby areas
+3. **Salary Flexibility**: Consider salary ranges and types (ประจำ, part-time, etc.)
+4. **Schedule Matching**: Match working days and hours flexibly
+5. **Experience Level**: Match based on required vs. available experience
+6. **Transport Access**: Consider train line proximity and accessibility
+7. **Job Category**: Match specialties and general practice appropriately
+8. **Language Understanding**: Understand Thai dental terminology and job descriptions
+
+**Matching Rules**:
+- If keyword is provided, search across title, description, clinic name, and all text fields
+- Location matching should consider hierarchy (zone > province > city)
+- Salary matching should be flexible (if user wants 3000+, show jobs with min salary >= 3000)
+- Experience should be inclusive (if user has 2 years, show jobs requiring 0-2 years)
+- Working type matching (ประจำ = full-time, part-time = part-time)
+- Train line proximity should be considered for location matching
+
+Return ONLY the Job IDs that match the search criteria, ranked by relevance.
+
+Format your response as:
+MATCHING_JOB_IDS: [jobId1, jobId2, jobId3, ...]
+
+If no jobs match, return:
+MATCHING_JOB_IDS: []
+''';
+
+      final content = [Content.text(prompt)];
+      final response = await model.generateContent(content);
+      final responseText = response.text ?? '';
+
+      // Parse the response to extract job IDs
+      final matchingJobIds = _parseGeminiResponse(responseText);
+
+      // Filter and sort the matching jobs
+      final matchingJobs = allJobs.where((job) => matchingJobIds.contains(job.jobId)).toList();
+      
+      // Sort by creation date (newest first) while preserving AI ranking for similar dates
+      matchingJobs.sort((a, b) {
+        final aIndex = matchingJobIds.indexOf(a.jobId);
+        final bIndex = matchingJobIds.indexOf(b.jobId);
+        
+        // If both jobs are close in AI ranking, sort by date
+        if ((aIndex - bIndex).abs() <= 2) {
+          return b.createdAt.compareTo(a.createdAt);
+        }
+        
+        // Otherwise preserve AI ranking
+        return aIndex.compareTo(bIndex);
+      });
+
+      return matchingJobs;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error in AI search: $e');
+      }
+      throw Exception('AI search failed: $e');
+    }
+  }
+
+  // Get formatted search criteria for display
+  List<String> getFormattedSearchCriteria() {
+    if (_lastSearchCriteria == null || _lastSearchCriteria!.isEmpty) {
+      return [];
+    }
+
+    final List<String> criteria = [];
+    
+    _lastSearchCriteria!.forEach((key, value) {
+      String displayText = '';
+      
+      switch (key) {
+        case 'keyword':
+          displayText = 'คำค้นหา: $value';
+          break;
+        case 'province':
+          displayText = 'พื้นที่: $value';
+          break;
+        case 'city':
+          displayText = 'เขต/อำเภอ: $value';
+          break;
+        case 'jobCategory':
+          displayText = 'หมวดงาน: $value';
+          break;
+        case 'experienceLevel':
+          displayText = 'ประสบการณ์: $value';
+          break;
+        case 'salaryType':
+          displayText = 'อัตราส่วนรายได้: $value';
+          break;
+        case 'minSalary':
+          displayText = 'ประกันรายได้ขั้นต่ำ: ${value.toString()} บาท';
+          break;
+        case 'maxSalary':
+          displayText = 'เงินเดือนขั้นต่ำ: ${value.toString()} บาท';
+          break;
+        case 'trainLine':
+          displayText = 'สายรถไฟฟ้า: $value';
+          break;
+        case 'trainStation':
+          displayText = 'สถานี: $value';
+          break;
+        case 'workingDays':
+          if (value is List) {
+            displayText = 'วันทำงาน: ${value.join(', ')}';
+          }
+          break;
+        case 'workingHours':
+          displayText = 'เวลาทำงาน: $value';
+          break;
+        case 'workingType':
+          displayText = 'ประเภทงาน: $value';
+          break;
+        case 'startDate':
+          displayText = 'วันเริ่มต้น: ${DateTime.parse(value).toString().split(' ')[0]}';
+          break;
+        case 'endDate':
+          displayText = 'วันสิ้นสุด: ${DateTime.parse(value).toString().split(' ')[0]}';
+          break;
+        case 'additionalRequirements':
+          displayText = 'ข้อกำหนดพิเศษ: $value';
+          break;
+        case 'isRemote':
+          if (value == true) displayText = 'ทำงานระยะไกล';
+          break;
+        case 'isUrgent':
+          if (value == true) displayText = 'งานด่วน';
+          break;
+      }
+      
+      if (displayText.isNotEmpty) {
+        criteria.add(displayText);
+      }
+    });
+    
+    return criteria;
+  }
+
+  // Save advanced search form state
+  void saveAdvancedSearchState({
+    String? keyword,
+    int? selectedProvinceZoneIndex,
+    String? selectedLocation,
+    String? selectedJobCategory,
+    String? selectedExperienceLevel,
+    String? selectedSalaryType,
+    String? minSalary,
+    String? maxSalary,
+    int? selectedTrainLineIndex,
+    String? selectedTrainStation,
+    String? selectedWorkingType,
+    List<String>? selectedWorkingDays,
+    String? workingHours,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? additionalRequirements,
+  }) {
+    _savedAdvancedSearchState = {
+      'keyword': keyword,
+      'selectedProvinceZoneIndex': selectedProvinceZoneIndex,
+      'selectedLocation': selectedLocation,
+      'selectedJobCategory': selectedJobCategory,
+      'selectedExperienceLevel': selectedExperienceLevel,
+      'selectedSalaryType': selectedSalaryType,
+      'minSalary': minSalary,
+      'maxSalary': maxSalary,
+      'selectedTrainLineIndex': selectedTrainLineIndex,
+      'selectedTrainStation': selectedTrainStation,
+      'selectedWorkingType': selectedWorkingType,
+      'selectedWorkingDays': selectedWorkingDays,
+      'workingHours': workingHours,
+      'startDate': startDate?.toIso8601String(),
+      'endDate': endDate?.toIso8601String(),
+      'additionalRequirements': additionalRequirements,
+    };
+  }
+
+  // Clear advanced search state
+  void clearAdvancedSearchState() {
+    _savedAdvancedSearchState = null;
   }
 } 
