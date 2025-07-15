@@ -4,6 +4,8 @@ import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_model.dart';
 import 'job_application_screen.dart';
+import 'advanced_job_search_screen.dart';
+import 'day_hour_job_search_screen.dart';
 
 class JobSearchScreen extends StatefulWidget {
   const JobSearchScreen({super.key});
@@ -92,23 +94,60 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
           // Search Bar
           Container(
             padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _keywordController,
-                    decoration: const InputDecoration(
-                      hintText: 'ค้นหาชื่องาน หรือคำอธิบาย...',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _keywordController,
+                        decoration: const InputDecoration(
+                          hintText: 'ค้นหาชื่องาน หรือคำอธิบาย...',
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(),
+                        ),
+                        onSubmitted: (_) => _searchJobs(),
+                      ),
                     ),
-                    onSubmitted: (_) => _searchJobs(),
-                  ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _searchJobs,
+                      child: const Text('ค้นหา'),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _searchJobs,
-                  child: const Text('ค้นหา'),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DayHourJobSearchScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.tune),
+                        label: const Text('เลือกวัน/เวลาทำงาน'),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdvancedJobSearchScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.tune),
+                        label: const Text('ค้นหาขั้นสูง'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

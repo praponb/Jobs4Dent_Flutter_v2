@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/job_model.dart';
 import '../models/job_application_model.dart';
 import '../models/user_model.dart';
@@ -169,12 +171,18 @@ class JobProvider with ChangeNotifier {
     String? city,
     String? jobCategory,
     String? experienceLevel,
+    String? salaryType,
     double? minSalary,
     double? maxSalary,
     DateTime? startDate,
     DateTime? endDate,
     bool? isRemote,
     bool? isUrgent,
+    String? trainLine,
+    String? trainStation,
+    List<String>? workingDays,
+    String? workingHours,
+    String? additionalRequirements,
     String? userId, // For matching calculation
   }) async {
     try {
@@ -246,6 +254,40 @@ class JobProvider with ChangeNotifier {
             job.endDate == null || job.endDate!.isBefore(endDate) || job.endDate!.isAtSameMomentAs(endDate)).toList();
       }
 
+      // Filter by salary type
+      if (salaryType != null && salaryType.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.salaryType == salaryType).toList();
+      }
+
+      // Filter by train line
+      if (trainLine != null && trainLine.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.trainLine == trainLine).toList();
+      }
+
+      // Filter by train station
+      if (trainStation != null && trainStation.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.trainStation != null && 
+                                   job.trainStation!.toLowerCase().contains(trainStation.toLowerCase())).toList();
+      }
+
+      // Filter by working days
+      if (workingDays != null && workingDays.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.workingDays != null && 
+                                   workingDays.any((day) => job.workingDays!.contains(day))).toList();
+      }
+
+      // Filter by working hours
+      if (workingHours != null && workingHours.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.workingHours != null && 
+                                   job.workingHours!.toLowerCase().contains(workingHours.toLowerCase())).toList();
+      }
+
+      // Filter by additional requirements
+      if (additionalRequirements != null && additionalRequirements.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.additionalRequirements != null && 
+                                   job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
+      }
+
       // Limit results to 50 after filtering
       if (_jobs.length > 50) {
         _jobs = _jobs.take(50).toList();
@@ -271,12 +313,18 @@ class JobProvider with ChangeNotifier {
     String? city,
     String? jobCategory,
     String? experienceLevel,
+    String? salaryType,
     double? minSalary,
     double? maxSalary,
     DateTime? startDate,
     DateTime? endDate,
     bool? isRemote,
     bool? isUrgent,
+    String? trainLine,
+    String? trainStation,
+    List<String>? workingDays,
+    String? workingHours,
+    String? additionalRequirements,
     String? userId, // For matching calculation
   }) async {
     try {
@@ -346,6 +394,40 @@ class JobProvider with ChangeNotifier {
       if (endDate != null) {
         _jobs = _jobs.where((job) =>
             job.endDate == null || job.endDate!.isBefore(endDate) || job.endDate!.isAtSameMomentAs(endDate)).toList();
+      }
+
+      // Filter by salary type
+      if (salaryType != null && salaryType.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.salaryType == salaryType).toList();
+      }
+
+      // Filter by train line
+      if (trainLine != null && trainLine.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.trainLine == trainLine).toList();
+      }
+
+      // Filter by train station
+      if (trainStation != null && trainStation.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.trainStation != null && 
+                                   job.trainStation!.toLowerCase().contains(trainStation.toLowerCase())).toList();
+      }
+
+      // Filter by working days
+      if (workingDays != null && workingDays.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.workingDays != null && 
+                                   workingDays.any((day) => job.workingDays!.contains(day))).toList();
+      }
+
+      // Filter by working hours
+      if (workingHours != null && workingHours.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.workingHours != null && 
+                                   job.workingHours!.toLowerCase().contains(workingHours.toLowerCase())).toList();
+      }
+
+      // Filter by additional requirements
+      if (additionalRequirements != null && additionalRequirements.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.additionalRequirements != null && 
+                                   job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
       }
 
       // Limit results to 50 after filtering
@@ -884,6 +966,126 @@ class JobProvider with ChangeNotifier {
       return false;
     } finally {
       _setLoading(false);
+    }
+  }
+
+  // Search jobs by working days and hours using Gemini AI
+  Future<List<JobModel>> searchJobsByDayHours(String searchQuery) async {
+    try {
+      // First, get all active jobs
+      final query = _firestore.collection('job_posts')
+          .where('isActive', isEqualTo: true)
+          .limit(500);
+
+      final querySnapshot = await query.get();
+      final allJobs = querySnapshot.docs
+          .map((doc) => JobModel.fromMap(doc.data()))
+          .toList();
+
+      // Filter jobs that have workingDays or workingHours
+      final jobsWithSchedule = allJobs.where((job) => 
+        (job.workingDays != null && job.workingDays!.isNotEmpty) ||
+        (job.workingHours != null && job.workingHours!.isNotEmpty)
+      ).toList();
+
+      if (jobsWithSchedule.isEmpty) {
+        return [];
+      }
+
+            // Use Gemini API to analyze the search query and match with job schedules
+      final apiKey = dotenv.env['GOOGLE_AI_STUDIO_APIKEY_AEK'] ?? '';
+      
+      if (apiKey.isEmpty) {
+        throw Exception('Google AI Studio API key not found. Please check your .env file.');
+      }
+      
+      final model = GenerativeModel(
+        model: 'gemini-1.5-flash',
+        apiKey: dotenv.env['GOOGLE_AI_STUDIO_APIKEY_AEK'] ?? '',
+      );
+
+      // Prepare the data for Gemini
+      final jobScheduleData = jobsWithSchedule.map((job) {
+        final workingDays = job.workingDays?.join(', ') ?? '';
+        final workingHours = job.workingHours ?? '';
+        return {
+          'jobId': job.jobId,
+          'title': job.title,
+          'clinicName': job.clinicName,
+          'workingDays': workingDays,
+          'workingHours': workingHours,
+        };
+      }).toList();
+
+      final prompt = '''
+You are an AI assistant helping to match job seekers with jobs based on their preferred working days and hours.
+
+User's search query: "$searchQuery"
+
+Job schedule data:
+${jobScheduleData.map((job) => 'Job ID: ${job['jobId']}, Title: ${job['title']}, Clinic: ${job['clinicName']}, Working Days: ${job['workingDays']}, Working Hours: ${job['workingHours']}').join('\n')}
+
+Please analyze the user's search query and return ONLY the Job IDs that match the user's requirements. Consider:
+1. Day preferences (Monday-Sunday, weekdays, weekends)
+2. Time preferences (morning, afternoon, evening, specific hours)
+3. Flexible matching (e.g., if user wants "weekdays" match Monday-Friday)
+4. Thai language understanding (วันจันทร์=Monday, วันอังคาร=Tuesday, etc.)
+
+Return only the matching Job IDs in this exact format:
+MATCHING_JOB_IDS: [jobId1, jobId2, jobId3]
+
+If no jobs match, return:
+MATCHING_JOB_IDS: []
+''';
+
+      final content = [Content.text(prompt)];
+      final response = await model.generateContent(content);
+      final responseText = response.text ?? '';
+
+      // Parse the response to extract job IDs
+      final matchingJobIds = _parseGeminiResponse(responseText);
+
+      // Filter the original jobs based on matching IDs
+      final matchingJobs = jobsWithSchedule.where((job) =>
+        matchingJobIds.contains(job.jobId)
+      ).toList();
+
+      // Sort by creation date (newest first)
+      matchingJobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      return matchingJobs;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error in searchJobsByDayHours: $e');
+      }
+      throw Exception('การค้นหาด้วย AI ไม่สำเร็จ: $e');
+    }
+  }
+
+  List<String> _parseGeminiResponse(String responseText) {
+    try {
+      final regex = RegExp(r'MATCHING_JOB_IDS:\s*\[(.*?)\]');
+      final match = regex.firstMatch(responseText);
+      
+      if (match != null) {
+        final jobIdsString = match.group(1) ?? '';
+        if (jobIdsString.trim().isEmpty) {
+          return [];
+        }
+        
+        return jobIdsString
+            .split(',')
+            .map((id) => id.trim().replaceAll('"', '').replaceAll("'", ''))
+            .where((id) => id.isNotEmpty)
+            .toList();
+      }
+      
+      return [];
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error parsing Gemini response: $e');
+      }
+      return [];
     }
   }
 } 
