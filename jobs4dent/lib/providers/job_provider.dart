@@ -41,6 +41,9 @@ class JobProvider with ChangeNotifier {
     'ทันตแพทย์รักษาเด็ก',
     'ทันตแพทย์แม็กซิลโลเฟเชียล',
     'ทันตแพทย์ผ่าตัดขากรรไกร',
+    'ทันตแพทย์ GP & จัดฟัน',
+    'ทันตแพทย์ GP & ศัลย์',
+    'ทันตแพทย์ GP & ฟันปลอม',
   ];
 
   // Experience Levels
@@ -176,6 +179,19 @@ class JobProvider with ChangeNotifier {
     String? experienceLevel,
     double? minSalary,
     String? userId, // For matching calculation
+    String? title,
+    String? description,
+    int? minExperienceYears,
+    String? salaryType,
+    String? perks,
+    String? city,
+    String? trainLine,
+    String? trainStation,
+    String? workingDays,
+    String? workingHours,
+    String? additionalRequirements,
+    String? startDate,
+    String? endDate,
   }) async {
     try {
       _setLoading(true);
@@ -197,6 +213,45 @@ class JobProvider with ChangeNotifier {
       }
       if (minSalary != null) {
         searchCriteria['minSalary'] = minSalary;
+      }
+      if (title != null && title.trim().isNotEmpty) {
+        searchCriteria['title'] = title.trim();
+      }
+      if (description != null && description.trim().isNotEmpty) {
+        searchCriteria['description'] = description.trim();
+      }
+      if (minExperienceYears != null) {
+        searchCriteria['minExperienceYears'] = minExperienceYears;
+      }
+      if (salaryType != null && salaryType.trim().isNotEmpty) {
+        searchCriteria['salaryType'] = salaryType.trim();
+      }
+      if (perks != null && perks.trim().isNotEmpty) {
+        searchCriteria['perks'] = perks.trim();
+      }
+      if (city != null && city.trim().isNotEmpty) {
+        searchCriteria['city'] = city.trim();
+      }
+      if (trainLine != null && trainLine.trim().isNotEmpty) {
+        searchCriteria['trainLine'] = trainLine.trim();
+      }
+      if (trainStation != null && trainStation.trim().isNotEmpty) {
+        searchCriteria['trainStation'] = trainStation.trim();
+      }
+      if (workingDays != null && workingDays.trim().isNotEmpty) {
+        searchCriteria['workingDays'] = workingDays.trim();
+      }
+      if (workingHours != null && workingHours.trim().isNotEmpty) {
+        searchCriteria['workingHours'] = workingHours.trim();
+      }
+      if (additionalRequirements != null && additionalRequirements.trim().isNotEmpty) {
+        searchCriteria['additionalRequirements'] = additionalRequirements.trim();
+      }
+      if (startDate != null && startDate.trim().isNotEmpty) {
+        searchCriteria['startDate'] = startDate.trim();
+      }
+      if (endDate != null && endDate.trim().isNotEmpty) {
+        searchCriteria['endDate'] = endDate.trim();
       }
 
       // Store the search criteria for display purposes
@@ -240,6 +295,56 @@ class JobProvider with ChangeNotifier {
       if (minSalary != null) {
         _jobs = _jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
       }
+
+      if (title != null && title.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.title.toLowerCase().contains(title.toLowerCase())).toList();
+      }
+
+      if (description != null && description.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.description.toLowerCase().contains(description.toLowerCase())).toList();
+      }
+
+      if (minExperienceYears != null) {
+        _jobs = _jobs.where((job) => job.minExperienceYears != null && job.minExperienceYears! >= minExperienceYears).toList();
+      }
+
+      if (salaryType != null && salaryType.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.salaryType == salaryType).toList();
+      }
+
+      if (perks != null && perks.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.perks != null && job.perks!.toLowerCase().contains(perks.toLowerCase())).toList();
+      }
+
+      if (city != null && city.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.city == city).toList();
+      }
+
+      if (trainLine != null && trainLine.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.trainLine != null && job.trainLine == trainLine).toList();
+      }
+
+      if (trainStation != null && trainStation.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.trainStation != null && job.trainStation == trainStation).toList();
+      }
+
+      if (workingDays != null && workingDays.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.workingDays != null && 
+                                   job.workingDays!.any((day) => workingDays.toLowerCase().contains(day.toLowerCase()))).toList();
+      }
+
+      if (workingHours != null && workingHours.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.workingHours != null && 
+                                   job.workingHours!.toLowerCase().contains(workingHours.toLowerCase())).toList();
+      }
+
+      if (additionalRequirements != null && additionalRequirements.isNotEmpty) {
+        _jobs = _jobs.where((job) => job.additionalRequirements != null && 
+                                   job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
+      }
+
+      // Date filtering would require parsing the string dates to DateTime
+      // For now, we'll skip date filtering as it requires proper date handling
 
       // Limit results to 50 after filtering
       if (_jobs.length > 50) {

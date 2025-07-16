@@ -19,9 +19,22 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _minSalaryController = TextEditingController();
   final TextEditingController _maxSalaryController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _minExperienceYearsController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _trainLineController = TextEditingController();
+  final TextEditingController _trainStationController = TextEditingController();
+  final TextEditingController _workingDaysController = TextEditingController();
+  final TextEditingController _workingHoursController = TextEditingController();
+  final TextEditingController _additionalRequirementsController = TextEditingController();
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
   
   String? _selectedCategory;
   String? _selectedExperienceLevel;
+  String? _selectedSalaryType;
+  String? _selectedPerks;
 
   @override
   void initState() {
@@ -35,6 +48,17 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
     _locationController.dispose();
     _minSalaryController.dispose();
     _maxSalaryController.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _minExperienceYearsController.dispose();
+    _cityController.dispose();
+    _trainLineController.dispose();
+    _trainStationController.dispose();
+    _workingDaysController.dispose();
+    _workingHoursController.dispose();
+    _additionalRequirementsController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
     super.dispose();
   }
 
@@ -58,6 +82,22 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
       province: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
       minSalary: _minSalaryController.text.trim().isEmpty ? null : double.tryParse(_minSalaryController.text.trim()),
       userId: authProvider.userModel?.userId,
+      title: _titleController.text.trim().isEmpty ? null : _titleController.text.trim(),
+      description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+      minExperienceYears: _minExperienceYearsController.text.trim().isEmpty ? null : int.tryParse(_minExperienceYearsController.text.trim()),
+      salaryType: _selectedSalaryType,
+      perks: _selectedPerks,
+      city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
+      trainLine: _trainLineController.text.trim().isEmpty ? null : _trainLineController.text.trim(),
+      trainStation: _trainStationController.text.trim().isEmpty ? null : _trainStationController.text.trim(),
+      workingDays: _workingDaysController.text.trim().isEmpty ? null : _workingDaysController.text.trim(),
+      workingHours: _workingHoursController.text.trim().isEmpty ? null : _workingHoursController.text.trim(),
+      additionalRequirements: _additionalRequirementsController.text.trim().isEmpty ? null : _additionalRequirementsController.text.trim(),
+      // isActive: _isActiveController.text.trim().isEmpty ? null : _isActiveController.text.trim(),
+      // createdAt: _createdAtController.text.trim().isEmpty ? null : _createdAtController.text.trim(),
+      startDate: _startDateController.text.trim().isEmpty ? null : _startDateController.text.trim(),
+      endDate: _endDateController.text.trim().isEmpty ? null : _endDateController.text.trim(),
+      //isActive: true,
     );
   }
 
