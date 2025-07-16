@@ -296,24 +296,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                       ),
                     ),
                   ),
-                  if (job.isUrgent) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red[50],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'เร่งด่วน',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.red[700],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
+
                 ],
               ),
               const SizedBox(height: 12),

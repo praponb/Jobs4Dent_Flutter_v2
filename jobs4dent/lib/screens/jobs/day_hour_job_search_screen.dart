@@ -229,18 +229,6 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
                       ),
                     ),
                   ),
-                  if (job.isUrgent)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'ด่วน',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -309,7 +297,7 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
               ),
               const SizedBox(height: 8),
               
-              if (job.minSalary != null || job.maxSalary != null)
+              if (job.minSalary != null)
                 Row(
                   children: [
                     const Icon(Icons.monetization_on, size: 16, color: Colors.grey),
@@ -353,23 +341,6 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
                       ),
                     ),
                   ),
-                  if (job.isRemote) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'ระยะไกล',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange.shade700,
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
               const SizedBox(height: 8),
@@ -409,12 +380,8 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
   }
 
   String _formatSalary(JobModel job) {
-    if (job.minSalary != null && job.maxSalary != null) {
-      return '${_formatNumber(job.minSalary!)} - ${_formatNumber(job.maxSalary!)} บาท';
-    } else if (job.minSalary != null) {
+    if (job.minSalary != null) {
       return 'เริ่มต้น ${_formatNumber(job.minSalary!)} บาท';
-    } else if (job.maxSalary != null) {
-      return 'สูงสุด ${_formatNumber(job.maxSalary!)} บาท';
     }
     return 'ตามตกลง';
   }
@@ -497,7 +464,7 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
                         _buildDetailRow('หมวดหมู่', job.jobCategory),
                         _buildDetailRow('ประสบการณ์', job.experienceLevel),
                         _buildDetailRow('ประเภทเงินเดือน', job.salaryType),
-                        if (job.minSalary != null || job.maxSalary != null)
+                        if (job.minSalary != null)
                           _buildDetailRow('เงินเดือน', _formatSalary(job)),
                         _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
                         if (job.workingDays != null && job.workingDays!.isNotEmpty)
