@@ -713,14 +713,14 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: job.isUrgent ? Colors.red[100] : Colors.green[100],
+                  color: Colors.green[100],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  job.isUrgent ? 'เร่งด่วน' : 'เปิดใช้งาน',
+                  'เปิดใช้งาน',
                   style: TextStyle(
                     fontSize: 12,
-                    color: job.isUrgent ? Colors.red[700] : Colors.green[700],
+                    color: Colors.green[700],
                     fontWeight: FontWeight.w500,
                   ),
                 ),

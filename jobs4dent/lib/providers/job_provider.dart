@@ -172,21 +172,9 @@ class JobProvider with ChangeNotifier {
   Future<void> searchJobs({
     String? keyword,
     String? province,
-    String? city,
     String? jobCategory,
     String? experienceLevel,
-    String? salaryType,
     double? minSalary,
-    double? maxSalary,
-    DateTime? startDate,
-    DateTime? endDate,
-    bool? isRemote,
-    bool? isUrgent,
-    String? trainLine,
-    String? trainStation,
-    List<String>? workingDays,
-    String? workingHours,
-    String? additionalRequirements,
     String? userId, // For matching calculation
   }) async {
     try {
@@ -201,50 +189,14 @@ class JobProvider with ChangeNotifier {
       if (province != null && province.trim().isNotEmpty) {
         searchCriteria['province'] = province.trim();
       }
-      if (city != null && city.trim().isNotEmpty) {
-        searchCriteria['city'] = city.trim();
-      }
       if (jobCategory != null && jobCategory.trim().isNotEmpty) {
         searchCriteria['jobCategory'] = jobCategory.trim();
       }
       if (experienceLevel != null && experienceLevel.trim().isNotEmpty) {
         searchCriteria['experienceLevel'] = experienceLevel.trim();
       }
-      if (salaryType != null && salaryType.trim().isNotEmpty) {
-        searchCriteria['salaryType'] = salaryType.trim();
-      }
       if (minSalary != null) {
         searchCriteria['minSalary'] = minSalary;
-      }
-      if (maxSalary != null) {
-        searchCriteria['maxSalary'] = maxSalary;
-      }
-      if (startDate != null) {
-        searchCriteria['startDate'] = startDate.toIso8601String();
-      }
-      if (endDate != null) {
-        searchCriteria['endDate'] = endDate.toIso8601String();
-      }
-      if (isRemote == true) {
-        searchCriteria['isRemote'] = isRemote;
-      }
-      if (isUrgent == true) {
-        searchCriteria['isUrgent'] = isUrgent;
-      }
-      if (trainLine != null && trainLine.trim().isNotEmpty && trainLine != 'ไม่ใกล้รถไฟฟ้า') {
-        searchCriteria['trainLine'] = trainLine.trim();
-      }
-      if (trainStation != null && trainStation.trim().isNotEmpty && trainStation != 'ไม่ใกล้รถไฟฟ้า') {
-        searchCriteria['trainStation'] = trainStation.trim();
-      }
-      if (workingDays != null && workingDays.isNotEmpty) {
-        searchCriteria['workingDays'] = workingDays;
-      }
-      if (workingHours != null && workingHours.trim().isNotEmpty) {
-        searchCriteria['workingHours'] = workingHours.trim();
-      }
-      if (additionalRequirements != null && additionalRequirements.trim().isNotEmpty) {
-        searchCriteria['additionalRequirements'] = additionalRequirements.trim();
       }
 
       // Store the search criteria for display purposes
@@ -277,10 +229,6 @@ class JobProvider with ChangeNotifier {
         _jobs = _jobs.where((job) => job.province == province).toList();
       }
       
-      if (city != null && city.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.city == city).toList();
-      }
-      
       if (jobCategory != null && jobCategory.isNotEmpty) {
         _jobs = _jobs.where((job) => job.jobCategory == jobCategory).toList();
       }
@@ -288,65 +236,9 @@ class JobProvider with ChangeNotifier {
       if (experienceLevel != null && experienceLevel.isNotEmpty) {
         _jobs = _jobs.where((job) => job.experienceLevel == experienceLevel).toList();
       }
-      
-      if (isRemote != null) {
-        _jobs = _jobs.where((job) => job.isRemote == isRemote).toList();
-      }
-      
-      if (isUrgent != null) {
-        _jobs = _jobs.where((job) => job.isUrgent == isUrgent).toList();
-      }
 
       if (minSalary != null) {
         _jobs = _jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
-      }
-
-      if (maxSalary != null) {
-        _jobs = _jobs.where((job) => job.maxSalary != null && job.maxSalary! <= maxSalary).toList();
-      }
-
-      if (startDate != null) {
-        _jobs = _jobs.where((job) =>
-            job.startDate == null || job.startDate!.isAfter(startDate) || job.startDate!.isAtSameMomentAs(startDate)).toList();
-      }
-
-      if (endDate != null) {
-        _jobs = _jobs.where((job) =>
-            job.endDate == null || job.endDate!.isBefore(endDate) || job.endDate!.isAtSameMomentAs(endDate)).toList();
-      }
-
-      // Filter by salary type
-      if (salaryType != null && salaryType.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.salaryType == salaryType).toList();
-      }
-
-      // Filter by train line
-      if (trainLine != null && trainLine.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.trainLine == trainLine).toList();
-      }
-
-      // Filter by train station
-      if (trainStation != null && trainStation.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.trainStation != null && 
-                                   job.trainStation!.toLowerCase().contains(trainStation.toLowerCase())).toList();
-      }
-
-      // Filter by working days
-      if (workingDays != null && workingDays.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.workingDays != null && 
-                                   workingDays.any((day) => job.workingDays!.contains(day))).toList();
-      }
-
-      // Filter by working hours
-      if (workingHours != null && workingHours.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.workingHours != null && 
-                                   job.workingHours!.toLowerCase().contains(workingHours.toLowerCase())).toList();
-      }
-
-      // Filter by additional requirements
-      if (additionalRequirements != null && additionalRequirements.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.additionalRequirements != null && 
-                                   job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
       }
 
       // Limit results to 50 after filtering
@@ -371,21 +263,9 @@ class JobProvider with ChangeNotifier {
   Future<void> searchJobsAlternative({
     String? keyword,
     String? province,
-    String? city,
     String? jobCategory,
     String? experienceLevel,
-    String? salaryType,
     double? minSalary,
-    double? maxSalary,
-    DateTime? startDate,
-    DateTime? endDate,
-    bool? isRemote,
-    bool? isUrgent,
-    String? trainLine,
-    String? trainStation,
-    List<String>? workingDays,
-    String? workingHours,
-    String? additionalRequirements,
     String? userId, // For matching calculation
   }) async {
     try {
@@ -419,10 +299,6 @@ class JobProvider with ChangeNotifier {
         _jobs = _jobs.where((job) => job.province == province).toList();
       }
       
-      if (city != null && city.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.city == city).toList();
-      }
-      
       if (jobCategory != null && jobCategory.isNotEmpty) {
         _jobs = _jobs.where((job) => job.jobCategory == jobCategory).toList();
       }
@@ -430,65 +306,9 @@ class JobProvider with ChangeNotifier {
       if (experienceLevel != null && experienceLevel.isNotEmpty) {
         _jobs = _jobs.where((job) => job.experienceLevel == experienceLevel).toList();
       }
-      
-      if (isRemote != null) {
-        _jobs = _jobs.where((job) => job.isRemote == isRemote).toList();
-      }
-      
-      if (isUrgent != null) {
-        _jobs = _jobs.where((job) => job.isUrgent == isUrgent).toList();
-      }
 
       if (minSalary != null) {
         _jobs = _jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
-      }
-
-      if (maxSalary != null) {
-        _jobs = _jobs.where((job) => job.maxSalary != null && job.maxSalary! <= maxSalary).toList();
-      }
-
-      if (startDate != null) {
-        _jobs = _jobs.where((job) =>
-            job.startDate == null || job.startDate!.isAfter(startDate) || job.startDate!.isAtSameMomentAs(startDate)).toList();
-      }
-
-      if (endDate != null) {
-        _jobs = _jobs.where((job) =>
-            job.endDate == null || job.endDate!.isBefore(endDate) || job.endDate!.isAtSameMomentAs(endDate)).toList();
-      }
-
-      // Filter by salary type
-      if (salaryType != null && salaryType.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.salaryType == salaryType).toList();
-      }
-
-      // Filter by train line
-      if (trainLine != null && trainLine.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.trainLine == trainLine).toList();
-      }
-
-      // Filter by train station
-      if (trainStation != null && trainStation.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.trainStation != null && 
-                                   job.trainStation!.toLowerCase().contains(trainStation.toLowerCase())).toList();
-      }
-
-      // Filter by working days
-      if (workingDays != null && workingDays.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.workingDays != null && 
-                                   workingDays.any((day) => job.workingDays!.contains(day))).toList();
-      }
-
-      // Filter by working hours
-      if (workingHours != null && workingHours.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.workingHours != null && 
-                                   job.workingHours!.toLowerCase().contains(workingHours.toLowerCase())).toList();
-      }
-
-      // Filter by additional requirements
-      if (additionalRequirements != null && additionalRequirements.isNotEmpty) {
-        _jobs = _jobs.where((job) => job.additionalRequirements != null && 
-                                   job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
       }
 
       // Limit results to 50 after filtering
@@ -1063,7 +883,9 @@ class JobProvider with ChangeNotifier {
       }
       
       final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
+        //model: 'gemini-1.5-flash',
+        //model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         apiKey: dotenv.env['GOOGLE_AI_STUDIO_APIKEY_AEK'] ?? '',
       );
 
@@ -1305,7 +1127,6 @@ MATCHING_JOB_IDS: []
           'experienceLevel': job.experienceLevel,
           'salaryType': job.salaryType,
           'minSalary': job.minSalary?.toString() ?? '',
-          'maxSalary': job.maxSalary?.toString() ?? '',
           'province': job.province,
           'city': job.city,
           'trainLine': job.trainLine ?? '',
@@ -1314,8 +1135,6 @@ MATCHING_JOB_IDS: []
           'workingHours': job.workingHours ?? '',
           'additionalRequirements': job.additionalRequirements ?? '',
           'perks': job.perks ?? '',
-          'isRemote': job.isRemote.toString(),
-          'isUrgent': job.isUrgent.toString(),
         };
       }).toList();
 
@@ -1427,55 +1246,17 @@ MATCHING_JOB_IDS: []
         case 'province':
           displayText = 'พื้นที่: $value';
           break;
-        case 'city':
-          displayText = 'เขต/อำเภอ: $value';
-          break;
         case 'jobCategory':
           displayText = 'หมวดงาน: $value';
           break;
         case 'experienceLevel':
           displayText = 'ประสบการณ์: $value';
           break;
-        case 'salaryType':
-          displayText = 'อัตราส่วนรายได้: $value';
-          break;
         case 'minSalary':
           displayText = 'ประกันรายได้ขั้นต่ำ: ${value.toString()} บาท';
           break;
         case 'maxSalary':
           displayText = 'เงินเดือนขั้นต่ำ: ${value.toString()} บาท';
-          break;
-        case 'trainLine':
-          displayText = 'สายรถไฟฟ้า: $value';
-          break;
-        case 'trainStation':
-          displayText = 'สถานี: $value';
-          break;
-        case 'workingDays':
-          if (value is List) {
-            displayText = 'วันทำงาน: ${value.join(', ')}';
-          }
-          break;
-        case 'workingHours':
-          displayText = 'เวลาทำงาน: $value';
-          break;
-        case 'workingType':
-          displayText = 'ประเภทงาน: $value';
-          break;
-        case 'startDate':
-          displayText = 'วันเริ่มต้น: ${DateTime.parse(value).toString().split(' ')[0]}';
-          break;
-        case 'endDate':
-          displayText = 'วันสิ้นสุด: ${DateTime.parse(value).toString().split(' ')[0]}';
-          break;
-        case 'additionalRequirements':
-          displayText = 'ข้อกำหนดพิเศษ: $value';
-          break;
-        case 'isRemote':
-          if (value == true) displayText = 'ทำงานระยะไกล';
-          break;
-        case 'isUrgent':
-          if (value == true) displayText = 'งานด่วน';
           break;
       }
       

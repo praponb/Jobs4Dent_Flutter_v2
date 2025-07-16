@@ -11,7 +11,6 @@ class JobModel {
   // Salary Information
   final String salaryType;
   final double? minSalary;
-  final double? maxSalary;
   final String? perks;
   
   // Location Information  
@@ -25,8 +24,6 @@ class JobModel {
   final DateTime? endDate;
   final List<String>? workingDays;
   final String? workingHours;
-  final bool isUrgent;
-  final bool isRemote;
   
   // Requirements
   final String? additionalRequirements;
@@ -53,7 +50,6 @@ class JobModel {
     this.minExperienceYears,
     required this.salaryType,
     this.minSalary,
-    this.maxSalary,
     this.perks,
     required this.province,
     required this.city,
@@ -63,8 +59,6 @@ class JobModel {
     this.endDate,
     this.workingDays,
     this.workingHours,
-    this.isUrgent = false,
-    this.isRemote = false,
     this.additionalRequirements,
     this.applicationIds = const [],
     this.applicationCount = 0,
@@ -87,7 +81,6 @@ class JobModel {
       minExperienceYears: map['minExperienceYears'],
       salaryType: map['salaryType'] ?? '50:50',
       minSalary: map['minSalary']?.toDouble(),
-      maxSalary: map['maxSalary']?.toDouble(),
       perks: map['perks'],
       province: map['province'] ?? '',
       city: map['city'] ?? '',
@@ -97,8 +90,6 @@ class JobModel {
       endDate: map['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endDate']) : null,
       workingDays: List<String>.from(map['workingDays'] ?? []),
       workingHours: map['workingHours'],
-      isUrgent: map['isUrgent'] ?? false,
-      isRemote: map['isRemote'] ?? false,
       additionalRequirements: map['additionalRequirements'],
       applicationIds: List<String>.from(map['applicationIds'] ?? []),
       applicationCount: map['applicationCount'] ?? 0,
@@ -122,7 +113,6 @@ class JobModel {
       'minExperienceYears': minExperienceYears,
       'salaryType': salaryType,
       'minSalary': minSalary,
-      'maxSalary': maxSalary,
       'perks': perks,
       'province': province,
       'city': city,
@@ -132,8 +122,6 @@ class JobModel {
       'endDate': endDate?.millisecondsSinceEpoch,
       'workingDays': workingDays,
       'workingHours': workingHours,
-      'isUrgent': isUrgent,
-      'isRemote': isRemote,
       'additionalRequirements': additionalRequirements,
       'applicationIds': applicationIds,
       'applicationCount': applicationCount,
@@ -156,7 +144,6 @@ class JobModel {
     int? minExperienceYears,
     String? salaryType,
     double? minSalary,
-    double? maxSalary,
     String? perks,
     String? province,
     String? city,
@@ -166,8 +153,6 @@ class JobModel {
     DateTime? endDate,
     List<String>? workingDays,
     String? workingHours,
-    bool? isUrgent,
-    bool? isRemote,
     String? additionalRequirements,
     List<String>? applicationIds,
     int? applicationCount,
@@ -188,7 +173,6 @@ class JobModel {
       minExperienceYears: minExperienceYears ?? this.minExperienceYears,
       salaryType: salaryType ?? this.salaryType,
       minSalary: minSalary ?? this.minSalary,
-      maxSalary: maxSalary ?? this.maxSalary,
       perks: perks ?? this.perks,
       province: province ?? this.province,
       city: city ?? this.city,
@@ -198,8 +182,6 @@ class JobModel {
       endDate: endDate ?? this.endDate,
       workingDays: workingDays ?? this.workingDays,
       workingHours: workingHours ?? this.workingHours,
-      isUrgent: isUrgent ?? this.isUrgent,
-      isRemote: isRemote ?? this.isRemote,
       additionalRequirements: additionalRequirements ?? this.additionalRequirements,
       applicationIds: applicationIds ?? this.applicationIds,
       applicationCount: applicationCount ?? this.applicationCount,

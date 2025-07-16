@@ -828,19 +828,19 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
               _buildSectionHeader('ข้อมูลรายได้'),
               const SizedBox(height: 16),
 
-              // Salary Type
+              // Salary Type (Doctor Fee)
               DropdownButtonFormField<String>(
                 value: _selectedSalaryType,
                 isExpanded: true,
                 decoration: const InputDecoration(
-                  labelText: 'Doctor Fee *',
+                  labelText: 'อัตราส่วนรายได้ (Doctor Fee) *',
                   border: OutlineInputBorder(),
                 ),
-                items: JobProvider.salaryTypes.map((type) {
+                items: JobProvider.salaryTypes.map((fee) {
                   return DropdownMenuItem(
-                    value: type,
+                    value: fee,
                     child: Text(
-                      type,
+                      fee,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),

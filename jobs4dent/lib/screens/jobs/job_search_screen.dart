@@ -40,12 +40,16 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
 
   void _loadJobs() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<JobProvider>(context, listen: false).searchJobs();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      Provider.of<JobProvider>(context, listen: false).searchJobs(
+        userId: authProvider.userModel?.userId,
+      );
     });
   }
 
   void _searchJobs() {
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
     jobProvider.searchJobs(
       keyword: _keywordController.text.trim().isEmpty ? null : _keywordController.text.trim(),
@@ -53,7 +57,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
       experienceLevel: _selectedExperienceLevel,
       province: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
       minSalary: _minSalaryController.text.trim().isEmpty ? null : double.tryParse(_minSalaryController.text.trim()),
-      maxSalary: _maxSalaryController.text.trim().isEmpty ? null : double.tryParse(_maxSalaryController.text.trim()),
+      userId: authProvider.userModel?.userId,
     );
   }
 
@@ -265,18 +269,6 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                       ),
                     ),
                   ),
-                  if (job.isUrgent)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'ด่วน',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -310,7 +302,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              if (job.minSalary != null || job.maxSalary != null)
+              if (job.minSalary != null)
                 Row(
                   children: [
                     const Icon(Icons.monetization_on, size: 16, color: Colors.grey),
@@ -353,23 +345,6 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                       ),
                     ),
                   ),
-                  if (job.isRemote) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'ระยะไกล',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange.shade700,
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
               const SizedBox(height: 8),
@@ -407,12 +382,8 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
   }
 
   String _formatSalary(JobModel job) {
-    if (job.minSalary != null && job.maxSalary != null) {
-      return '${_formatNumber(job.minSalary!)} - ${_formatNumber(job.maxSalary!)} บาท';
-    } else if (job.minSalary != null) {
+    if (job.minSalary != null) {
       return 'เริ่มต้น ${_formatNumber(job.minSalary!)} บาท';
-    } else if (job.maxSalary != null) {
-      return 'สูงสุด ${_formatNumber(job.maxSalary!)} บาท';
     }
     return 'ตามตกลง';
   }
@@ -495,7 +466,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                         _buildDetailRow('หมวดหมู่', job.jobCategory),
                         _buildDetailRow('ประสบการณ์', job.experienceLevel),
                         _buildDetailRow('ประเภทเงินเดือน', job.salaryType),
-                        if (job.minSalary != null || job.maxSalary != null)
+                        if (job.minSalary != null)
                           _buildDetailRow('เงินเดือน', _formatSalary(job)),
                         _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
                         if (job.trainLine != null && job.trainStation != null)
@@ -534,35 +505,6 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                         const SizedBox(height: 16),
                         Row(
                           children: [
-                            if (job.isUrgent)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text(
-                                  'ด่วน',
-                                  style: TextStyle(color: Colors.white, fontSize: 12),
-                                ),
-                              ),
-                            if (job.isRemote) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.shade50,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  'ทำงานระยะไกล',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.orange.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
                           ],
                         ),
                         
