@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,43 +30,146 @@ class AuthProvider with ChangeNotifier {
   }
 
   void _init() async {
+    print('🚀 Initializing AuthProvider...');
+    
+    // Set a timeout to ensure loading doesn't stay true forever
+    Timer(const Duration(seconds: 3), () {
+      if (_isLoading) {
+        print('⏰ Timeout reached - setting loading to false');
+        _isLoading = false;
+        notifyListeners();
+      }
+    });
+    
+    // Optional: Run diagnosis for debugging (can be removed in production)
+    // await Future.delayed(const Duration(milliseconds: 500));
+    // await diagnoseFirebaseState();
+    
+    // Listen for auth state changes - this is the primary way to handle auth state
     _auth.authStateChanges().listen((User? user) async {
+      print('🔐 Auth state changed: ${user?.email ?? "No user"}');
+      
       _user = user;
       if (user != null) {
+        print('👤 User authenticated: ${user.email}');
+        print('📧 Email verified: ${user.emailVerified}');
+        
         await _loadUserModel();
-        // Update last login time
+        
         if (_userModel != null) {
+          print('✅ User model loaded successfully');
+          print('👤 User type: ${_userModel!.userType}');
+          print('📝 Profile complete: ${_userModel!.isProfileComplete}');
+          print('🎯 Needs profile setup: $needsProfileSetup');
+          
           await _updateLastLogin();
+        } else {
+          print('❌ Failed to load user model');
         }
       } else {
+        print('❌ No authenticated user');
         _userModel = null;
       }
+      
+      // Set loading to false after processing auth state
       _isLoading = false;
       notifyListeners();
+      
+      // Debug final state (can be removed in production)
+      // debugAuthState();
     });
   }
 
   Future<void> _loadUserModel() async {
     if (_user != null) {
       try {
+        print('📄 Loading user document from Firestore for UID: ${_user!.uid}');
+        
         DocumentSnapshot doc = await _firestore
             .collection('users')
             .doc(_user!.uid)
             .get();
         
         if (doc.exists) {
-          _userModel = UserModel.fromMap(doc.data() as Map<String, dynamic>);
+          print('📋 Document exists, parsing UserModel...');
+          final data = doc.data() as Map<String, dynamic>;
+          
+          // Add missing required fields with defaults if they don't exist
+          data['userId'] = data['userId'] ?? _user!.uid;
+          data['email'] = data['email'] ?? _user!.email ?? '';
+          data['userName'] = data['userName'] ?? _user!.displayName ?? 'User';
+          data['isDentist'] = data['isDentist'] ?? (data['userType'] == 'dentist' || data['userType'] == 'assistant');
+          data['userType'] = data['userType'] ?? 'dentist';
+          data['currentRole'] = data['currentRole'] ?? data['userType'] ?? 'dentist';
+          data['roles'] = data['roles'] ?? [data['userType'] ?? 'dentist'];
+          data['isMainAccount'] = data['isMainAccount'] ?? true;
+          data['isActive'] = data['isActive'] ?? true;
+          data['isProfileComplete'] = data['isProfileComplete'] ?? false;
+          data['authProvider'] = data['authProvider'] ?? 'email';
+          data['isEmailVerified'] = data['isEmailVerified'] ?? (_user!.emailVerified);
+          data['verificationStatus'] = data['verificationStatus'] ?? 'unverified';
+          
+          // Handle timestamps - convert Firestore Timestamp to int milliseconds
+          if (data['createdAt'] == null) {
+            data['createdAt'] = DateTime.now().millisecondsSinceEpoch;
+          } else if (data['createdAt'] is Timestamp) {
+            data['createdAt'] = (data['createdAt'] as Timestamp).millisecondsSinceEpoch;
+          }
+          
+          if (data['updatedAt'] == null) {
+            data['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
+          } else if (data['updatedAt'] is Timestamp) {
+            data['updatedAt'] = (data['updatedAt'] as Timestamp).millisecondsSinceEpoch;
+          }
+          
+          // Handle other potential timestamp fields
+          if (data['lastLoginAt'] != null && data['lastLoginAt'] is Timestamp) {
+            data['lastLoginAt'] = (data['lastLoginAt'] as Timestamp).millisecondsSinceEpoch;
+          }
+          
+          if (data['verificationSubmittedAt'] != null && data['verificationSubmittedAt'] is Timestamp) {
+            data['verificationSubmittedAt'] = (data['verificationSubmittedAt'] as Timestamp).millisecondsSinceEpoch;
+          }
+          
+          if (data['verificationReviewedAt'] != null && data['verificationReviewedAt'] is Timestamp) {
+            data['verificationReviewedAt'] = (data['verificationReviewedAt'] as Timestamp).millisecondsSinceEpoch;
+          }
+          
+          print('📊 Attempting to create UserModel with data: ${data.keys}');
+          
+          _userModel = UserModel.fromMap(data);
+          
+          print('✅ UserModel created successfully');
+          print('   Email: ${_userModel!.email}');
+          print('   UserType: ${_userModel!.userType}');
+          print('   IsProfileComplete: ${_userModel!.isProfileComplete}');
           
           // Update email verification status if it has changed
           if (_userModel!.isEmailVerified != _user!.emailVerified) {
             await _updateEmailVerificationStatus(_user!.emailVerified);
           }
+
+          // Check and update profile completion status for existing users
+          await _checkAndUpdateProfileCompletion();
         } else {
+          print('❌ User document doesn\'t exist in Firestore, creating new one...');
           // User document doesn't exist in Firestore, create it
           await _createUserDocumentFromExistingAuth();
         }
       } catch (e) {
+        print('❌ Error loading user data: $e');
+        print('   Stack trace: ${e.toString()}');
         _error = 'Error loading user data: $e';
+        
+        // If UserModel parsing fails, try to create a new document
+        if (e.toString().contains('fromMap') || e.toString().contains('UserModel')) {
+          print('🔧 UserModel parsing failed, creating new document...');
+          try {
+            await _createUserDocumentFromExistingAuth();
+          } catch (createError) {
+            print('❌ Failed to create new document: $createError');
+          }
+        }
       }
     }
   }
@@ -83,6 +187,72 @@ class AuthProvider with ChangeNotifier {
         // Silent fail for last login update
       }
     }
+  }
+
+  Future<void> _checkAndUpdateProfileCompletion() async {
+    if (_user != null && _userModel != null) {
+      try {
+        print('🔄 Checking profile completion for: ${_userModel!.email}');
+        print('   Current isProfileComplete: ${_userModel!.isProfileComplete}');
+        
+        // Check if user has essential profile data to be considered complete
+        bool shouldBeComplete = _hasEssentialProfileData();
+        
+        // If the user should be complete but isn't marked as such, update it
+        if (shouldBeComplete && !_userModel!.isProfileComplete) {
+          print('✏️ Updating profile completion status for existing user: ${_user!.uid}');
+          
+          await _firestore
+              .collection('users')
+              .doc(_user!.uid)
+              .update({
+            'isProfileComplete': true,
+            'updatedAt': DateTime.now().millisecondsSinceEpoch,
+          });
+          
+          // Update local model
+          _userModel = _userModel!.copyWith(
+            isProfileComplete: true,
+            updatedAt: DateTime.now(),
+          );
+          
+          print('✅ Successfully updated profile completion status to true');
+        } else if (shouldBeComplete) {
+          print('✅ Profile is already marked as complete');
+        } else {
+          print('❌ Profile does not have essential data - keeping incomplete');
+        }
+      } catch (e) {
+        print('❌ Error checking profile completion: $e');
+      }
+    }
+  }
+
+  bool _hasEssentialProfileData() {
+    if (_userModel == null) return false;
+    
+    print('🔍 Checking essential profile data for: ${_userModel!.email}');
+    
+    // Check if user has the essential data that indicates a complete profile
+    bool hasBasicInfo = _userModel!.userName.isNotEmpty && 
+                       _userModel!.email.isNotEmpty;
+    
+    bool hasUserType = _userModel!.userType.isNotEmpty && 
+                      _userModel!.userType != 'unknown' &&
+                      _userModel!.userType != '';
+    
+    bool hasRole = _userModel!.currentRole.isNotEmpty;
+    
+    print('   Basic info: $hasBasicInfo (name: "${_userModel!.userName}", email: "${_userModel!.email}")');
+    print('   User type: $hasUserType ("${_userModel!.userType}")');
+    print('   Role: $hasRole ("${_userModel!.currentRole}")');
+    
+    // For any user type, if they have basic info + user type + role, consider it complete
+    // This is more lenient than the previous version
+    bool isComplete = hasBasicInfo && hasUserType && hasRole;
+    
+    print('   Essential data complete: $isComplete');
+    return isComplete;
   }
 
   Future<void> _updateEmailVerificationStatus(bool isVerified) async {
@@ -110,6 +280,8 @@ class AuthProvider with ChangeNotifier {
   Future<void> _createUserDocumentFromExistingAuth() async {
     if (_user != null) {
       try {
+        print('🏗️ Creating user document for existing auth user: ${_user!.email}');
+        
         // Determine auth provider based on providerData
         String authProvider = 'email';
         if (_user!.providerData.any((info) => info.providerId == 'google.com')) {
@@ -121,8 +293,14 @@ class AuthProvider with ChangeNotifier {
           authProvider: authProvider,
           userType: 'dentist', // Default type
           isEmailVerified: _user!.emailVerified,
+          additionalData: {
+            'isProfileComplete': true, // Mark existing users as complete
+          },
         );
+        
+        print('✅ User document created for existing auth user');
       } catch (e) {
+        print('❌ Error creating user document: $e');
         _error = 'Error creating user document: $e';
       }
     }
@@ -633,8 +811,88 @@ class AuthProvider with ChangeNotifier {
 
   // Check if user needs to complete profile setup
   bool get needsProfileSetup {
-    if (_userModel == null) return true;
-    return !_userModel!.isProfileComplete;
+    print('🤔 Checking if profile setup is needed...');
+    
+    if (_userModel == null) {
+      print('   UserModel is null - setup needed');
+      return true;
+    }
+    
+    print('   UserModel exists for: ${_userModel!.email}');
+    print('   isProfileComplete: ${_userModel!.isProfileComplete}');
+    
+    // If explicitly marked as complete, no setup needed
+    if (_userModel!.isProfileComplete) {
+      print('   Profile marked as complete - no setup needed');
+      return false;
+    }
+    
+    // For existing users, check if they have essential data even if not marked complete
+    // This helps users who registered before the isProfileComplete field was implemented
+    bool hasEssentialData = _hasEssentialProfileData();
+    bool needsSetup = !hasEssentialData;
+    
+    print('   Profile not marked complete, checking essential data...');
+    print('   Has essential data: $hasEssentialData');
+    print('   Needs setup: $needsSetup');
+    
+    return needsSetup;
+  }
+
+  // Force refresh user data from Firestore
+  Future<void> refreshUserData() async {
+    if (_user != null) {
+      print('🔄 Refreshing user data from Firestore...');
+      await _loadUserModel();
+      notifyListeners();
+    }
+  }
+
+  // Debug method to check current auth state
+  void debugAuthState() {
+    print('🐛 DEBUG AUTH STATE:');
+    print('   Firebase User: ${_user?.email ?? "null"}');
+    print('   Firebase User UID: ${_user?.uid ?? "null"}');
+    print('   UserModel: ${_userModel?.email ?? "null"}');
+    print('   UserModel UserType: ${_userModel?.userType ?? "null"}');
+    print('   IsProfileComplete: ${_userModel?.isProfileComplete ?? "null"}');
+    print('   NeedsProfileSetup: $needsProfileSetup');
+    print('   IsLoading: $_isLoading');
+  }
+
+  // Manual diagnostic method to check Firebase state
+  Future<void> diagnoseFirebaseState() async {
+    print('🔬 MANUAL FIREBASE DIAGNOSIS:');
+    
+    // Check Firebase Auth current user
+    final currentUser = _auth.currentUser;
+    print('   Firebase Auth currentUser: ${currentUser?.email ?? "null"}');
+    print('   Firebase Auth currentUser UID: ${currentUser?.uid ?? "null"}');
+    
+    if (currentUser != null) {
+      try {
+        // Check if user document exists in Firestore
+        final doc = await _firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+        
+        print('   Firestore document exists: ${doc.exists}');
+        
+        if (doc.exists) {
+          final data = doc.data() as Map<String, dynamic>;
+          print('   Firestore email: ${data['email'] ?? "null"}');
+          print('   Firestore userType: ${data['userType'] ?? "null"}');
+          print('   Firestore currentRole: ${data['currentRole'] ?? "null"}');
+          print('   Firestore isProfileComplete: ${data['isProfileComplete'] ?? "null"}');
+          print('   Firestore userName: ${data['userName'] ?? "null"}');
+        }
+      } catch (e) {
+        print('   Error checking Firestore: $e');
+      }
+    }
+    
+    print('🔬 DIAGNOSIS COMPLETE');
   }
 
   // Sync user data between Firebase Auth and Firestore

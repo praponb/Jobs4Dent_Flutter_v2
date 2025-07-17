@@ -6,11 +6,11 @@ import 'personal_info_screen.dart';
 import 'education_experience_screen.dart';
 import 'skills_specialties_screen.dart';
 import 'work_location_preference_screen.dart';
+import 'document_verification_screen.dart';
+import 'dentist_mini_resume_screen.dart';
+import 'branch_management_screen.dart';
 // Note: Additional profile screens implementation pending
 // import 'availability_calendar_screen.dart';
-// import 'documents_screen.dart';
-// import 'clinic_info_screen.dart';
-// import 'branch_management_screen.dart';
 // import 'clinic_photos_screen.dart';
 // import 'sales_area_screen.dart';
 // import 'sales_reports_screen.dart';
@@ -204,6 +204,36 @@ class ProfileScreen extends StatelessWidget {
                       );
                     },
                   ),
+                  _MenuItemData(
+                    icon: Icons.verified_user_outlined,
+                    title: 'ยืนยันตัวตน',
+                    subtitle: _getVerificationSubtitle(user.verificationStatus),
+                    showBadge: user.verificationStatus == 'unverified' || user.verificationStatus == 'rejected',
+                    badgeColor: user.verificationStatus == 'rejected' ? Colors.red : Colors.orange,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DocumentVerificationScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  if (user.userType == 'dentist') ...[
+                    _MenuItemData(
+                      icon: Icons.assignment_outlined,
+                      title: 'ข้อมูลสรุปสำหรับสมัครงาน',
+                      subtitle: 'การศึกษา ประสบการณ์ และความสามารถ',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DentistMiniResumeScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                   if (user.userType == 'dentist' || user.userType == 'assistant') ...[
                     _MenuItemData(
                       icon: Icons.school_outlined,
@@ -273,48 +303,48 @@ class ProfileScreen extends StatelessWidget {
                     //   },
                     // ),
                   ],
-                                      // Note: Clinic management screens implementation pending
-                  // if (user.userType == 'clinic') ...[
-                  //   _MenuItemData(
-                  //     icon: Icons.business_outlined,
-                  //     title: 'Clinic Information',
-                  //     subtitle: 'Establishment details and services',
-                  //     onTap: () {
-                  //       Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (context) => const ClinicInfoScreen(),
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  //   _MenuItemData(
-                  //     icon: Icons.account_tree_outlined,
-                  //     title: 'Branch Management',
-                  //     subtitle: 'Manage clinic branches',
-                  //     onTap: () {
-                  //       Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (context) => const BranchManagementScreen(),
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  //   _MenuItemData(
-                  //     icon: Icons.photo_library_outlined,
-                  //     title: 'Clinic Photos',
-                  //     subtitle: 'Upload clinic atmosphere photos',
-                  //     onTap: () {
-                  //       Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (context) => const ClinicPhotosScreen(),
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ],
+                  if (user.userType == 'clinic') ...[
+                    _MenuItemData(
+                      icon: Icons.account_tree_outlined,
+                      title: 'จัดการข้อมูลสาขา',
+                      subtitle: 'จัดการข้อมูลสาขาของคลินิก',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BranchManagementScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    // Note: Additional clinic screens implementation pending
+                    // _MenuItemData(
+                    //   icon: Icons.business_outlined,
+                    //   title: 'Clinic Information',
+                    //   subtitle: 'Establishment details and services',
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => const ClinicInfoScreen(),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                    // _MenuItemData(
+                    //   icon: Icons.photo_library_outlined,
+                    //   title: 'Clinic Photos',
+                    //   subtitle: 'Upload clinic atmosphere photos',
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => const ClinicPhotosScreen(),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                  ],
                                       // Note: Sales management screens implementation pending
                   // if (user.userType == 'sales') ...[
                   //   _MenuItemData(
@@ -564,6 +594,19 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
+  String _getVerificationSubtitle(String verificationStatus) {
+    switch (verificationStatus) {
+      case 'verified':
+        return 'ยืนยันตัวตนแล้ว ✓';
+      case 'pending':
+        return 'รอการตรวจสอบจากทีมงาน';
+      case 'rejected':
+        return 'ไม่ผ่านการตรวจสอบ - ต้องส่งเอกสารใหม่';
+      default:
+        return 'อัปโหลดเอกสารเพื่อยืนยันตัวตน';
+    }
+  }
+
   void _showLogoutDialog(BuildContext context, AuthProvider authProvider) {
     showDialog(
       context: context,
@@ -601,6 +644,8 @@ class _MenuItemData {
   final String? subtitle;
   final VoidCallback onTap;
   final bool isDestructive;
+  final bool showBadge;
+  final Color? badgeColor;
 
   _MenuItemData({
     required this.icon,
@@ -608,5 +653,7 @@ class _MenuItemData {
     this.subtitle,
     required this.onTap,
     this.isDestructive = false,
+    this.showBadge = false,
+    this.badgeColor,
   });
 } 

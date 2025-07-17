@@ -11,7 +11,9 @@ import '../jobs/applicant_management_screen.dart';
 import '../jobs/my_posted_jobs_screen.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../profile/profile_screen.dart';
-import '../profile/sub_user_management_screen.dart';
+import '../profile/sub_branch_management_screen.dart';
+import '../profile/branch_management_screen.dart';
+import '../profile/document_verification_screen.dart';
 
 class ClinicDashboard extends StatefulWidget {
   const ClinicDashboard({super.key});
@@ -392,14 +394,48 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           children: [
             Expanded(
               child: _buildActionCard(
-                title: 'จัดการสาขา',
-                subtitle: 'Sub-users & permissions',
-                icon: Icons.account_tree,
+                title: 'จัดการข้อมูลสาขา',
+                subtitle: 'จัดการสาขาคลินิก',
+                icon: Icons.business,
                 color: Colors.purple,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SubUserManagementScreen()),
+                    MaterialPageRoute(builder: (context) => const BranchManagementScreen()),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildActionCard(
+                title: 'ยืนยันตัวตน',
+                subtitle: 'อัปโหลดเอกสาร',
+                icon: Icons.verified_user,
+                color: Colors.indigo,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DocumentVerificationScreen()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                title: 'จัดการผู้ใช้ย่อย',
+                subtitle: 'Sub-users & permissions',
+                icon: Icons.account_tree,
+                color: Colors.amber,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SubBranchManagementScreen()),
                   );
                 },
               ),
@@ -935,7 +971,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SubUserManagementScreen(),
+                    builder: (context) => const SubBranchManagementScreen(),
                   ),
                 );
               },
@@ -982,7 +1018,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SubUserManagementScreen(),
+                          builder: (context) => const SubBranchManagementScreen(),
                         ),
                       );
                     },

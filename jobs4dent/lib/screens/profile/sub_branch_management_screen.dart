@@ -4,14 +4,14 @@ import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
 //import 'create_sub_user_screen.dart';
 
-class SubUserManagementScreen extends StatefulWidget {
-  const SubUserManagementScreen({super.key});
+class SubBranchManagementScreen extends StatefulWidget {
+  const SubBranchManagementScreen({super.key});
 
   @override
-  State<SubUserManagementScreen> createState() => _SubUserManagementScreenState();
+  State<SubBranchManagementScreen> createState() => _SubBranchManagementScreenState();
 }
 
-class _SubUserManagementScreenState extends State<SubUserManagementScreen> {
+class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
   List<UserModel> _subUsers = [];
   bool _isLoading = true;
 
