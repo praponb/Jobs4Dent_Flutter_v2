@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/marketplace_provider.dart';
 import '../../models/user_model.dart';
+import '../profile/document_verification_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -408,6 +409,29 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 color: Colors.purple,
                 onTap: () => _showAnalytics(),
               ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                title: 'ยืนยันตัวตน',
+                subtitle: 'จัดการเอกสารตรวจสอบ',
+                icon: Icons.verified_user,
+                color: Colors.indigo,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DocumentVerificationScreen()),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(), // Empty space for future features
             ),
           ],
         ),

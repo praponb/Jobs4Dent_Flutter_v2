@@ -69,6 +69,20 @@ class UserModel {
   final bool isProfileComplete;
   final DateTime? lastLoginAt;
   
+  // Verification System
+  final String verificationStatus; // 'unverified', 'pending', 'verified', 'rejected'
+  final List<String>? verificationDocuments; // URLs of uploaded verification documents
+  final String? verificationRejectionReason; // Reason for rejection if status is 'rejected'
+  final DateTime? verificationSubmittedAt; // When documents were submitted
+  final DateTime? verificationReviewedAt; // When documents were reviewed
+  final String? reviewedByAdminId; // Admin who reviewed the documents
+  
+  // Dentist Mini-Resume
+  final String? educationInstitute; // University/Institution where graduated from dental school
+  final int? experienceYears; // Years of experience after graduation
+  final List<String>? coreCompetencies; // Procedures/treatments they can perform
+  final List<String>? workLimitations; // Procedures they prefer not to do
+  
   UserModel({
     required this.userId,
     required this.email,
@@ -119,6 +133,16 @@ class UserModel {
     this.isActive = true,
     this.isProfileComplete = false,
     this.lastLoginAt,
+    this.verificationStatus = 'unverified',
+    this.verificationDocuments,
+    this.verificationRejectionReason,
+    this.verificationSubmittedAt,
+    this.verificationReviewedAt,
+    this.reviewedByAdminId,
+    this.educationInstitute,
+    this.experienceYears,
+    this.coreCompetencies,
+    this.workLimitations,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -172,6 +196,16 @@ class UserModel {
       isActive: map['isActive'] ?? true,
       isProfileComplete: map['isProfileComplete'] ?? false,
       lastLoginAt: map['lastLoginAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['lastLoginAt']) : null,
+      verificationStatus: map['verificationStatus'] ?? 'unverified',
+      verificationDocuments: List<String>.from(map['verificationDocuments'] ?? []),
+      verificationRejectionReason: map['verificationRejectionReason'],
+      verificationSubmittedAt: map['verificationSubmittedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['verificationSubmittedAt']) : null,
+      verificationReviewedAt: map['verificationReviewedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['verificationReviewedAt']) : null,
+      reviewedByAdminId: map['reviewedByAdminId'],
+      educationInstitute: map['educationInstitute'],
+      experienceYears: map['experienceYears'],
+      coreCompetencies: List<String>.from(map['coreCompetencies'] ?? []),
+      workLimitations: List<String>.from(map['workLimitations'] ?? []),
     );
   }
 
@@ -226,6 +260,16 @@ class UserModel {
       'isActive': isActive,
       'isProfileComplete': isProfileComplete,
       'lastLoginAt': lastLoginAt?.millisecondsSinceEpoch,
+      'verificationStatus': verificationStatus,
+      'verificationDocuments': verificationDocuments,
+      'verificationRejectionReason': verificationRejectionReason,
+      'verificationSubmittedAt': verificationSubmittedAt?.millisecondsSinceEpoch,
+      'verificationReviewedAt': verificationReviewedAt?.millisecondsSinceEpoch,
+      'reviewedByAdminId': reviewedByAdminId,
+      'educationInstitute': educationInstitute,
+      'experienceYears': experienceYears,
+      'coreCompetencies': coreCompetencies,
+      'workLimitations': workLimitations,
     };
   }
 
@@ -279,6 +323,16 @@ class UserModel {
     bool? isActive,
     bool? isProfileComplete,
     DateTime? lastLoginAt,
+    String? verificationStatus,
+    List<String>? verificationDocuments,
+    String? verificationRejectionReason,
+    DateTime? verificationSubmittedAt,
+    DateTime? verificationReviewedAt,
+    String? reviewedByAdminId,
+    String? educationInstitute,
+    int? experienceYears,
+    List<String>? coreCompetencies,
+    List<String>? workLimitations,
   }) {
     return UserModel(
       userId: userId ?? this.userId,
@@ -330,6 +384,16 @@ class UserModel {
       isActive: isActive ?? this.isActive,
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
+      verificationDocuments: verificationDocuments ?? this.verificationDocuments,
+      verificationRejectionReason: verificationRejectionReason ?? this.verificationRejectionReason,
+      verificationSubmittedAt: verificationSubmittedAt ?? this.verificationSubmittedAt,
+      verificationReviewedAt: verificationReviewedAt ?? this.verificationReviewedAt,
+      reviewedByAdminId: reviewedByAdminId ?? this.reviewedByAdminId,
+      educationInstitute: educationInstitute ?? this.educationInstitute,
+      experienceYears: experienceYears ?? this.experienceYears,
+      coreCompetencies: coreCompetencies ?? this.coreCompetencies,
+      workLimitations: workLimitations ?? this.workLimitations,
     );
   }
 } 

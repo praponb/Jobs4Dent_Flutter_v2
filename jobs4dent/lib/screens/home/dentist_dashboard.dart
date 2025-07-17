@@ -8,6 +8,8 @@ import '../marketplace/marketplace_screen.dart';
 import '../jobs/job_search_screen.dart';
 import '../jobs/my_applications_screen.dart';
 import '../profile/profile_screen.dart';
+import '../profile/dentist_mini_resume_screen.dart';
+import '../profile/document_verification_screen.dart';
 
 class DentistDashboard extends StatefulWidget {
   const DentistDashboard({super.key});
@@ -336,6 +338,40 @@ class _DentistDashboardState extends State<DentistDashboard> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const MyApplicationsScreen()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                title: 'ข้อมูลสำหรับสมัครงาน',
+                subtitle: 'จัดการ Resume ย่อ',
+                icon: Icons.assignment,
+                color: Colors.orange,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DentistMiniResumeScreen()),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildActionCard(
+                title: 'ยืนยันตัวตน',
+                subtitle: 'อัปโหลดเอกสาร',
+                icon: Icons.verified_user,
+                color: Colors.indigo,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DocumentVerificationScreen()),
                   );
                 },
               ),

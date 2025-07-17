@@ -9,6 +9,7 @@ import '../../models/product_model.dart';
 import '../marketplace/my_products_screen.dart';
 import '../marketplace/product_listing_screen.dart';
 import '../profile/profile_screen.dart';
+import '../profile/document_verification_screen.dart';
 
 class SellerDashboard extends StatefulWidget {
   const SellerDashboard({super.key});
@@ -397,6 +398,29 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   _showDetailedAnalytics();
                 },
               ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                title: 'ยืนยันตัวตน',
+                subtitle: 'อัปโหลดเอกสาร',
+                icon: Icons.verified_user,
+                color: Colors.indigo,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DocumentVerificationScreen()),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(), // Empty space
             ),
           ],
         ),

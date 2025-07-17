@@ -9,6 +9,8 @@ import 'providers/job_provider.dart';
 import 'providers/marketplace_provider.dart';
 import 'providers/appointment_provider.dart';
 import 'providers/chat_provider.dart';
+import 'providers/verification_provider.dart';
+import 'providers/branch_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/user_type_selection_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -44,6 +46,8 @@ class Jobs4DentApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => MarketplaceProvider()),
         ChangeNotifierProvider(create: (_) => AppointmentProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => VerificationProvider()),
+        ChangeNotifierProvider(create: (_) => BranchProvider()),
       ],
       child: MaterialApp(
         title: 'Jobs4Dent',
@@ -85,17 +89,22 @@ class AuthWrapper extends StatelessWidget {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         if (authProvider.isLoading) {
+          debugPrint('⏳ Showing SplashScreen - loading...');
           return const SplashScreen();
         }
         
         if (authProvider.user != null) {
+          debugPrint('👤 User is authenticated: ${authProvider.user!.email}');
           // Check if user needs to complete profile setup
           if (authProvider.needsProfileSetup) {
+            debugPrint('📝 User needs profile setup - showing UserTypeSelectionScreen');
             return const UserTypeSelectionScreen();
           } else {
+            debugPrint('✅ User profile complete - showing HomeScreen');
             return const HomeScreen();
           }
         } else {
+          debugPrint('🔐 No user authenticated - showing LoginScreen');
           return const LoginScreen();
         }
       },
