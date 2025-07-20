@@ -119,7 +119,6 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
     'กำแพงเพชร',
     'ชัยนาท',
     'นครนายก',
-    'นครปฐม',
     'นครสวรรค์',
     'พิจิตร',
     'พิษณุโลก',

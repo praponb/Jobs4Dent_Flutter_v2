@@ -142,30 +142,34 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                   width: double.infinity,
                   child: Row(
                     children: [
-                      OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const DayHourJobSearchScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.tune),
-                        label: const Text('เลือกวัน/เวลาทำงาน'),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DayHourJobSearchScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.tune),
+                          label: const Text('เลือกวัน/เวลาทำงาน'),
+                        ),
                       ),
                       const SizedBox(width: 8),
-                      OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdvancedJobSearchScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.tune),
-                        label: const Text('ค้นหาขั้นสูง'),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AdvancedJobSearchScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.tune),
+                          label: const Text('ค้นหาขั้นสูง'),
+                        ),
                       ),
                     ],
                   ),

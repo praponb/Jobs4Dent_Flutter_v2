@@ -79,6 +79,7 @@ class UserModel {
   
   // Dentist Mini-Resume
   final String? educationInstitute; // University/Institution where graduated from dental school
+  final String? educationSpecialist; // Institution for specialist dentistry education (if any)
   final int? experienceYears; // Years of experience after graduation
   final List<String>? coreCompetencies; // Procedures/treatments they can perform
   final List<String>? workLimitations; // Procedures they prefer not to do
@@ -140,6 +141,7 @@ class UserModel {
     this.verificationReviewedAt,
     this.reviewedByAdminId,
     this.educationInstitute,
+    this.educationSpecialist,
     this.experienceYears,
     this.coreCompetencies,
     this.workLimitations,
@@ -203,6 +205,7 @@ class UserModel {
       verificationReviewedAt: map['verificationReviewedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['verificationReviewedAt']) : null,
       reviewedByAdminId: map['reviewedByAdminId'],
       educationInstitute: map['educationInstitute'],
+      educationSpecialist: map['educationSpecialist'],
       experienceYears: map['experienceYears'],
       coreCompetencies: List<String>.from(map['coreCompetencies'] ?? []),
       workLimitations: List<String>.from(map['workLimitations'] ?? []),
@@ -267,6 +270,7 @@ class UserModel {
       'verificationReviewedAt': verificationReviewedAt?.millisecondsSinceEpoch,
       'reviewedByAdminId': reviewedByAdminId,
       'educationInstitute': educationInstitute,
+      'educationSpecialist': educationSpecialist,
       'experienceYears': experienceYears,
       'coreCompetencies': coreCompetencies,
       'workLimitations': workLimitations,
@@ -330,6 +334,7 @@ class UserModel {
     DateTime? verificationReviewedAt,
     String? reviewedByAdminId,
     String? educationInstitute,
+    String? educationSpecialist,
     int? experienceYears,
     List<String>? coreCompetencies,
     List<String>? workLimitations,
@@ -391,6 +396,7 @@ class UserModel {
       verificationReviewedAt: verificationReviewedAt ?? this.verificationReviewedAt,
       reviewedByAdminId: reviewedByAdminId ?? this.reviewedByAdminId,
       educationInstitute: educationInstitute ?? this.educationInstitute,
+      educationSpecialist: educationSpecialist ?? this.educationSpecialist,
       experienceYears: experienceYears ?? this.experienceYears,
       coreCompetencies: coreCompetencies ?? this.coreCompetencies,
       workLimitations: workLimitations ?? this.workLimitations,
