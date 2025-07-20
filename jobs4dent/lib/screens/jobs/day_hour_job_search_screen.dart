@@ -252,19 +252,21 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
               
               // Working Days and Hours
               if (job.workingDays != null && job.workingDays!.isNotEmpty) ...[
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today, size: 16, color: Colors.blue),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        'วันทำงาน: ${job.workingDays!.join(', ')}',
-                        style: const TextStyle(fontSize: 14, color: Colors.blue),
-                      ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'วันทำงาน: ${job.workingDays!}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.blue[700],
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 4),
               ],
               
               if (job.workingHours != null && job.workingHours!.isNotEmpty) ...[
@@ -468,7 +470,7 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
                           _buildDetailRow('เงินเดือน', _formatSalary(job)),
                         _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
                         if (job.workingDays != null && job.workingDays!.isNotEmpty)
-                          _buildDetailRow('วันทำงาน', job.workingDays!.join(', ')),
+                          _buildDetailRow('วันทำงาน', job.workingDays!),
                         if (job.workingHours != null)
                           _buildDetailRow('เวลาทำงาน', job.workingHours!),
                         

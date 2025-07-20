@@ -22,7 +22,7 @@ class JobModel {
   // Time Information
   final DateTime? startDate;
   final DateTime? endDate;
-  final List<String>? workingDays;
+  final String? workingDays;
   final String? workingHours;
   
   // Requirements
@@ -88,7 +88,7 @@ class JobModel {
       trainStation: map['trainStation'],
       startDate: map['startDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['startDate']) : null,
       endDate: map['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endDate']) : null,
-      workingDays: List<String>.from(map['workingDays'] ?? []),
+      workingDays: map['workingDays'] as String?,
       workingHours: map['workingHours'],
       additionalRequirements: map['additionalRequirements'],
       applicationIds: List<String>.from(map['applicationIds'] ?? []),
@@ -151,7 +151,7 @@ class JobModel {
     String? trainStation,
     DateTime? startDate,
     DateTime? endDate,
-    List<String>? workingDays,
+    String? workingDays,
     String? workingHours,
     String? additionalRequirements,
     List<String>? applicationIds,

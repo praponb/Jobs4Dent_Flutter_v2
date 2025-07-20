@@ -519,7 +519,7 @@ class _BranchEditScreenState extends State<BranchEditScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('อัปเดตข้อมูลสาขาสำเร็จและบันทึกลง Firebase แล้ว'),
+              content: Text('อัปเดตข้อมูลสาขาสำเร็จและบันทึกแล้ว'),
               backgroundColor: Colors.green,
             ),
           );
@@ -546,7 +546,7 @@ class _BranchEditScreenState extends State<BranchEditScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('สร้างสาขาใหม่สำเร็จและบันทึกลง Firebase แล้ว'),
+              content: Text('สร้างสาขาใหม่สำเร็จและบันทึกแล้ว'),
               backgroundColor: Colors.green,
             ),
           );

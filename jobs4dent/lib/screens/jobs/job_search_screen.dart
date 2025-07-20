@@ -516,7 +516,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                         if (job.trainLine != null && job.trainStation != null)
                           _buildDetailRow('รถไฟฟ้า', '${job.trainLine} - ${job.trainStation}'),
                         if (job.workingDays != null && job.workingDays!.isNotEmpty)
-                          _buildDetailRow('วันทำงาน', job.workingDays!.join(', ')),
+                          _buildDetailRow('วันทำงาน', job.workingDays!),
                         if (job.workingHours != null)
                           _buildDetailRow('เวลาทำงาน', job.workingHours!),
                         if (job.perks != null && job.perks!.isNotEmpty)

@@ -503,7 +503,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                             if (job.minSalary != null)
                               _buildDetailRow('เงินเดือนขั้นต่ำ', '${_formatNumber(job.minSalary!)} บาท'),
                             if (job.workingDays != null && job.workingDays!.isNotEmpty)
-                              _buildDetailRow('วันทำงาน', job.workingDays!.join(', ')),
+                              _buildDetailRow('วันทำงาน', job.workingDays!),
                             if (job.workingHours != null)
                               _buildDetailRow('เวลาทำงาน', job.workingHours!),
                             if (job.perks != null && job.perks!.isNotEmpty)
