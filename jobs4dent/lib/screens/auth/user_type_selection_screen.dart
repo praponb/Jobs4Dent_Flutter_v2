@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../home/home_screen.dart';
 
 class UserTypeSelectionScreen extends StatefulWidget {
   const UserTypeSelectionScreen({super.key});
@@ -188,7 +189,12 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                             
                             if (success && context.mounted) {
                               // Navigate to home screen
-                              Navigator.of(context).pushReplacementNamed('/home');
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HomeScreen(),
+                                ),
+                              );
                             } else if (authProvider.error != null && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

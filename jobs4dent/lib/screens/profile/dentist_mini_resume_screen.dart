@@ -14,6 +14,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _educationController = TextEditingController();
   final _experienceController = TextEditingController();
+  final _educationSpecialistController = TextEditingController(); // Added missing controller
   
   List<String> _selectedCompetencies = [];
   List<String> _selectedLimitations = [];
@@ -21,24 +22,26 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
 
   // Predefined competencies list
   final List<String> _availableCompetencies = [
-    'ทันตกรรมทั่วไป',
-    'การรักษารากฟัน',
-    'ศัลยกรรมช่องปาก',
-    'การจัดฟัน',
-    'รากฟันเทียม',
-    'ทันตกรรมเด็ก',
-    'ทันตกรรมประดิษฐ์',
-    'ปริทันตวิทยา',
-    'ทันตกรรมบูรณะ',
-    'ทันตกรรมชุมชน',
-    'เวชศาสตร์ช่องปาก',
-    'รังสีทันตกรรม',
-    'การฟอกสีฟัน',
-    'การทำฟันปลอม',
-    'การขูดหินปูน',
-    'การผ่าตัดฟันคุด',
-    'การรักษาโรคเหงือก',
-    'การทำงานเฉพาะทาง',
+    'อุดฟัน',
+    'ขูดหินปูน',
+    'ถอนฟัน',
+    'ผ่าฟันคุดบน',
+    'ผ่าฟันคุดล่าง',
+    'ผ่าฟันฝัง',
+    'รักษารากฟันกรามน้อย',
+    'รักษารากฟันกรามใหญ่',
+    'ฟอกสีฟัน',
+    'ฟันปลอมถอดได้',
+    'ฟันปลอมทั้งปาก',
+    'ครอบฟัน',
+    'สะพานฟัน',
+    'วีเนียร์',
+    'อุดปิดช่องฟันห่าง',
+    'จัดฟัน',
+    'ถอนฟันน้ำนม',
+    'อุดฟันน้ำนม',
+    'รักษารากฟันเด็ก',
+    'ผ่าตัดขากรรไกร',
   ];
 
   @override
@@ -71,6 +74,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
           setState(() {
             _educationController.text = data['educationInstitute']?.toString() ?? '';
             _experienceController.text = data['experienceYears']?.toString() ?? '';
+            _educationSpecialistController.text = data['educationSpecialist']?.toString() ?? ''; // Load educationSpecialist
             _selectedCompetencies = List<String>.from(data['coreCompetencies'] ?? []);
             _selectedLimitations = List<String>.from(data['workLimitations'] ?? []);
           });
@@ -111,6 +115,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
   void dispose() {
     _educationController.dispose();
     _experienceController.dispose();
+    _educationSpecialistController.dispose(); // Dispose new controller
     super.dispose();
   }
 
@@ -172,6 +177,8 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+
+                    //สถาบันที่สำเร็จการศึกษา
                     Row(
                       children: [
                         Icon(
@@ -180,12 +187,14 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
                           size: 24,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'สถาบันที่สำเร็จการศึกษา',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                        Expanded(
+                          child: Text(
+                            'จบทันตกรรมทั่วไปจากสถาบัน?',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -194,17 +203,55 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
                     TextFormField(
                       controller: _educationController,
                       decoration: const InputDecoration(
-                        hintText: 'เช่น จุฬาลงกรณ์มหาวิทยาลัย',
+                        hintText: 'เช่น จุฬาฯ มหิดล เชียงใหม่ มศว.',
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'กรุณากรอกสถาบันที่สำเร็จการศึกษา';
+                          return 'กรุณากรอกสถาบันที่สำเร็จการศึกษาทันตกรรมทั่วไป';
                         }
                         return null;
                       },
                     ),
+
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.school,
+                          color: Colors.blue[600],
+                          size: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'จบทันตแพทย์เฉพาะทาง(ถ้ามี)จากสถาบัน',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _educationSpecialistController,
+                      maxLines: null,
+                      minLines: 1,
+                      decoration: const InputDecoration(
+                        hintText: 'จัดฟัน รักษารากฟัน ฟันปลอม\nเช่น จุฬาฯ มหิดล เชียงใหม่ มศว.',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        hintMaxLines: 2,
+                      ),
+                      validator: (value) {
+                        // This field is optional, so no validation required
+                        return null;
+                      },
+                    ),
+
                   ],
                 ),
               ),
@@ -288,12 +335,14 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
                           size: 24,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'ความสามารถ/หัตถการที่ทำได้',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                        Expanded(
+                          child: Text(
+                            'ความสามารถ/หัตถการที่ทำได้',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -514,6 +563,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
             .update({
           'educationInstitute': _educationController.text.trim(),
           'experienceYears': int.parse(_experienceController.text.trim()),
+          'educationSpecialist': _educationSpecialistController.text.trim(), // Save educationSpecialist
           'coreCompetencies': _selectedCompetencies,
           'workLimitations': _selectedLimitations,
           'updatedAt': FieldValue.serverTimestamp(),

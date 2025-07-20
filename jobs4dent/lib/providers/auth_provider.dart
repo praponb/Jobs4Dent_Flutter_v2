@@ -99,9 +99,9 @@ class AuthProvider with ChangeNotifier {
           data['email'] = data['email'] ?? _user!.email ?? '';
           data['userName'] = data['userName'] ?? _user!.displayName ?? 'User';
           data['isDentist'] = data['isDentist'] ?? (data['userType'] == 'dentist' || data['userType'] == 'assistant');
-          data['userType'] = data['userType'] ?? 'dentist';
-          data['currentRole'] = data['currentRole'] ?? data['userType'] ?? 'dentist';
-          data['roles'] = data['roles'] ?? [data['userType'] ?? 'dentist'];
+          data['userType'] = data['userType'] ?? 'pending'; // Default to pending so users go through type selection
+          data['currentRole'] = data['currentRole'] ?? data['userType'] ?? 'pending';
+          data['roles'] = data['roles'] ?? [data['userType'] ?? 'pending'];
           data['isMainAccount'] = data['isMainAccount'] ?? true;
           data['isActive'] = data['isActive'] ?? true;
           data['isProfileComplete'] = data['isProfileComplete'] ?? false;
@@ -239,7 +239,8 @@ class AuthProvider with ChangeNotifier {
     
     bool hasUserType = _userModel!.userType.isNotEmpty && 
                       _userModel!.userType != 'unknown' &&
-                      _userModel!.userType != '';
+                      _userModel!.userType != '' &&
+                      _userModel!.userType != 'pending';
     
     bool hasRole = _userModel!.currentRole.isNotEmpty;
     
@@ -288,13 +289,15 @@ class AuthProvider with ChangeNotifier {
           authProvider = 'google';
         }
 
+        // For new users, set userType to 'pending' so they go through user type selection
+        // This ensures all new users (regardless of how they registered) go through the proper flow
         await _createUserDocument(
           _user!,
           authProvider: authProvider,
-          userType: 'dentist', // Default type
+          userType: 'pending', // Set to pending so user goes through UserTypeSelectionScreen
           isEmailVerified: _user!.emailVerified,
           additionalData: {
-            'isProfileComplete': true, // Mark existing users as complete
+            'isProfileComplete': false, // New users need to complete profile setup
           },
         );
         
@@ -478,20 +481,25 @@ class AuthProvider with ChangeNotifier {
       
       if (isNewUser) {
         debugPrint('🔄 Creating new user document in Firestore...');
+        debugPrint('📧 New Google user: ${userCredential.user!.email}');
+        debugPrint('🎯 Setting userType to: pending');
+        
         await _createUserDocument(
           userCredential.user!,
           authProvider: 'google',
-          userType: 'dentist', // Default
+          userType: 'pending', // Set to pending so user goes through UserTypeSelectionScreen
           isEmailVerified: true,
           additionalData: {
             'signInMethod': 'google',
             'googleProfile': {
               'displayName': userCredential.user!.displayName,
               'photoURL': userCredential.user!.photoURL,
-            }
+            },
+            'isProfileComplete': false, // New users need to complete profile setup
           },
         );
         debugPrint('✅ New Google user created in Firestore: ${userCredential.user!.email}');
+        debugPrint('🎯 Final userType: ${_userModel?.userType}');
       } else {
         debugPrint('🔄 Loading existing user data from Firestore...');
         // Load existing user data from Firestore
@@ -784,11 +792,28 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signOut() async {
     try {
+      print('🚪 Starting sign out process...');
+      
+      // Clear loading state first
+      _isLoading = true;
+      notifyListeners();
+      
+      // Sign out from Google and Firebase
       await _googleSignIn.signOut();
       await _auth.signOut();
+      
+      // Clear all user data
+      _user = null;
       _userModel = null;
+      _error = null;
+      _successMessage = null;
+      _isLoading = false;
+      
+      print('✅ Sign out completed successfully');
     } catch (e) {
+      print('❌ Error signing out: $e');
       _error = 'Error signing out: $e';
+      _isLoading = false;
     }
     notifyListeners();
   }
@@ -819,7 +844,14 @@ class AuthProvider with ChangeNotifier {
     }
     
     print('   UserModel exists for: ${_userModel!.email}');
+    print('   UserType: ${_userModel!.userType}');
     print('   isProfileComplete: ${_userModel!.isProfileComplete}');
+    
+    // If user type is 'pending', always need setup
+    if (_userModel!.userType == 'pending') {
+      print('   User type is pending - setup needed');
+      return true;
+    }
     
     // If explicitly marked as complete, no setup needed
     if (_userModel!.isProfileComplete) {
@@ -948,21 +980,25 @@ class AuthProvider with ChangeNotifier {
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'weak-password':
-          return 'The password provided is too weak.';
+          return 'รหัสผ่านไม่ปลอดภัยเพียงพอ กรุณาใช้รหัสผ่านที่แข็งแกร่งกว่านี้';
         case 'email-already-in-use':
-          return 'An account already exists for this email.';
+          return 'อีเมลนี้ถูกใช้งานแล้ว\n\n'
+                 '💡 หากคุณกำลังทดสอบ:\n'
+                 '• ลบผู้ใช้จาก Firebase Authentication Console\n'
+                 '• หรือใช้อีเมลอื่นสำหรับการทดสอบ\n\n'
+                 'กรุณาเข้าสู่ระบบ หรือใช้อีเมลอื่น';
         case 'invalid-email':
-          return 'The email address is not valid.';
+          return 'รูปแบบอีเมลไม่ถูกต้อง';
         case 'user-not-found':
-          return 'No user found for this email.';
+          return 'ไม่พบบัญชีผู้ใช้สำหรับอีเมลนี้';
         case 'wrong-password':
-          return 'Wrong password provided.';
+          return 'รหัสผ่านไม่ถูกต้อง';
         case 'user-disabled':
-          return 'This user account has been disabled.';
+          return 'บัญชีผู้ใช้นี้ถูกปิดใช้งาน';
         case 'too-many-requests':
           return 'พยายามหลายครั้งเกินไป กรุณาลองใหม่อีกครั้งในภายหลัง';
         default:
-          return error.message ?? 'An error occurred.';
+          return error.message ?? 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
       }
     }
     return error.toString();

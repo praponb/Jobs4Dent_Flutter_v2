@@ -17,37 +17,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
   
-  String _selectedUserType = 'dentist';
+  // Remove user type selection from registration - will be handled in UserTypeSelectionScreen
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
 
-  final List<Map<String, dynamic>> userTypes = [
-    {
-      'type': 'dentist',
-      'title': 'ทันตแพทย์',
-      'description': 'ทันตกรรมทั่วไป/ทันตกรรมเฉพาะทาง',
-      'icon': Icons.medical_services,
-    },
-    {
-      'type': 'assistant',
-      'title': 'ผู้ช่วยทันตแพทย์/เคาเตอร์',
-      'description': 'ผู้ช่วยทันตแพทย์/พนักงานเคาเตอร์',
-      'icon': Icons.medical_information,
-    },
-    {
-      'type': 'clinic',
-      'title': 'เจ้าของคลินิก',
-      'description': 'เจ้าของ/ผู้จัดการคลินิกทันตกรรม',
-      'icon': Icons.business,
-    },
-    {
-      'type': 'seller',
-      'title': 'ผู้ขายอุปกรณ์และอื่นๆ',
-      'description': 'ผู้ขายอุปกรณ์ ตัวแทน และอื่นๆ',
-      'icon': Icons.store,
-    },
-  ];
+  // User type selection removed - handled in UserTypeSelectionScreen
 
   @override
   void dispose() {
@@ -119,7 +94,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       email: _emailController.text.trim(),
       password: _passwordController.text,
       userName: _nameController.text.trim(),
-      userType: _selectedUserType,
+      userType: 'pending', // Temporary type - will be set in UserTypeSelectionScreen
     );
 
     if (success && mounted) {
@@ -131,7 +106,52 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           ),
         ),
       );
+    } else if (mounted && authProvider.error != null) {
+      // Check if it's an email-already-in-use error
+      if (authProvider.error!.contains('อีเมลนี้ถูกใช้งานแล้ว') || 
+          authProvider.error!.contains('email-already-in-use')) {
+        _showEmailAlreadyExistsDialog();
+      }
     }
+  }
+
+  void _showEmailAlreadyExistsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('อีเมลนี้ถูกใช้งานแล้ว'),
+          content: const Text(
+            'อีเมลนี้มีบัญชีอยู่แล้วใน Firebase Authentication\n\n'
+            'คุณสามารถ:\n'
+            '• เข้าสู่ระบบด้วยอีเมลนี้\n'
+            '• ใช้อีเมลอื่นในการสมัครสมาชิก\n\n'
+            '💡 สำหรับการพัฒนา: ลบผู้ใช้จาก Firebase Authentication Console'
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Clear email field to encourage using a different email
+                _emailController.clear();
+              },
+              child: const Text('ใช้อีเมลอื่น'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Go back to login screen
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2196F3),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('เข้าสู่ระบบ'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -267,100 +287,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                     const SizedBox(height: 24),
 
-                    // User Type Selection
-                    const Text(
-                      'เลือกบทบาทของคุณ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    ...userTypes.map((userType) {
-                      final isSelected = _selectedUserType == userType['type'];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              _selectedUserType = userType['type'];
-                            });
-                          },
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: isSelected 
-                                    ? const Color(0xFF2196F3) 
-                                    : Colors.grey[300]!,
-                                width: isSelected ? 2 : 1,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                              color: isSelected 
-                                  ? const Color(0xFF2196F3).withValues(alpha: 0.05)
-                                  : Colors.white,
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? const Color(0xFF2196F3)
-                                        : Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Icon(
-                                    userType['icon'],
-                                    color: isSelected 
-                                        ? Colors.white 
-                                        : Colors.grey[600],
-                                    size: 16,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        userType['title'],
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: isSelected 
-                                              ? const Color(0xFF2196F3)
-                                              : Colors.black87,
-                                        ),
-                                      ),
-                                      Text(
-                                        userType['description'],
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (isSelected)
-                                  const Icon(
-                                    Icons.check_circle,
-                                    color: Color(0xFF2196F3),
-                                    size: 20,
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-
-                    const SizedBox(height: 20),
-
                     // Terms and Conditions
                     Row(
                       children: [
@@ -456,25 +382,51 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.red[200]!),
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.error_outline, color: Colors.red[600]),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                authProvider.error!,
-                                style: TextStyle(
+                            Row(
+                              children: [
+                                Icon(Icons.error_outline, color: Colors.red[600]),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    authProvider.error!,
+                                    style: TextStyle(
+                                      color: Colors.red[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close),
+                                  onPressed: authProvider.clearError,
+                                  iconSize: 20,
                                   color: Colors.red[600],
-                                  fontSize: 14,
+                                ),
+                              ],
+                            ),
+                            // Show login button if email already exists error
+                            if (authProvider.error!.contains('อีเมลนี้ถูกใช้งานแล้ว') || 
+                                authProvider.error!.contains('email-already-in-use')) ...[
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    authProvider.clearError();
+                                    Navigator.pop(context); // Go back to login screen
+                                  },
+                                  icon: const Icon(Icons.login, size: 16),
+                                  label: const Text('ไปที่หน้าเข้าสู่ระบบ'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: const Color(0xFF2196F3),
+                                    backgroundColor: Colors.blue[50],
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                  ),
                                 ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: authProvider.clearError,
-                              iconSize: 20,
-                              color: Colors.red[600],
-                            ),
+                            ],
                           ],
                         ),
                       ),

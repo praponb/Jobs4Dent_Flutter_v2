@@ -180,32 +180,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isEmailLogin = false;
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              decoration: BoxDecoration(
-                                color: !_isEmailLogin 
-                                    ? const Color(0xFF2196F3) 
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'เข้าสู่ระบบเร็ว',
-                                style: TextStyle(
-                                  color: !_isEmailLogin ? Colors.white : Colors.grey[600],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: GestureDetector(
+                        //     onTap: () {
+                        //       setState(() {
+                        //         _isEmailLogin = false;
+                        //       });
+                        //     },
+                        //     child: Container(
+                        //       padding: const EdgeInsets.symmetric(vertical: 12),
+                        //       decoration: BoxDecoration(
+                        //         color: !_isEmailLogin 
+                        //             ? const Color(0xFF2196F3) 
+                        //             : Colors.transparent,
+                        //         borderRadius: BorderRadius.circular(12),
+                        //       ),
+                        //       child: Text(
+                        //         'เข้าสู่ระบบเร็ว',
+                        //         style: TextStyle(
+                        //           color: !_isEmailLogin ? Colors.white : Colors.grey[600],
+                        //           fontWeight: FontWeight.w600,
+                        //         ),
+                        //         textAlign: TextAlign.center,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
@@ -360,13 +360,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
-                          : Image.asset(
-                              'assets/google_logo.png',
-                              height: 24,
-                              width: 24,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.login, color: Colors.white);
-                              },
+                          : const Icon(
+                              Icons.login,
+                              color: Colors.white,
+                              size: 24,
                             ),
                       label: Text(
                         authProvider.isLoading ? 'กำลังเข้าสู่ระบบ...' : 'ดำเนินการต่อด้วย Google',

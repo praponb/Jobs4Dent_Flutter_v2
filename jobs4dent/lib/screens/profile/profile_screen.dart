@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import 'role_switcher_screen.dart';
+// import '../../providers/user_provider.dart';
+// import '../../models/user_model.dart';
+import '../auth/login_screen.dart';
 import 'personal_info_screen.dart';
 import 'education_experience_screen.dart';
 import 'skills_specialties_screen.dart';
 import 'work_location_preference_screen.dart';
+import 'branch_management_screen.dart';
+import 'role_switcher_screen.dart';
 import 'document_verification_screen.dart';
 import 'dentist_mini_resume_screen.dart';
-import 'branch_management_screen.dart';
 // Note: Additional profile screens implementation pending
 // import 'availability_calendar_screen.dart';
 // import 'clinic_photos_screen.dart';
@@ -623,8 +626,49 @@ class ProfileScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
-                await authProvider.signOut();
+                Navigator.of(context).pop(); // Close the dialog first
+                
+                try {
+                  // Show loading indicator
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                  
+                  // Sign out
+                  await authProvider.signOut();
+                  
+                  // Close loading dialog
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                  
+                  // Navigate to login screen and clear all routes
+                  if (context.mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  }
+                } catch (e) {
+                  // Close loading dialog if still open
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                  
+                  // Show error message
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error signing out: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
               },
               child: const Text(
                 'ออกจากระบบ',
