@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/job_provider.dart';
+import '../../providers/job_constants.dart';
 import '../../providers/auth_provider.dart';
 import 'job_search_screen.dart';
 
@@ -824,7 +825,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                   value: null,
                   child: Text('เลือกหมวดหมู่งาน'),
                 ),
-                ...JobProvider.jobCategories.map((category) {
+                ...JobConstants.jobCategories.map((category) {
                   return DropdownMenuItem(
                     value: category,
                     child: Text(category),
@@ -850,7 +851,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                   value: null,
                   child: Text('เลือกระดับประสบการณ์'),
                 ),
-                ...JobProvider.experienceLevels.map((level) {
+                ...JobConstants.experienceLevels.map((level) {
                   return DropdownMenuItem(
                     value: level,
                     child: Text(level),
@@ -880,7 +881,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                   value: null,
                   child: Text('อัตราส่วนรายได้'),
                 ),
-                ...JobProvider.salaryTypes.map((type) {
+                ...JobConstants.salaryTypes.map((type) {
                   return DropdownMenuItem(
                     value: type,
                     child: Text(type),

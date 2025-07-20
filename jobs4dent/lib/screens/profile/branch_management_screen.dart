@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/branch_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/branch_model.dart';
 import 'branch_edit_screen.dart';
-import 'branch_map_view_screen.dart';
+// import 'branch_map_view_screen.dart';
 
 class BranchManagementScreen extends StatefulWidget {
   const BranchManagementScreen({super.key});
@@ -55,6 +56,85 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('เกิดข้อผิดพลาดในการโหลดข้อมูลสาขา: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Opens Google Maps app with the branch's coordinates
+  Future<void> _viewOnGoogleMap(BranchModel branch) async {
+    try {
+      // Check if branch has coordinates
+      if (branch.coordinates == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('ไม่พบข้อมูลพิกัดของสาขานี้'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      final double latitude = branch.coordinates!.latitude;
+      final double longitude = branch.coordinates!.longitude;
+      
+      // Create Google Maps URL with coordinates and branch name as label
+      final String encodedBranchName = Uri.encodeComponent(branch.branchName);
+      
+      // Try different Google Maps URL formats for better compatibility
+      final List<String> mapUrls = [
+        // Google Maps app URL showing location with marker (not navigation)
+        'geo:$latitude,$longitude?q=$latitude,$longitude($encodedBranchName)',
+        // Google Maps web URL with marker
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude',
+        // Alternative Google Maps web URL with place name
+        'https://maps.google.com/?q=$latitude,$longitude($encodedBranchName)',
+        // Fallback web URL showing location
+        'https://www.google.com/maps/@$latitude,$longitude,17z',
+      ];
+
+      bool mapOpened = false;
+
+      // Try each URL until one works
+      for (String mapUrl in mapUrls) {
+        final Uri uri = Uri.parse(mapUrl);
+        
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication, // Open in external app
+          );
+          mapOpened = true;
+          
+          print('🗺️ Opened Google Maps for branch: ${branch.branchName}');
+          print('📍 Coordinates: $latitude, $longitude');
+          print('🔗 URL used: $mapUrl');
+          break;
+        }
+      }
+
+      if (!mapOpened) {
+        // If no URL worked, show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('ไม่สามารถเปิดแผนที่ได้ กรุณาตรวจสอบการติดตั้ง Google Maps'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+
+    } catch (e) {
+      print('❌ Error opening Google Maps: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('เกิดข้อผิดพลาดในการเปิดแผนที่: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -393,7 +473,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () => _viewOnMap(branch),
+                        onPressed: () => _viewOnGoogleMap(branch),
                         icon: const Icon(Icons.map, size: 18),
                         label: const Text('ดูแผนที่'),
                         style: ElevatedButton.styleFrom(
@@ -496,24 +576,23 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
     ).then((_) => _loadBranches());
   }
 
-  void _viewOnMap(BranchModel branch) {
-    if (branch.coordinates == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('ไม่มีข้อมูลพิกัดของสาขานี้'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BranchMapViewScreen(branch: branch),
-      ),
-    );
-  }
+  // void _viewOnMap(BranchModel branch) {
+  //   if (branch.coordinates == null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('ไม่มีข้อมูลพิกัดของสาขานี้'),
+  //         backgroundColor: Colors.orange,
+  //       ),
+  //     );
+  //     return;
+  //   }
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => BranchMapViewScreen(branch: branch),
+  //     ),
+  //   );
+  // }
 
   void _confirmDeleteBranch(BranchModel branch) {
     showDialog(

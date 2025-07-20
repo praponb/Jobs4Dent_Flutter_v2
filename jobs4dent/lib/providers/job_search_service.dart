@@ -1,0 +1,241 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import '../models/job_model.dart';
+import '../models/user_model.dart';
+
+/// Service class for job search functionality
+class JobSearchService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  /// Search jobs with filters
+  Future<List<JobModel>> searchJobs({
+    String? keyword,
+    String? province,
+    String? jobCategory,
+    String? experienceLevel,
+    double? minSalary,
+    String? userId, // For matching calculation
+    String? title,
+    String? description,
+    int? minExperienceYears,
+    String? salaryType,
+    String? perks,
+    String? city,
+    String? trainLine,
+    String? trainStation,
+    String? workingDays,
+    String? workingHours,
+    String? additionalRequirements,
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      // Use a simple query without composite index requirements
+      // Only filter by isActive and do all other filtering client-side
+      Query query = _firestore.collection('job_posts')
+          .where('isActive', isEqualTo: true)
+          .limit(500); // Increase limit to get more results for client-side filtering
+
+      final querySnapshot = await query.get();
+
+      List<JobModel> jobs = querySnapshot.docs
+          .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      // Sort by createdAt descending (client-side)
+      jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // Apply all filters client-side to avoid composite index issues
+      if (keyword != null && keyword.isNotEmpty) {
+        jobs = jobs.where((job) =>
+            job.title.toLowerCase().contains(keyword.toLowerCase()) ||
+            job.description.toLowerCase().contains(keyword.toLowerCase()) ||
+            job.clinicName.toLowerCase().contains(keyword.toLowerCase())).toList();
+      }
+
+      if (province != null && province.isNotEmpty) {
+        jobs = jobs.where((job) => job.province == province).toList();
+      }
+      
+      if (jobCategory != null && jobCategory.isNotEmpty) {
+        jobs = jobs.where((job) => job.jobCategory == jobCategory).toList();
+      }
+      
+      if (experienceLevel != null && experienceLevel.isNotEmpty) {
+        jobs = jobs.where((job) => job.experienceLevel == experienceLevel).toList();
+      }
+
+      if (minSalary != null) {
+        jobs = jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
+      }
+
+      if (title != null && title.isNotEmpty) {
+        jobs = jobs.where((job) => job.title.toLowerCase().contains(title.toLowerCase())).toList();
+      }
+
+      if (description != null && description.isNotEmpty) {
+        jobs = jobs.where((job) => job.description.toLowerCase().contains(description.toLowerCase())).toList();
+      }
+
+      if (minExperienceYears != null) {
+        jobs = jobs.where((job) => job.minExperienceYears != null && job.minExperienceYears! >= minExperienceYears).toList();
+      }
+
+      if (salaryType != null && salaryType.isNotEmpty) {
+        jobs = jobs.where((job) => job.salaryType == salaryType).toList();
+      }
+
+      if (perks != null && perks.isNotEmpty) {
+        jobs = jobs.where((job) => job.perks != null && job.perks!.toLowerCase().contains(perks.toLowerCase())).toList();
+      }
+
+      if (city != null && city.isNotEmpty) {
+        jobs = jobs.where((job) => job.city == city).toList();
+      }
+
+      if (trainLine != null && trainLine.isNotEmpty) {
+        jobs = jobs.where((job) => job.trainLine != null && job.trainLine == trainLine).toList();
+      }
+
+      if (trainStation != null && trainStation.isNotEmpty) {
+        jobs = jobs.where((job) => job.trainStation != null && job.trainStation == trainStation).toList();
+      }
+
+      if (workingDays != null && workingDays.isNotEmpty) {
+        jobs = jobs.where((job) => job.workingDays != null && 
+                                   job.workingDays!.toLowerCase().contains(workingDays.toLowerCase())).toList();
+      }
+
+      if (workingHours != null && workingHours.isNotEmpty) {
+        jobs = jobs.where((job) => job.workingHours != null && 
+                                   job.workingHours!.toLowerCase().contains(workingHours.toLowerCase())).toList();
+      }
+
+      if (additionalRequirements != null && additionalRequirements.isNotEmpty) {
+        jobs = jobs.where((job) => job.additionalRequirements != null && 
+                                   job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
+      }
+
+      // Limit results to 50 after filtering
+      if (jobs.length > 50) {
+        jobs = jobs.take(50).toList();
+      }
+
+      // Calculate matching scores if userId is provided
+      if (userId != null) {
+        jobs = await calculateMatchingScores(jobs, userId);
+      }
+
+      return jobs;
+    } catch (e) {
+      throw Exception('การค้นหางานไม่สำเร็จ: $e');
+    }
+  }
+
+  /// Search jobs with filters - Alternative approach without composite indexes
+  Future<List<JobModel>> searchJobsAlternative({
+    String? keyword,
+    String? province,
+    String? jobCategory,
+    String? experienceLevel,
+    double? minSalary,
+    String? userId, // For matching calculation
+  }) async {
+    try {
+      // Use the simplest possible query - no composite indexes required
+      Query query = _firestore.collection('job_posts').limit(1000);
+
+      final querySnapshot = await query.get();
+
+      List<JobModel> jobs = querySnapshot.docs
+          .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      // Filter by isActive first (client-side)
+      jobs = jobs.where((job) => job.isActive).toList();
+
+      // Sort by createdAt descending (client-side)
+      jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // Apply all filters client-side
+      if (keyword != null && keyword.isNotEmpty) {
+        jobs = jobs.where((job) =>
+            job.title.toLowerCase().contains(keyword.toLowerCase()) ||
+            job.description.toLowerCase().contains(keyword.toLowerCase()) ||
+            job.clinicName.toLowerCase().contains(keyword.toLowerCase())).toList();
+      }
+
+      if (province != null && province.isNotEmpty) {
+        jobs = jobs.where((job) => job.province == province).toList();
+      }
+      
+      if (jobCategory != null && jobCategory.isNotEmpty) {
+        jobs = jobs.where((job) => job.jobCategory == jobCategory).toList();
+      }
+      
+      if (experienceLevel != null && experienceLevel.isNotEmpty) {
+        jobs = jobs.where((job) => job.experienceLevel == experienceLevel).toList();
+      }
+
+      if (minSalary != null) {
+        jobs = jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
+      }
+
+      // Limit results to 50 after filtering
+      if (jobs.length > 50) {
+        jobs = jobs.take(50).toList();
+      }
+
+      // Calculate matching scores if userId is provided
+      if (userId != null) {
+        jobs = await calculateMatchingScores(jobs, userId);
+      }
+
+      return jobs;
+    } catch (e) {
+      throw Exception('การค้นหางานไม่สำเร็จ: $e');
+    }
+  }
+
+  /// Calculate matching scores for jobs based on user profile
+  Future<List<JobModel>> calculateMatchingScores(List<JobModel> jobs, String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      if (!userDoc.exists) return jobs;
+
+      final user = UserModel.fromMap(userDoc.data()!);
+      
+      for (int i = 0; i < jobs.length; i++) {
+        final job = jobs[i];
+        double score = 0.0;
+        int factors = 0;
+
+        // Location matching (30% weight)
+        if (user.workLocationPreference?.contains(job.province) ?? false) {
+          score += 30;
+        }
+        factors++;
+
+        // Experience matching (20% weight)
+        if (job.minExperienceYears != null && user.yearsOfExperience != null) {
+          final userExperience = int.tryParse(user.yearsOfExperience!) ?? 0;
+          if (userExperience >= job.minExperienceYears!) {
+            score += 20;
+          } else {
+            score += (userExperience / job.minExperienceYears!) * 20;
+          }
+        }
+        factors++;
+
+        jobs[i] = job.copyWith(matchingScore: factors > 0 ? score / factors : 0);
+      }
+
+      // Sort by matching score
+      jobs.sort((a, b) => (b.matchingScore ?? 0).compareTo(a.matchingScore ?? 0));
+      return jobs;
+    } catch (e) {
+      debugPrint('Error calculating matching scores: $e');
+      return jobs;
+    }
+  }
+} 

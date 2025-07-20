@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/job_provider.dart';
+import '../../providers/job_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_application_model.dart';
 
@@ -617,7 +618,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                     labelText: 'สถานะ',
                     border: OutlineInputBorder(),
                   ),
-                  items: JobProvider.applicationStatuses.map((status) {
+                  items: JobConstants.applicationStatuses.map((status) {
                     return DropdownMenuItem(
                       value: status,
                       child: Text(_getStatusDisplayName(status)),
