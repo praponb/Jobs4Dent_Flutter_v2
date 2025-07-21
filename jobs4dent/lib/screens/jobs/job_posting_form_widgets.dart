@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import '../../providers/job_constants.dart';
+import 'job_posting_constants.dart';
 
 /// Reusable form widgets for job posting screen
 class JobPostingFormWidgets {
@@ -338,5 +339,232 @@ class JobPostingFormWidgets {
       }
     }
     return null;
+  }
+
+  // Advanced Search Specific Widgets
+  /// Section title widget for advanced search forms
+  static Widget buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Colors.blue,
+      ),
+    );
+  }
+
+  /// Working days selection chips widget
+  static Widget buildWorkingDaysSelection({
+    required List<String> selectedDays,
+    required Function(String, bool) onDayToggled,
+  }) {
+    const workingDayOptions = [
+      'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('วันทำงาน:', style: TextStyle(fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: workingDayOptions.map((day) {
+            return FilterChip(
+              label: Text(day),
+              selected: selectedDays.contains(day),
+              onSelected: (selected) => onDayToggled(day, selected),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// Working type radio buttons widget
+  static Widget buildWorkingTypeSelection({
+    required String? selectedType,
+    required Function(String?) onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('ประเภทการทำงาน:', style: TextStyle(fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8),
+        Row(
+          children: JobPostingConstants.workingTypes.map((type) {
+            return Expanded(
+              child: Row(
+                children: [
+                  Radio<String>(
+                    value: type,
+                    groupValue: selectedType,
+                    onChanged: onChanged,
+                  ),
+                  Text(type),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// Date picker widget for advanced search
+  static Widget buildDatePicker({
+    required BuildContext context,
+    required String label,
+    required DateTime? selectedDate,
+    required Function(DateTime?) onDateSelected,
+    DateTime? firstDate,
+    DateTime? lastDate,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: () async {
+          final date = await showDatePicker(
+            context: context,
+            initialDate: selectedDate ?? DateTime.now(),
+            firstDate: firstDate ?? DateTime.now(),
+            lastDate: lastDate ?? DateTime.now().add(const Duration(days: 365)),
+          );
+          if (date != null) {
+            onDateSelected(date);
+          }
+        },
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: label,
+            border: const OutlineInputBorder(),
+            suffixIcon: const Icon(Icons.calendar_today),
+          ),
+          child: Text(
+            selectedDate?.toString().split(' ')[0] ?? 'เลือกวันที่',
+            style: TextStyle(
+              color: selectedDate != null ? Colors.black : Colors.grey,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Province zone dropdown widget
+  static Widget buildProvinceZoneDropdown({
+    required int? selectedIndex,
+    required Function(int?) onChanged,
+  }) {
+    return DropdownButtonFormField<int>(
+      value: selectedIndex,
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'พื้นที่',
+        border: OutlineInputBorder(),
+      ),
+      items: [
+        const DropdownMenuItem(
+          value: null,
+          child: Text('เลือกพื้นที่'),
+        ),
+        for (int i = 0; i < JobPostingConstants.thaiProvinceZones.length; i++)
+          DropdownMenuItem(
+            value: i,
+            child: Text(JobPostingConstants.thaiProvinceZones[i]),
+          ),
+      ],
+      onChanged: onChanged,
+    );
+  }
+
+  /// Location dropdown widget based on selected province zone
+  static Widget buildLocationDropdown({
+    required int? selectedProvinceZoneIndex,
+    required String? selectedLocation,
+    required Function(String?) onChanged,
+  }) {
+    if (selectedProvinceZoneIndex == null) return const SizedBox.shrink();
+
+    return DropdownButtonFormField<String>(
+      value: selectedLocation,
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'จังหวัด/โซนในจังหวัด',
+        border: OutlineInputBorder(),
+      ),
+      items: [
+        const DropdownMenuItem(
+          value: null,
+          child: Text('เลือกโซนทำงาน'),
+        ),
+        ...JobPostingConstants.thaiLocationZones[selectedProvinceZoneIndex].map((location) {
+          return DropdownMenuItem(
+            value: location,
+            child: Text(location),
+          );
+        }),
+      ],
+      onChanged: onChanged,
+    );
+  }
+
+  /// Train line dropdown widget
+  static Widget buildTrainLineDropdown({
+    required int? selectedIndex,
+    required Function(int?) onChanged,
+  }) {
+    return DropdownButtonFormField<int>(
+      value: selectedIndex,
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'สายรถไฟฟ้า',
+        border: OutlineInputBorder(),
+      ),
+      items: [
+        const DropdownMenuItem(
+          value: null,
+          child: Text('เลือกสายรถไฟฟ้า'),
+        ),
+        for (int i = 0; i < JobPostingConstants.thaiTrainLines.length; i++)
+          DropdownMenuItem(
+            value: i,
+            child: Text(JobPostingConstants.thaiTrainLines[i]),
+          ),
+      ],
+      onChanged: onChanged,
+    );
+  }
+
+  /// Train station dropdown widget based on selected train line
+  static Widget buildTrainStationDropdown({
+    required int? selectedTrainLineIndex,
+    required String? selectedStation,
+    required Function(String?) onChanged,
+  }) {
+    if (selectedTrainLineIndex == null) return const SizedBox.shrink();
+
+    return DropdownButtonFormField<String>(
+      value: selectedStation,
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'สถานีรถไฟฟ้า',
+        border: OutlineInputBorder(),
+      ),
+      items: [
+        const DropdownMenuItem(
+          value: null,
+          child: Text('เลือกสถานี'),
+        ),
+        ...JobPostingConstants.thaiTrainStations[selectedTrainLineIndex].map((station) {
+          return DropdownMenuItem(
+            value: station,
+            child: Text(station),
+          );
+        }),
+      ],
+      onChanged: onChanged,
+    );
   }
 } 

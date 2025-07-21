@@ -601,6 +601,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
                 ],
               ),
             );
