@@ -1,5 +1,5 @@
-/// Constants for job posting screen
-/// Contains all location data, provinces, cities, train lines and stations
+// Constants for job posting screen
+// Contains all location data, provinces, cities, train lines and stations
 
 class JobPostingConstants {
   // Working types

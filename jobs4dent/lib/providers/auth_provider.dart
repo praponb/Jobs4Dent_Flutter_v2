@@ -27,12 +27,12 @@ class AuthProvider with ChangeNotifier {
   }
 
   void _init() async {
-    print('🚀 Initializing AuthProvider...');
+    debugPrint('🚀 Initializing AuthProvider...');
     
     // Set a timeout to ensure loading doesn't stay true forever
     Timer(const Duration(seconds: 3), () {
       if (_isLoading) {
-        print('⏰ Timeout reached - setting loading to false');
+        debugPrint('⏰ Timeout reached - setting loading to false');
         _isLoading = false;
         notifyListeners();
       }
@@ -40,27 +40,27 @@ class AuthProvider with ChangeNotifier {
     
     // Listen for auth state changes
     FirebaseAuthService.authStateChanges.listen((User? user) async {
-      print('🔐 Auth state changed: ${user?.email ?? "No user"}');
+      debugPrint('🔐 Auth state changed: ${user?.email ?? "No user"}');
       
       _user = user;
       if (user != null) {
-        print('👤 User authenticated: ${user.email}');
-        print('📧 Email verified: ${user.emailVerified}');
+        debugPrint('👤 User authenticated: ${user.email}');
+        debugPrint('📧 Email verified: ${user.emailVerified}');
         
         await _loadUserModel();
         
         if (_userModel != null) {
-          print('✅ User model loaded successfully');
-          print('👤 User type: ${_userModel!.userType}');
-          print('📝 Profile complete: ${_userModel!.isProfileComplete}');
-          print('🎯 Needs profile setup: $needsProfileSetup');
+          debugPrint('✅ User model loaded successfully');
+          debugPrint('👤 User type: ${_userModel!.userType}');
+          debugPrint('📝 Profile complete: ${_userModel!.isProfileComplete}');
+          debugPrint('🎯 Needs profile setup: $needsProfileSetup');
           
           await UserManagementService.updateLastLogin(user.uid);
         } else {
-          print('❌ Failed to load user model');
+          debugPrint('❌ Failed to load user model');
         }
       } else {
-        print('❌ No authenticated user');
+        debugPrint('❌ No authenticated user');
         _userModel = null;
       }
       
@@ -91,21 +91,21 @@ class AuthProvider with ChangeNotifier {
           await UserManagementService.createUserDocumentFromExistingAuth(_user!);
           _userModel = await UserManagementService.loadUserModel(_user!.uid);
         }
-      } catch (e) {
-        print('❌ Error loading user data: $e');
-        _error = 'Error loading user data: $e';
-        
-        // If UserModel parsing fails, try to create a new document
-        if (e.toString().contains('fromMap') || e.toString().contains('UserModel')) {
-          print('🔧 UserModel parsing failed, creating new document...');
-          try {
-            await UserManagementService.createUserDocumentFromExistingAuth(_user!);
-            _userModel = await UserManagementService.loadUserModel(_user!.uid);
-          } catch (createError) {
-            print('❌ Failed to create new document: $createError');
+              } catch (e) {
+          debugPrint('❌ Error loading user data: $e');
+          _error = 'Error loading user data: $e';
+          
+          // If UserModel parsing fails, try to create a new document
+          if (e.toString().contains('fromMap') || e.toString().contains('UserModel')) {
+            debugPrint('🔧 UserModel parsing failed, creating new document...');
+            try {
+              await UserManagementService.createUserDocumentFromExistingAuth(_user!);
+              _userModel = await UserManagementService.loadUserModel(_user!.uid);
+            } catch (createError) {
+              debugPrint('❌ Failed to create new document: $createError');
+            }
           }
         }
-      }
     }
   }
 
@@ -442,7 +442,7 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signOut() async {
     try {
-      print('🚪 Starting sign out process...');
+      debugPrint('🚪 Starting sign out process...');
       
       // Clear loading state first
       _isLoading = true;
@@ -459,9 +459,9 @@ class AuthProvider with ChangeNotifier {
       _successMessage = null;
       _isLoading = false;
       
-      print('✅ Sign out completed successfully');
+      debugPrint('✅ Sign out completed successfully');
     } catch (e) {
-      print('❌ Error signing out: $e');
+      debugPrint('❌ Error signing out: $e');
       _error = 'Error signing out: $e';
       _isLoading = false;
     }
@@ -486,26 +486,26 @@ class AuthProvider with ChangeNotifier {
 
   // Check if user needs to complete profile setup
   bool get needsProfileSetup {
-    print('🤔 Checking if profile setup is needed...');
+    debugPrint('🤔 Checking if profile setup is needed...');
     
     if (_userModel == null) {
-      print('   UserModel is null - setup needed');
+      debugPrint('   UserModel is null - setup needed');
       return true;
     }
     
-    print('   UserModel exists for: ${_userModel!.email}');
-    print('   UserType: ${_userModel!.userType}');
-    print('   isProfileComplete: ${_userModel!.isProfileComplete}');
+    debugPrint('   UserModel exists for: ${_userModel!.email}');
+    debugPrint('   UserType: ${_userModel!.userType}');
+    debugPrint('   isProfileComplete: ${_userModel!.isProfileComplete}');
     
     // If user type is 'pending', always need setup
     if (_userModel!.userType == 'pending') {
-      print('   User type is pending - setup needed');
+      debugPrint('   User type is pending - setup needed');
       return true;
     }
     
     // If explicitly marked as complete, no setup needed
     if (_userModel!.isProfileComplete) {
-      print('   Profile marked as complete - no setup needed');
+      debugPrint('   Profile marked as complete - no setup needed');
       return false;
     }
     
@@ -513,9 +513,9 @@ class AuthProvider with ChangeNotifier {
     bool hasEssentialData = UserManagementService.hasEssentialProfileData(_userModel!);
     bool needsSetup = !hasEssentialData;
     
-    print('   Profile not marked complete, checking essential data...');
-    print('   Has essential data: $hasEssentialData');
-    print('   Needs setup: $needsSetup');
+    debugPrint('   Profile not marked complete, checking essential data...');
+    debugPrint('   Has essential data: $hasEssentialData');
+    debugPrint('   Needs setup: $needsSetup');
     
     return needsSetup;
   }
@@ -523,7 +523,7 @@ class AuthProvider with ChangeNotifier {
   // Force refresh user data from Firestore
   Future<void> refreshUserData() async {
     if (_user != null) {
-      print('🔄 Refreshing user data from Firestore...');
+      debugPrint('🔄 Refreshing user data from Firestore...');
       await _loadUserModel();
       notifyListeners();
     }
@@ -531,14 +531,14 @@ class AuthProvider with ChangeNotifier {
 
   // Debug method to check current auth state
   void debugAuthState() {
-    print('🐛 DEBUG AUTH STATE:');
-    print('   Firebase User: ${_user?.email ?? "null"}');
-    print('   Firebase User UID: ${_user?.uid ?? "null"}');
-    print('   UserModel: ${_userModel?.email ?? "null"}');
-    print('   UserModel UserType: ${_userModel?.userType ?? "null"}');
-    print('   IsProfileComplete: ${_userModel?.isProfileComplete ?? "null"}');
-    print('   NeedsProfileSetup: $needsProfileSetup');
-    print('   IsLoading: $_isLoading');
+    debugPrint('🐛 DEBUG AUTH STATE:');
+    debugPrint('   Firebase User: ${_user?.email ?? "null"}');
+    debugPrint('   Firebase User UID: ${_user?.uid ?? "null"}');
+    debugPrint('   UserModel: ${_userModel?.email ?? "null"}');
+    debugPrint('   UserModel UserType: ${_userModel?.userType ?? "null"}');
+    debugPrint('   IsProfileComplete: ${_userModel?.isProfileComplete ?? "null"}');
+    debugPrint('   NeedsProfileSetup: $needsProfileSetup');
+    debugPrint('   IsLoading: $_isLoading');
   }
 
   // Sync user data between Firebase Auth and Firestore

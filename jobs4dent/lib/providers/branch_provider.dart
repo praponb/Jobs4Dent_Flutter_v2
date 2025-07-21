@@ -87,7 +87,7 @@ class BranchProvider with ChangeNotifier {
       _error = 'เกิดข้อผิดพลาดในการสร้างสาขา: ${e.toString()}';
       _isLoading = false;
       notifyListeners();
-      throw e;
+      rethrow;
     }
   }
 
@@ -118,7 +118,7 @@ class BranchProvider with ChangeNotifier {
       _error = 'เกิดข้อผิดพลาดในการอัปเดตสาขา: ${e.toString()}';
       _isLoading = false;
       notifyListeners();
-      throw e;
+      rethrow;
     }
   }
 
@@ -149,7 +149,7 @@ class BranchProvider with ChangeNotifier {
       _error = 'เกิดข้อผิดพลาดในการลบสาขา: ${e.toString()}';
       _isLoading = false;
       notifyListeners();
-      throw e;
+      rethrow;
     }
   }
 

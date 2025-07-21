@@ -139,7 +139,7 @@ class _DocumentVerificationScreenState extends State<DocumentVerificationScreen>
                             ),
                           ],
                         ),
-                      )).toList(),
+                      )),
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -319,7 +319,7 @@ class _DocumentVerificationScreenState extends State<DocumentVerificationScreen>
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),

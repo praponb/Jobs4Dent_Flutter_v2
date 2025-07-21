@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../models/user_model.dart';
 import 'firebase_auth_service.dart';
-// import 'user_management_service.dart';
 import 'auth_error_handler.dart';
 
 /// Service class for role management and sub-user operations
@@ -165,7 +164,11 @@ class RoleManagementService {
         
         if (doc.exists) {
           final data = doc.data() as Map<String, dynamic>;
-          subUsers.add(UserModel.fromMap(data));
+          
+          // Process the data to handle Firestore Timestamps
+          final processedData = _processUserData(data, subUserId);
+          
+          subUsers.add(UserModel.fromMap(processedData));
         }
       }
       return subUsers;
@@ -173,6 +176,63 @@ class RoleManagementService {
       debugPrint('❌ Error loading sub-users: $e');
       return [];
     }
+  }
+
+  /// Process user data to ensure all required fields exist and handle timestamps
+  static Map<String, dynamic> _processUserData(Map<String, dynamic> data, String uid) {
+    // Add missing required fields with defaults if they don't exist
+    data['userId'] = data['userId'] ?? uid;
+    data['email'] = data['email'] ?? '';
+    data['userName'] = data['userName'] ?? 'User';
+    data['isDentist'] = data['isDentist'] ?? (data['userType'] == 'dentist' || data['userType'] == 'assistant');
+    data['userType'] = data['userType'] ?? 'clinic';
+    data['currentRole'] = data['currentRole'] ?? data['userType'] ?? 'clinic';
+    data['roles'] = data['roles'] ?? [data['userType'] ?? 'clinic'];
+    data['isMainAccount'] = data['isMainAccount'] ?? false;
+    data['isActive'] = data['isActive'] ?? true;
+    data['isProfileComplete'] = data['isProfileComplete'] ?? true;
+    data['authProvider'] = data['authProvider'] ?? 'email';
+    data['isEmailVerified'] = data['isEmailVerified'] ?? false;
+    data['verificationStatus'] = data['verificationStatus'] ?? 'unverified';
+    
+    // Handle timestamps - convert Firestore Timestamp to int milliseconds
+    data = _processTimestamps(data);
+    
+    return data;
+  }
+
+  /// Process timestamp fields
+  static Map<String, dynamic> _processTimestamps(Map<String, dynamic> data) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    
+    // Handle createdAt
+    if (data['createdAt'] == null) {
+      data['createdAt'] = now;
+    } else if (data['createdAt'] is Timestamp) {
+      data['createdAt'] = (data['createdAt'] as Timestamp).millisecondsSinceEpoch;
+    }
+    
+    // Handle updatedAt
+    if (data['updatedAt'] == null) {
+      data['updatedAt'] = now;
+    } else if (data['updatedAt'] is Timestamp) {
+      data['updatedAt'] = (data['updatedAt'] as Timestamp).millisecondsSinceEpoch;
+    }
+    
+    // Handle other potential timestamp fields
+    if (data['lastLoginAt'] != null && data['lastLoginAt'] is Timestamp) {
+      data['lastLoginAt'] = (data['lastLoginAt'] as Timestamp).millisecondsSinceEpoch;
+    }
+    
+    if (data['verificationSubmittedAt'] != null && data['verificationSubmittedAt'] is Timestamp) {
+      data['verificationSubmittedAt'] = (data['verificationSubmittedAt'] as Timestamp).millisecondsSinceEpoch;
+    }
+    
+    if (data['verificationReviewedAt'] != null && data['verificationReviewedAt'] is Timestamp) {
+      data['verificationReviewedAt'] = (data['verificationReviewedAt'] as Timestamp).millisecondsSinceEpoch;
+    }
+    
+    return data;
   }
 
   /// Update sub-user permissions
