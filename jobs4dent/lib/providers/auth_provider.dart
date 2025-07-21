@@ -2,17 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import 'auth/firebase_auth_service.dart';
+import 'auth/google_sign_in_service.dart';
+import 'auth/user_management_service.dart';
+import 'auth/role_management_service.dart';
+import 'auth/auth_error_handler.dart';
 
 class AuthProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email', 'profile'],
-  );
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   User? _user;
   UserModel? _userModel;
   bool _isLoading = true;
@@ -41,12 +38,8 @@ class AuthProvider with ChangeNotifier {
       }
     });
     
-    // Optional: Run diagnosis for debugging (can be removed in production)
-    // await Future.delayed(const Duration(milliseconds: 500));
-    // await diagnoseFirebaseState();
-    
-    // Listen for auth state changes - this is the primary way to handle auth state
-    _auth.authStateChanges().listen((User? user) async {
+    // Listen for auth state changes
+    FirebaseAuthService.authStateChanges.listen((User? user) async {
       print('🔐 Auth state changed: ${user?.email ?? "No user"}');
       
       _user = user;
@@ -62,7 +55,7 @@ class AuthProvider with ChangeNotifier {
           print('📝 Profile complete: ${_userModel!.isProfileComplete}');
           print('🎯 Needs profile setup: $needsProfileSetup');
           
-          await _updateLastLogin();
+          await UserManagementService.updateLastLogin(user.uid);
         } else {
           print('❌ Failed to load user model');
         }
@@ -74,237 +67,44 @@ class AuthProvider with ChangeNotifier {
       // Set loading to false after processing auth state
       _isLoading = false;
       notifyListeners();
-      
-      // Debug final state (can be removed in production)
-      // debugAuthState();
     });
   }
 
   Future<void> _loadUserModel() async {
     if (_user != null) {
       try {
-        print('📄 Loading user document from Firestore for UID: ${_user!.uid}');
+        _userModel = await UserManagementService.loadUserModel(_user!.uid);
         
-        DocumentSnapshot doc = await _firestore
-            .collection('users')
-            .doc(_user!.uid)
-            .get();
-        
-        if (doc.exists) {
-          print('📋 Document exists, parsing UserModel...');
-          final data = doc.data() as Map<String, dynamic>;
-          
-          // Add missing required fields with defaults if they don't exist
-          data['userId'] = data['userId'] ?? _user!.uid;
-          data['email'] = data['email'] ?? _user!.email ?? '';
-          data['userName'] = data['userName'] ?? _user!.displayName ?? 'User';
-          data['isDentist'] = data['isDentist'] ?? (data['userType'] == 'dentist' || data['userType'] == 'assistant');
-          data['userType'] = data['userType'] ?? 'pending'; // Default to pending so users go through type selection
-          data['currentRole'] = data['currentRole'] ?? data['userType'] ?? 'pending';
-          data['roles'] = data['roles'] ?? [data['userType'] ?? 'pending'];
-          data['isMainAccount'] = data['isMainAccount'] ?? true;
-          data['isActive'] = data['isActive'] ?? true;
-          data['isProfileComplete'] = data['isProfileComplete'] ?? false;
-          data['authProvider'] = data['authProvider'] ?? 'email';
-          data['isEmailVerified'] = data['isEmailVerified'] ?? (_user!.emailVerified);
-          data['verificationStatus'] = data['verificationStatus'] ?? 'unverified';
-          
-          // Handle timestamps - convert Firestore Timestamp to int milliseconds
-          if (data['createdAt'] == null) {
-            data['createdAt'] = DateTime.now().millisecondsSinceEpoch;
-          } else if (data['createdAt'] is Timestamp) {
-            data['createdAt'] = (data['createdAt'] as Timestamp).millisecondsSinceEpoch;
-          }
-          
-          if (data['updatedAt'] == null) {
-            data['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
-          } else if (data['updatedAt'] is Timestamp) {
-            data['updatedAt'] = (data['updatedAt'] as Timestamp).millisecondsSinceEpoch;
-          }
-          
-          // Handle other potential timestamp fields
-          if (data['lastLoginAt'] != null && data['lastLoginAt'] is Timestamp) {
-            data['lastLoginAt'] = (data['lastLoginAt'] as Timestamp).millisecondsSinceEpoch;
-          }
-          
-          if (data['verificationSubmittedAt'] != null && data['verificationSubmittedAt'] is Timestamp) {
-            data['verificationSubmittedAt'] = (data['verificationSubmittedAt'] as Timestamp).millisecondsSinceEpoch;
-          }
-          
-          if (data['verificationReviewedAt'] != null && data['verificationReviewedAt'] is Timestamp) {
-            data['verificationReviewedAt'] = (data['verificationReviewedAt'] as Timestamp).millisecondsSinceEpoch;
-          }
-          
-          print('📊 Attempting to create UserModel with data: ${data.keys}');
-          
-          _userModel = UserModel.fromMap(data);
-          
-          print('✅ UserModel created successfully');
-          print('   Email: ${_userModel!.email}');
-          print('   UserType: ${_userModel!.userType}');
-          print('   IsProfileComplete: ${_userModel!.isProfileComplete}');
-          
+        if (_userModel != null) {
           // Update email verification status if it has changed
           if (_userModel!.isEmailVerified != _user!.emailVerified) {
-            await _updateEmailVerificationStatus(_user!.emailVerified);
+            await UserManagementService.updateEmailVerificationStatus(
+              _user!.uid, 
+              _user!.emailVerified
+            );
           }
 
           // Check and update profile completion status for existing users
-          await _checkAndUpdateProfileCompletion();
+          _userModel = await UserManagementService.checkAndUpdateProfileCompletion(_userModel!);
         } else {
-          print('❌ User document doesn\'t exist in Firestore, creating new one...');
           // User document doesn't exist in Firestore, create it
-          await _createUserDocumentFromExistingAuth();
+          await UserManagementService.createUserDocumentFromExistingAuth(_user!);
+          _userModel = await UserManagementService.loadUserModel(_user!.uid);
         }
       } catch (e) {
         print('❌ Error loading user data: $e');
-        print('   Stack trace: ${e.toString()}');
         _error = 'Error loading user data: $e';
         
         // If UserModel parsing fails, try to create a new document
         if (e.toString().contains('fromMap') || e.toString().contains('UserModel')) {
           print('🔧 UserModel parsing failed, creating new document...');
           try {
-            await _createUserDocumentFromExistingAuth();
+            await UserManagementService.createUserDocumentFromExistingAuth(_user!);
+            _userModel = await UserManagementService.loadUserModel(_user!.uid);
           } catch (createError) {
             print('❌ Failed to create new document: $createError');
           }
         }
-      }
-    }
-  }
-
-  Future<void> _updateLastLogin() async {
-    if (_user != null && _userModel != null) {
-      try {
-        await _firestore
-            .collection('users')
-            .doc(_user!.uid)
-            .update({
-          'lastLoginAt': DateTime.now().millisecondsSinceEpoch,
-        });
-      } catch (e) {
-        // Silent fail for last login update
-      }
-    }
-  }
-
-  Future<void> _checkAndUpdateProfileCompletion() async {
-    if (_user != null && _userModel != null) {
-      try {
-        print('🔄 Checking profile completion for: ${_userModel!.email}');
-        print('   Current isProfileComplete: ${_userModel!.isProfileComplete}');
-        
-        // Check if user has essential profile data to be considered complete
-        bool shouldBeComplete = _hasEssentialProfileData();
-        
-        // If the user should be complete but isn't marked as such, update it
-        if (shouldBeComplete && !_userModel!.isProfileComplete) {
-          print('✏️ Updating profile completion status for existing user: ${_user!.uid}');
-          
-          await _firestore
-              .collection('users')
-              .doc(_user!.uid)
-              .update({
-            'isProfileComplete': true,
-            'updatedAt': DateTime.now().millisecondsSinceEpoch,
-          });
-          
-          // Update local model
-          _userModel = _userModel!.copyWith(
-            isProfileComplete: true,
-            updatedAt: DateTime.now(),
-          );
-          
-          print('✅ Successfully updated profile completion status to true');
-        } else if (shouldBeComplete) {
-          print('✅ Profile is already marked as complete');
-        } else {
-          print('❌ Profile does not have essential data - keeping incomplete');
-        }
-      } catch (e) {
-        print('❌ Error checking profile completion: $e');
-      }
-    }
-  }
-
-  bool _hasEssentialProfileData() {
-    if (_userModel == null) return false;
-    
-    print('🔍 Checking essential profile data for: ${_userModel!.email}');
-    
-    // Check if user has the essential data that indicates a complete profile
-    bool hasBasicInfo = _userModel!.userName.isNotEmpty && 
-                       _userModel!.email.isNotEmpty;
-    
-    bool hasUserType = _userModel!.userType.isNotEmpty && 
-                      _userModel!.userType != 'unknown' &&
-                      _userModel!.userType != '' &&
-                      _userModel!.userType != 'pending';
-    
-    bool hasRole = _userModel!.currentRole.isNotEmpty;
-    
-    print('   Basic info: $hasBasicInfo (name: "${_userModel!.userName}", email: "${_userModel!.email}")');
-    print('   User type: $hasUserType ("${_userModel!.userType}")');
-    print('   Role: $hasRole ("${_userModel!.currentRole}")');
-    
-    // For any user type, if they have basic info + user type + role, consider it complete
-    // This is more lenient than the previous version
-    bool isComplete = hasBasicInfo && hasUserType && hasRole;
-    
-    print('   Essential data complete: $isComplete');
-    return isComplete;
-  }
-
-  Future<void> _updateEmailVerificationStatus(bool isVerified) async {
-    if (_user != null && _userModel != null) {
-      try {
-        await _firestore
-            .collection('users')
-            .doc(_user!.uid)
-            .update({
-          'isEmailVerified': isVerified,
-          'updatedAt': DateTime.now().millisecondsSinceEpoch,
-        });
-        
-        // Update local model
-        _userModel = _userModel!.copyWith(
-          isEmailVerified: isVerified,
-          updatedAt: DateTime.now(),
-        );
-      } catch (e) {
-        // Silent fail for email verification update
-      }
-    }
-  }
-
-  Future<void> _createUserDocumentFromExistingAuth() async {
-    if (_user != null) {
-      try {
-        print('🏗️ Creating user document for existing auth user: ${_user!.email}');
-        
-        // Determine auth provider based on providerData
-        String authProvider = 'email';
-        if (_user!.providerData.any((info) => info.providerId == 'google.com')) {
-          authProvider = 'google';
-        }
-
-        // For new users, set userType to 'pending' so they go through user type selection
-        // This ensures all new users (regardless of how they registered) go through the proper flow
-        await _createUserDocument(
-          _user!,
-          authProvider: authProvider,
-          userType: 'pending', // Set to pending so user goes through UserTypeSelectionScreen
-          isEmailVerified: _user!.emailVerified,
-          additionalData: {
-            'isProfileComplete': false, // New users need to complete profile setup
-          },
-        );
-        
-        print('✅ User document created for existing auth user');
-      } catch (e) {
-        print('❌ Error creating user document: $e');
-        _error = 'Error creating user document: $e';
       }
     }
   }
@@ -322,31 +122,33 @@ class AuthProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      final authResult = await FirebaseAuthService.registerWithEmail(
         email: email,
         password: password,
+        userName: userName,
       );
 
-      // Send email verification
-      await userCredential.user!.sendEmailVerification();
+      if (authResult.success && authResult.user != null) {
+        // Create user document
+        await UserManagementService.createUserDocument(
+          authResult.user!,
+          authProvider: 'email',
+          userType: userType,
+          isEmailVerified: false,
+        );
 
-      // Update display name
-      await userCredential.user!.updateDisplayName(userName);
-
-      // Create user document
-      await _createUserDocument(
-        userCredential.user!,
-        authProvider: 'email',
-        userType: userType,
-        isEmailVerified: false,
-      );
-
-      _successMessage = 'ลงทะเบียนสำเร็จแล้ว! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีของคุณ';
-      _isLoading = false;
-      notifyListeners();
-      return true;
+        _successMessage = authResult.message;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = authResult.error;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
-      _error = 'Registration failed: ${_getErrorMessage(e)}';
+      _error = 'Registration failed: ${AuthErrorHandler.getErrorMessage(e)}';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -364,31 +166,26 @@ class AuthProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      final authResult = await FirebaseAuthService.signInWithEmail(
         email: email,
         password: password,
       );
 
-      // Check if email is verified
-      if (!userCredential.user!.emailVerified) {
-        _error = 'กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ';
-        await _auth.signOut();
+      if (authResult.success) {
+        // Load user data from Firestore
+        await _loadUserModel();
+        
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = authResult.error;
         _isLoading = false;
         notifyListeners();
         return false;
       }
-
-      // Load user data from Firestore
-      await _loadUserModel();
-      
-      // Update last login time
-      await _updateLastLogin();
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } catch (e) {
-      _error = 'Sign-in failed: ${_getErrorMessage(e)}';
+      _error = 'Sign-in failed: ${AuthErrorHandler.getErrorMessage(e)}';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -398,15 +195,19 @@ class AuthProvider with ChangeNotifier {
   // Resend email verification
   Future<bool> resendEmailVerification() async {
     try {
-      if (_user != null && !_user!.emailVerified) {
-        await _user!.sendEmailVerification();
-        _successMessage = 'ส่งอีเมลยืนยันแล้ว! กรุณาตรวจสอบกล่องจดหมายของคุณ';
+      final authResult = await FirebaseAuthService.resendEmailVerification();
+      
+      if (authResult.success) {
+        _successMessage = authResult.message;
         notifyListeners();
         return true;
+      } else {
+        _error = authResult.error;
+        notifyListeners();
+        return false;
       }
-      return false;
     } catch (e) {
-              _error = 'ไม่สามารถส่งอีเมลยืนยันได้: ${_getErrorMessage(e)}';
+      _error = 'ไม่สามารถส่งอีเมลยืนยันได้: ${AuthErrorHandler.getErrorMessage(e)}';
       notifyListeners();
       return false;
     }
@@ -417,12 +218,20 @@ class AuthProvider with ChangeNotifier {
     try {
       _error = null;
       _successMessage = null;
-      await _auth.sendPasswordResetEmail(email: email);
-      _successMessage = 'ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว! กรุณาตรวจสอบกล่องจดหมายของคุณ';
-      notifyListeners();
-      return true;
+      
+      final authResult = await FirebaseAuthService.resetPassword(email: email);
+      
+      if (authResult.success) {
+        _successMessage = authResult.message;
+        notifyListeners();
+        return true;
+      } else {
+        _error = authResult.error;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
-              _error = 'ไม่สามารถส่งอีเมลรีเซ็ตได้: ${_getErrorMessage(e)}';
+      _error = 'ไม่สามารถส่งอีเมลรีเซ็ตได้: ${AuthErrorHandler.getErrorMessage(e)}';
       notifyListeners();
       return false;
     }
@@ -434,85 +243,44 @@ class AuthProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      debugPrint('🔄 Starting Google Sign-In process...');
+      final googleResult = await GoogleSignInService.signInWithGoogle();
+      
+      if (googleResult.success && googleResult.user != null) {
+        if (googleResult.isNewUser) {
+          debugPrint('🔄 Creating new user document in Firestore...');
+          
+          await UserManagementService.createUserDocument(
+            googleResult.user!,
+            authProvider: 'google',
+            userType: 'pending', // Set to pending so user goes through UserTypeSelectionScreen
+            isEmailVerified: true,
+            additionalData: {
+              'signInMethod': 'google',
+              'googleProfile': googleResult.googleProfile?.toMap(),
+              'isProfileComplete': false, // New users need to complete profile setup
+            },
+          );
+          debugPrint('✅ New Google user created in Firestore: ${googleResult.user!.email}');
+        } else {
+          debugPrint('🔄 Loading existing user data from Firestore...');
+          // Load existing user data from Firestore
+          await _loadUserModel();
+          debugPrint('✅ Existing Google user loaded from Firestore: ${googleResult.user!.email}');
+        }
 
-      // Check if Google Play Services is available
-      final bool isAvailable = await _googleSignIn.isSignedIn();
-      debugPrint('📱 Google Play Services available: $isAvailable');
-
-      // Sign out first to ensure clean state
-      await _googleSignIn.signOut();
-      debugPrint('🔄 Signed out from previous session');
-
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        debugPrint('❌ User cancelled Google Sign-In');
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else if (googleResult.cancelled) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      } else {
+        _error = googleResult.error;
         _isLoading = false;
         notifyListeners();
         return false;
       }
-
-      debugPrint('✅ Google user selected: ${googleUser.email}');
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      
-      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
-        throw Exception('Failed to get Google authentication tokens');
-      }
-
-      debugPrint('✅ Got Google authentication tokens');
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      debugPrint('🔄 Signing in with Firebase...');
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
-      
-      if (userCredential.user == null) {
-        throw Exception('Failed to sign in with Firebase');
-      }
-
-      debugPrint('✅ Firebase sign-in successful: ${userCredential.user!.email}');
-      
-      // Check if user exists in Firestore, if not create a new user document
-      bool isNewUser = userCredential.additionalUserInfo?.isNewUser == true;
-      
-      if (isNewUser) {
-        debugPrint('🔄 Creating new user document in Firestore...');
-        debugPrint('📧 New Google user: ${userCredential.user!.email}');
-        debugPrint('🎯 Setting userType to: pending');
-        
-        await _createUserDocument(
-          userCredential.user!,
-          authProvider: 'google',
-          userType: 'pending', // Set to pending so user goes through UserTypeSelectionScreen
-          isEmailVerified: true,
-          additionalData: {
-            'signInMethod': 'google',
-            'googleProfile': {
-              'displayName': userCredential.user!.displayName,
-              'photoURL': userCredential.user!.photoURL,
-            },
-            'isProfileComplete': false, // New users need to complete profile setup
-          },
-        );
-        debugPrint('✅ New Google user created in Firestore: ${userCredential.user!.email}');
-        debugPrint('🎯 Final userType: ${_userModel?.userType}');
-      } else {
-        debugPrint('🔄 Loading existing user data from Firestore...');
-        // Load existing user data from Firestore
-        await _loadUserModel();
-        
-        // Update last login time for existing users
-        await _updateLastLogin();
-        debugPrint('✅ Existing Google user loaded from Firestore: ${userCredential.user!.email}');
-      }
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } catch (e) {
       debugPrint('❌ Google Sign-In Error: $e');
       _error = 'Error signing in with Google: $e';
@@ -522,80 +290,22 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _createUserDocument(
-    User user, {
-    required String authProvider,
-    required String userType,
-    required bool isEmailVerified,
-    Map<String, dynamic>? additionalData,
-  }) async {
-    try {
-      final now = DateTime.now();
-      
-      final userModel = UserModel(
-        userId: user.uid,
-        email: user.email ?? '',
-        userName: user.displayName ?? 'User',
-        profilePhotoUrl: user.photoURL,
-        isDentist: userType == 'dentist' || userType == 'assistant',
-        userType: userType,
-        currentRole: userType,
-        roles: [userType],
-        createdAt: now,
-        updatedAt: now,
-        authProvider: authProvider,
-        isEmailVerified: isEmailVerified,
-        isMainAccount: true,
-        isActive: true,
-        isProfileComplete: false,
-        lastLoginAt: now,
-      );
-
-      // Merge additional data if provided
-      Map<String, dynamic> userData = userModel.toMap();
-      if (additionalData != null) {
-        userData.addAll(additionalData);
-      }
-
-      // Store user data in Firestore 'users' collection
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .set(userData, SetOptions(merge: true));
-      
-      _userModel = userModel;
-      
-      // Log successful user creation
-      debugPrint('✅ User document created in Firestore: ${user.email}');
-    } catch (e) {
-      _error = 'Error creating user document in Firestore: $e';
-      debugPrint('❌ Failed to create user document: $e');
-    }
-  }
-
   // Role switching functionality
   Future<bool> switchRole(String newRole) async {
     try {
-      if (_userModel == null || !_userModel!.roles.contains(newRole)) {
-        _error = 'Invalid role or access denied';
+      if (_userModel == null) return false;
+
+      final roleResult = await RoleManagementService.switchRole(_userModel!, newRole);
+      
+      if (roleResult.success && roleResult.userModel != null) {
+        _userModel = roleResult.userModel;
+        notifyListeners();
+        return true;
+      } else {
+        _error = roleResult.error;
         notifyListeners();
         return false;
       }
-
-      final updatedUser = _userModel!.copyWith(
-        currentRole: newRole,
-        isDentist: newRole == 'dentist' || newRole == 'assistant',
-        updatedAt: DateTime.now(),
-      );
-
-      await _firestore
-          .collection('users')
-          .doc(_user!.uid)
-          .update({'currentRole': newRole, 'isDentist': updatedUser.isDentist});
-
-      _userModel = updatedUser;
-      notifyListeners();
-      return true;
     } catch (e) {
       _error = 'Error switching role: $e';
       notifyListeners();
@@ -606,25 +316,19 @@ class AuthProvider with ChangeNotifier {
   // Add role to user
   Future<bool> addRole(String role) async {
     try {
-      if (_userModel == null || _userModel!.roles.contains(role)) {
+      if (_userModel == null) return false;
+
+      final roleResult = await RoleManagementService.addRole(_userModel!, role);
+      
+      if (roleResult.success && roleResult.userModel != null) {
+        _userModel = roleResult.userModel;
+        notifyListeners();
+        return true;
+      } else {
+        _error = roleResult.error;
+        notifyListeners();
         return false;
       }
-
-      List<String> newRoles = List.from(_userModel!.roles)..add(role);
-      
-      final updatedUser = _userModel!.copyWith(
-        roles: newRoles,
-        updatedAt: DateTime.now(),
-      );
-
-      await _firestore
-          .collection('users')
-          .doc(_user!.uid)
-          .update({'roles': newRoles});
-
-      _userModel = updatedUser;
-      notifyListeners();
-      return true;
     } catch (e) {
       _error = 'Error adding role: $e';
       notifyListeners();
@@ -642,69 +346,35 @@ class AuthProvider with ChangeNotifier {
     required List<String> permissions,
   }) async {
     try {
-      if (_userModel == null || !_userModel!.isMainAccount || _userModel!.userType != 'clinic') {
-        _error = 'Only clinic owners can create sub-users';
-        notifyListeners();
-        return false;
-      }
+      if (_userModel == null) return false;
 
       _isLoading = true;
       notifyListeners();
 
-      // Create Firebase Auth user
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      final subUserResult = await RoleManagementService.createSubUser(
+        parentUser: _userModel!,
         email: email,
         password: password,
-      );
-
-      await userCredential.user!.updateDisplayName(userName);
-      await userCredential.user!.sendEmailVerification();
-
-      // Create sub-user document
-      final subUserModel = UserModel(
-        userId: userCredential.user!.uid,
-        email: email,
         userName: userName,
-        isDentist: false,
-        userType: 'clinic',
-        currentRole: 'clinic',
-        roles: ['clinic'],
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        authProvider: 'email',
-        isEmailVerified: false,
-        parentUserId: _user!.uid,
-        isMainAccount: false,
         branchName: branchName,
         branchAddress: branchAddress,
-        permissions: {'permissions': permissions},
-        isActive: true,
-        isProfileComplete: true,
+        permissions: permissions,
       );
 
-      await _firestore
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set(subUserModel.toMap());
-
-      // Update main account with sub-user ID
-      List<String> currentSubUsers = List.from(_userModel!.subUserIds ?? []);
-      currentSubUsers.add(userCredential.user!.uid);
-
-      await _firestore
-          .collection('users')
-          .doc(_user!.uid)
-          .update({'subUserIds': currentSubUsers});
-
-      // Update local user model
-      _userModel = _userModel!.copyWith(subUserIds: currentSubUsers);
-
-      _isLoading = false;
-      _successMessage = 'สร้างผู้ใช้ย่อยสำเร็จแล้ว! อีเมลยืนยันถูกส่งไปแล้ว';
-      notifyListeners();
-      return true;
+      if (subUserResult.success && subUserResult.updatedParent != null) {
+        _userModel = subUserResult.updatedParent;
+        _successMessage = subUserResult.message;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = subUserResult.error;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
-      _error = 'Error creating sub-user: ${_getErrorMessage(e)}';
+      _error = 'Error creating sub-user: ${AuthErrorHandler.getErrorMessage(e)}';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -713,28 +383,8 @@ class AuthProvider with ChangeNotifier {
 
   // Get sub-users for clinic
   Future<List<UserModel>> getSubUsers() async {
-    if (_userModel == null || _userModel!.subUserIds == null) {
-      return [];
-    }
-
-    try {
-      List<UserModel> subUsers = [];
-      for (String subUserId in _userModel!.subUserIds!) {
-        DocumentSnapshot doc = await _firestore
-            .collection('users')
-            .doc(subUserId)
-            .get();
-        
-        if (doc.exists) {
-          subUsers.add(UserModel.fromMap(doc.data() as Map<String, dynamic>));
-        }
-      }
-      return subUsers;
-    } catch (e) {
-      _error = 'Error loading sub-users: $e';
-      notifyListeners();
-      return [];
-    }
+    if (_userModel == null) return [];
+    return await RoleManagementService.getSubUsers(_userModel!);
   }
 
   Future<bool> updateUserProfile({
@@ -771,19 +421,19 @@ class AuthProvider with ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      // Update user data in Firestore 'users' collection
-      await _firestore
-          .collection('users')
-          .doc(_user!.uid)
-          .set(updatedUser.toMap(), SetOptions(merge: true));
-
-      _userModel = updatedUser;
-      notifyListeners();
+      final success = await UserManagementService.updateUserProfile(_user!.uid, updatedUser);
       
-      debugPrint('✅ User profile updated in Firestore: ${_user!.email}');
-      return true;
+      if (success) {
+        _userModel = updatedUser;
+        notifyListeners();
+        return true;
+      } else {
+        _error = 'Error updating user profile';
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
-      _error = 'Error updating user profile in Firestore: $e';
+      _error = 'Error updating user profile: $e';
       debugPrint('❌ Failed to update user profile: $e');
       notifyListeners();
       return false;
@@ -799,8 +449,8 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       
       // Sign out from Google and Firebase
-      await _googleSignIn.signOut();
-      await _auth.signOut();
+      await GoogleSignInService.signOut();
+      await FirebaseAuthService.signOut();
       
       // Clear all user data
       _user = null;
@@ -860,8 +510,7 @@ class AuthProvider with ChangeNotifier {
     }
     
     // For existing users, check if they have essential data even if not marked complete
-    // This helps users who registered before the isProfileComplete field was implemented
-    bool hasEssentialData = _hasEssentialProfileData();
+    bool hasEssentialData = UserManagementService.hasEssentialProfileData(_userModel!);
     bool needsSetup = !hasEssentialData;
     
     print('   Profile not marked complete, checking essential data...');
@@ -892,115 +541,22 @@ class AuthProvider with ChangeNotifier {
     print('   IsLoading: $_isLoading');
   }
 
-  // Manual diagnostic method to check Firebase state
-  Future<void> diagnoseFirebaseState() async {
-    print('🔬 MANUAL FIREBASE DIAGNOSIS:');
-    
-    // Check Firebase Auth current user
-    final currentUser = _auth.currentUser;
-    print('   Firebase Auth currentUser: ${currentUser?.email ?? "null"}');
-    print('   Firebase Auth currentUser UID: ${currentUser?.uid ?? "null"}');
-    
-    if (currentUser != null) {
-      try {
-        // Check if user document exists in Firestore
-        final doc = await _firestore
-            .collection('users')
-            .doc(currentUser.uid)
-            .get();
-        
-        print('   Firestore document exists: ${doc.exists}');
-        
-        if (doc.exists) {
-          final data = doc.data() as Map<String, dynamic>;
-          print('   Firestore email: ${data['email'] ?? "null"}');
-          print('   Firestore userType: ${data['userType'] ?? "null"}');
-          print('   Firestore currentRole: ${data['currentRole'] ?? "null"}');
-          print('   Firestore isProfileComplete: ${data['isProfileComplete'] ?? "null"}');
-          print('   Firestore userName: ${data['userName'] ?? "null"}');
-        }
-      } catch (e) {
-        print('   Error checking Firestore: $e');
-      }
-    }
-    
-    print('🔬 DIAGNOSIS COMPLETE');
-  }
-
   // Sync user data between Firebase Auth and Firestore
   Future<bool> syncUserData() async {
-    if (_user == null) return false;
+    if (_user == null || _userModel == null) return false;
     
     try {
-      await _loadUserModel();
+      final success = await UserManagementService.syncUserData(_user!, _userModel!);
       
-      if (_userModel != null) {
-        // Update any discrepancies between Auth and Firestore
-        Map<String, dynamic> updates = {};
-        
-        if (_userModel!.email != _user!.email) {
-          updates['email'] = _user!.email;
-        }
-        
-        if (_userModel!.isEmailVerified != _user!.emailVerified) {
-          updates['isEmailVerified'] = _user!.emailVerified;
-        }
-        
-        if (_userModel!.userName != _user!.displayName && _user!.displayName != null) {
-          updates['userName'] = _user!.displayName;
-        }
-        
-        if (_userModel!.profilePhotoUrl != _user!.photoURL) {
-          updates['profilePhotoUrl'] = _user!.photoURL;
-        }
-        
-        if (updates.isNotEmpty) {
-          updates['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
-          
-          await _firestore
-              .collection('users')
-              .doc(_user!.uid)
-              .update(updates);
-              
-          await _loadUserModel(); // Reload updated data
-          debugPrint('✅ User data synchronized between Auth and Firestore');
-        }
+      if (success) {
+        await _loadUserModel(); // Reload updated data
       }
       
-      return true;
+      return success;
     } catch (e) {
       _error = 'Error syncing user data: $e';
       debugPrint('❌ Failed to sync user data: $e');
       return false;
     }
-  }
-
-  // Helper method to get user-friendly error messages
-  String _getErrorMessage(dynamic error) {
-    if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'weak-password':
-          return 'รหัสผ่านไม่ปลอดภัยเพียงพอ กรุณาใช้รหัสผ่านที่แข็งแกร่งกว่านี้';
-        case 'email-already-in-use':
-          return 'อีเมลนี้ถูกใช้งานแล้ว\n\n'
-                 '💡 หากคุณกำลังทดสอบ:\n'
-                 '• ลบผู้ใช้จาก Firebase Authentication Console\n'
-                 '• หรือใช้อีเมลอื่นสำหรับการทดสอบ\n\n'
-                 'กรุณาเข้าสู่ระบบ หรือใช้อีเมลอื่น';
-        case 'invalid-email':
-          return 'รูปแบบอีเมลไม่ถูกต้อง';
-        case 'user-not-found':
-          return 'ไม่พบบัญชีผู้ใช้สำหรับอีเมลนี้';
-        case 'wrong-password':
-          return 'รหัสผ่านไม่ถูกต้อง';
-        case 'user-disabled':
-          return 'บัญชีผู้ใช้นี้ถูกปิดใช้งาน';
-        case 'too-many-requests':
-          return 'พยายามหลายครั้งเกินไป กรุณาลองใหม่อีกครั้งในภายหลัง';
-        default:
-          return error.message ?? 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
-      }
-    }
-    return error.toString();
   }
 } 

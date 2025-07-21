@@ -88,7 +88,7 @@ class JobModel {
       trainStation: map['trainStation'],
       startDate: map['startDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['startDate']) : null,
       endDate: map['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endDate']) : null,
-      workingDays: map['workingDays'] as String?,
+      workingDays: _parseWorkingDays(map['workingDays']),
       workingHours: map['workingHours'],
       additionalRequirements: map['additionalRequirements'],
       applicationIds: List<String>.from(map['applicationIds'] ?? []),
@@ -99,6 +99,19 @@ class JobModel {
       deadline: map['deadline'] != null ? DateTime.fromMillisecondsSinceEpoch(map['deadline']) : null,
       matchingScore: map['matchingScore']?.toDouble(),
     );
+  }
+
+  // Helper method to parse workingDays field which can be either String or List
+  static String? _parseWorkingDays(dynamic workingDaysData) {
+    if (workingDaysData == null) return null;
+    
+    if (workingDaysData is String) {
+      return workingDaysData;
+    } else if (workingDaysData is List) {
+      return workingDaysData.join(', ');
+    } else {
+      return workingDaysData.toString();
+    }
   }
 
   Map<String, dynamic> toMap() {
