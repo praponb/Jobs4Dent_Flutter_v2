@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../dashboard_utils.dart';
 import '../../jobs/job_search_screen.dart';
 import '../../jobs/my_applications_screen.dart';
 import '../../profile/dentist_mini_resume_screen.dart';
+import '../../profile/assistant_mini_resume_screen.dart';
 import '../../profile/document_verification_screen.dart';
 import '../../marketplace/marketplace_screen.dart';
+import '../../../providers/auth_provider.dart';
 
 /// Quick actions widget for dentist dashboard
 class DentistQuickActions extends StatelessWidget {
@@ -72,10 +75,20 @@ class DentistQuickActions extends StatelessWidget {
                 icon: Icons.assignment,
                 color: Colors.orange,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DentistMiniResumeScreen()),
-                  );
+                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  final user = authProvider.userModel;
+                  
+                  if (user?.currentRole == 'assistant') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AssistantMiniResumeScreen()),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const DentistMiniResumeScreen()),
+                    );
+                  }
                 },
               ),
             ),
