@@ -60,7 +60,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
       final user = authProvider.userModel;
       
       if (user != null) {
-        print('Loading dentist data from Firestore collection "users" for user: ${user.userId}');
+        debugPrint('Loading dentist data from Firestore collection "users" for user: ${user.userId}');
         
         // Load fresh data from Firestore "users" collection
         final doc = await FirebaseFirestore.instance
@@ -79,10 +79,10 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
             _selectedLimitations = List<String>.from(data['workLimitations'] ?? []);
           });
 
-          print('Successfully loaded dentist mini-resume data from Firestore');
+          debugPrint('Successfully loaded dentist mini-resume data from Firestore');
         }
       } else {
-        print('User not found - cannot load dentist data');
+        debugPrint('User not found - cannot load dentist data');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -93,7 +93,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
         }
       }
     } catch (e) {
-      print('Error loading dentist data: $e');
+      debugPrint('Error loading dentist data: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -554,7 +554,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
       final user = authProvider.userModel;
 
       if (user != null) {
-        print('Saving dentist mini-resume data to Firestore collection "users" for user: ${user.userId}');
+        debugPrint('Saving dentist mini-resume data to Firestore collection "users" for user: ${user.userId}');
         
         // Update user profile directly in Firestore
         await FirebaseFirestore.instance
@@ -569,7 +569,7 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
           'updatedAt': FieldValue.serverTimestamp(),
         });
 
-        print('Successfully saved dentist mini-resume data to Firestore');
+        debugPrint('Successfully saved dentist mini-resume data to Firestore');
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

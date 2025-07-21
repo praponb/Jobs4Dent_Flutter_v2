@@ -356,7 +356,7 @@ class _BranchEditScreenState extends State<BranchEditScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ..._daysOfWeek.map((day) => _buildOperatingHourRow(day)).toList(),
+                    ..._daysOfWeek.map((day) => _buildOperatingHourRow(day)),
                   ],
                 ),
               ),
@@ -513,7 +513,7 @@ class _BranchEditScreenState extends State<BranchEditScreen> {
           updatedAt: now,
         );
 
-        print('Updating branch to Firebase collection "branches": ${updatedBranch.branchId}');
+        debugPrint('Updating branch to Firebase collection "branches": ${updatedBranch.branchId}');
         await branchProvider.updateBranch(updatedBranch);
 
         if (mounted) {
@@ -540,7 +540,7 @@ class _BranchEditScreenState extends State<BranchEditScreen> {
           isActive: true, // Explicitly set as active
         );
 
-        print('Creating new branch in Firebase collection "branches" for clinic: ${user.userId}');
+        debugPrint('Creating new branch in Firebase collection "branches" for clinic: ${user.userId}');
         await branchProvider.createBranch(newBranch);
 
         if (mounted) {

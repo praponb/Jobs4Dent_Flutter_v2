@@ -123,8 +123,8 @@ class _BranchMapViewScreenState extends State<BranchMapViewScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _centerOnBranch,
         backgroundColor: const Color(0xFF2196F3),
-        child: const Icon(Icons.my_location, color: Colors.white),
         tooltip: 'กลับไปที่ตำแหน่งสาขา',
+        child: const Icon(Icons.my_location, color: Colors.white),
       ),
     );
   }
@@ -417,7 +417,7 @@ class _BranchMapViewScreenState extends State<BranchMapViewScreen> {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

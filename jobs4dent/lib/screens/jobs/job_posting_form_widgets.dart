@@ -62,7 +62,7 @@ class JobPostingFormWidgets {
         title: Text(
           selectedValues.isEmpty 
               ? 'เลือก$title' 
-              : '${selectedValues.join(", ")}',
+              : selectedValues.join(", "),
           style: TextStyle(
             color: selectedValues.isEmpty ? Colors.grey[600] : Colors.black,
           ),

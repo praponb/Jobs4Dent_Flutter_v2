@@ -126,14 +126,14 @@ class VerificationProvider with ChangeNotifier {
           
           documentUrls.add(downloadUrl);
           
-          print('Successfully uploaded file $i: $downloadUrl');
+          debugPrint('Successfully uploaded file $i: $downloadUrl');
         } catch (uploadError) {
           // If one file fails, delete already uploaded files
           for (final url in documentUrls) {
             try {
               await _storage.refFromURL(url).delete();
             } catch (deleteError) {
-              print('Failed to delete file during cleanup: $deleteError');
+              debugPrint('Failed to delete file during cleanup: $deleteError');
             }
           }
           throw Exception('เกิดข้อผิดพลาดในการอัปโหลดไฟล์ ${file.path.split('/').last}: ${uploadError.toString()}');
@@ -153,13 +153,13 @@ class VerificationProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
 
-      print('Successfully uploaded ${documentUrls.length} verification documents for user $userId');
+      debugPrint('Successfully uploaded ${documentUrls.length} verification documents for user $userId');
 
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการอัปโหลดเอกสาร: ${e.toString()}';
       _isLoading = false;
       notifyListeners();
-      throw e;
+      rethrow;
     }
   }
 
@@ -327,14 +327,14 @@ class VerificationProvider with ChangeNotifier {
         try {
           final ref = _storage.refFromURL(url);
           await ref.delete();
-          print('Successfully deleted document: $url');
+          debugPrint('Successfully deleted document: $url');
         } catch (deleteError) {
-          print('Failed to delete document $url: $deleteError');
+          debugPrint('Failed to delete document $url: $deleteError');
           // Continue with other files even if one fails
         }
       }
     } catch (e) {
-      print('Error deleting verification documents: $e');
+      debugPrint('Error deleting verification documents: $e');
       // Don't throw error here as this might be called during cleanup
     }
   }
@@ -354,7 +354,7 @@ class VerificationProvider with ChangeNotifier {
         'customMetadata': metadata.customMetadata,
       };
     } catch (e) {
-      print('Error getting file info: $e');
+      debugPrint('Error getting file info: $e');
       return null;
     }
   }

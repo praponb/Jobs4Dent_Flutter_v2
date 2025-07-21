@@ -22,7 +22,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
   }
 
   Future<void> _loadBranchesOnInit() async {
-    print('Branch Management Screen initialized - loading branches for first time');
+    debugPrint('Branch Management Screen initialized - loading branches for first time');
     await _loadBranches();
   }
 
@@ -33,14 +33,14 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
       final user = authProvider.userModel;
 
       if (user != null) {
-        print('Loading branches from Firestore collection "branches" for user: ${user.userId}');
+        debugPrint('Loading branches from Firestore collection "branches" for user: ${user.userId}');
         await branchProvider.loadBranchesForClinic(user.userId);
         
         if (mounted) {
-          print('Successfully loaded ${branchProvider.branches.length} branches from Firestore');
+          debugPrint('Successfully loaded ${branchProvider.branches.length} branches from Firestore');
         }
       } else {
-        print('User not found - cannot load branches');
+        debugPrint('User not found - cannot load branches');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -51,7 +51,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
         }
       }
     } catch (e) {
-      print('Error loading branches: $e');
+      debugPrint('Error loading branches: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -110,9 +110,9 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
           );
           mapOpened = true;
           
-          print('🗺️ Opened Google Maps for branch: ${branch.branchName}');
-          print('📍 Coordinates: $latitude, $longitude');
-          print('🔗 URL used: $mapUrl');
+          debugPrint('🗺️ Opened Google Maps for branch: ${branch.branchName}');
+          debugPrint('📍 Coordinates: $latitude, $longitude');
+          debugPrint('🔗 URL used: $mapUrl');
           break;
         }
       }
@@ -130,7 +130,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
       }
 
     } catch (e) {
-      print('❌ Error opening Google Maps: $e');
+      debugPrint('❌ Error opening Google Maps: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
