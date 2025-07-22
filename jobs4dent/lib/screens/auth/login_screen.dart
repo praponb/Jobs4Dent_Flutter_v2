@@ -180,33 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Row(
                       children: [
-                        // Expanded(
-                        //   child: GestureDetector(
-                        //     onTap: () {
-                        //       setState(() {
-                        //         _isEmailLogin = false;
-                        //       });
-                        //     },
-                        //     child: Container(
-                        //       padding: const EdgeInsets.symmetric(vertical: 12),
-                        //       decoration: BoxDecoration(
-                        //         color: !_isEmailLogin 
-                        //             ? const Color(0xFF2196F3) 
-                        //             : Colors.transparent,
-                        //         borderRadius: BorderRadius.circular(12),
-                        //       ),
-                        //       child: Text(
-                        //         'เข้าสู่ระบบเร็ว',
-                        //         style: TextStyle(
-                        //           color: !_isEmailLogin ? Colors.white : Colors.grey[600],
-                        //           fontWeight: FontWeight.w600,
-                        //         ),
-                        //         textAlign: TextAlign.center,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        Expanded(
+                       Expanded(
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -463,10 +437,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: 'เชื่อมต่อกับผู้เชี่ยวชาญทันตกรรม',
                       ),
                       SizedBox(height: 12),
-                      _FeatureItem(
-                        icon: Icons.store,
-                        text: 'เข้าถึงตลาดเครื่องมือทันตกรรม',
-                      ),
+                      // _FeatureItem(
+                      //   icon: Icons.store,
+                      //   text: 'เข้าถึงตลาดเครื่องมือทันตกรรม',
+                      // ),
                     ],
                   ),
                 ],
