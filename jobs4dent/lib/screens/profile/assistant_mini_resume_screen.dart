@@ -393,6 +393,7 @@ final List<String> _availableEqSkills = [
                           const SizedBox(height: 16),
                           DropdownButtonFormField<String>(
                             value: _selectedEducationLevel,
+                            isExpanded: true,
                             decoration: const InputDecoration(
                               labelText: 'ระดับการศึกษา',
                               border: OutlineInputBorder(),
@@ -418,6 +419,7 @@ final List<String> _availableEqSkills = [
                           const SizedBox(height: 16),
                           DropdownButtonFormField<String>(
                             value: _selectedJobType,
+                            isExpanded: true,
                             decoration: const InputDecoration(
                               labelText: 'ประเภทงาน',
                               border: OutlineInputBorder(),
@@ -483,6 +485,7 @@ final List<String> _availableEqSkills = [
                           const SizedBox(height: 16),
                           DropdownButtonFormField<String>(
                             value: _selectedJobReadiness,
+                            isExpanded: true,
                             decoration: const InputDecoration(
                               labelText: 'ความพร้อมเริ่มงาน',
                               border: OutlineInputBorder(),
