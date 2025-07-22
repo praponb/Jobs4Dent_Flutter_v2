@@ -79,6 +79,7 @@ class UserModel {
   // Verification System
   final String verificationStatus; // 'unverified', 'pending', 'verified', 'rejected'
   final List<String>? verificationDocuments; // URLs of uploaded verification documents
+  final int? verificationDocumentCounts; // Number of documents in verificationDocuments array
   final String? verificationRejectionReason; // Reason for rejection if status is 'rejected'
   final DateTime? verificationSubmittedAt; // When documents were submitted
   final DateTime? verificationReviewedAt; // When documents were reviewed
@@ -151,6 +152,7 @@ class UserModel {
     this.lastLoginAt,
     this.verificationStatus = 'unverified',
     this.verificationDocuments,
+    this.verificationDocumentCounts,
     this.verificationRejectionReason,
     this.verificationSubmittedAt,
     this.verificationReviewedAt,
@@ -223,6 +225,7 @@ class UserModel {
       lastLoginAt: map['lastLoginAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['lastLoginAt']) : null,
       verificationStatus: map['verificationStatus'] ?? 'unverified',
       verificationDocuments: List<String>.from(map['verificationDocuments'] ?? []),
+      verificationDocumentCounts: map['verificationDocumentCounts'],
       verificationRejectionReason: map['verificationRejectionReason'],
       verificationSubmittedAt: map['verificationSubmittedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['verificationSubmittedAt']) : null,
       verificationReviewedAt: map['verificationReviewedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['verificationReviewedAt']) : null,
@@ -296,6 +299,7 @@ class UserModel {
       'lastLoginAt': lastLoginAt?.millisecondsSinceEpoch,
       'verificationStatus': verificationStatus,
       'verificationDocuments': verificationDocuments,
+      'verificationDocumentCounts': verificationDocumentCounts,
       'verificationRejectionReason': verificationRejectionReason,
       'verificationSubmittedAt': verificationSubmittedAt?.millisecondsSinceEpoch,
       'verificationReviewedAt': verificationReviewedAt?.millisecondsSinceEpoch,
@@ -368,6 +372,7 @@ class UserModel {
     DateTime? lastLoginAt,
     String? verificationStatus,
     List<String>? verificationDocuments,
+    int? verificationDocumentCounts,
     String? verificationRejectionReason,
     DateTime? verificationSubmittedAt,
     DateTime? verificationReviewedAt,
@@ -438,6 +443,7 @@ class UserModel {
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       verificationDocuments: verificationDocuments ?? this.verificationDocuments,
+      verificationDocumentCounts: verificationDocumentCounts ?? this.verificationDocumentCounts,
       verificationRejectionReason: verificationRejectionReason ?? this.verificationRejectionReason,
       verificationSubmittedAt: verificationSubmittedAt ?? this.verificationSubmittedAt,
       verificationReviewedAt: verificationReviewedAt ?? this.verificationReviewedAt,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/user_model.dart';
 
@@ -140,20 +140,31 @@ class VerificationProvider with ChangeNotifier {
         }
       }
 
+      // Get current verification documents from Firestore
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final userData = userDoc.data() ?? <String, dynamic>{};
+      
+      // Get existing documents or empty list if none exist
+      final existingDocuments = List<String>.from(userData['verificationDocuments'] ?? []);
+      
+      // Append new documents to existing ones
+      final allDocuments = [...existingDocuments, ...documentUrls];
+      
       // Update user's verification status and documents in Firestore
       await _firestore.collection('users').doc(userId).update({
         'verificationStatus': 'pending',
-        'verificationDocuments': documentUrls,
+        'verificationDocuments': allDocuments,
+        'verificationDocumentCounts': allDocuments.length,
         'verificationSubmittedAt': FieldValue.serverTimestamp(),
         'verificationRejectionReason': null,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      _uploadedDocuments = documentUrls;
+      _uploadedDocuments = allDocuments;
       _isLoading = false;
       notifyListeners();
 
-      debugPrint('Successfully uploaded ${documentUrls.length} verification documents for user $userId');
+      debugPrint('Successfully uploaded ${documentUrls.length} new verification documents for user $userId. Total documents: ${allDocuments.length}');
 
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการอัปโหลดเอกสาร: ${e.toString()}';
@@ -178,53 +189,50 @@ class VerificationProvider with ChangeNotifier {
     }
   }
 
-  // Pick files for verification with validation
+  // Pick images from Photo Gallery for verification with validation
   Future<List<File>?> pickVerificationDocuments() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-        allowMultiple: true,
-        allowCompression: true,
-        withData: false, // Don't load file data into memory immediately
+      final ImagePicker picker = ImagePicker();
+      
+      // Show dialog to user to choose single or multiple images
+      final List<XFile> selectedImages = await picker.pickMultiImage(
+        imageQuality: 85, // Compress images to reduce file size
       );
 
-      if (result != null && result.files.isNotEmpty) {
+      if (selectedImages.isNotEmpty) {
         List<File> selectedFiles = [];
         
-        // Validate each selected file
-        for (final platformFile in result.files) {
-          if (platformFile.path != null) {
-            final file = File(platformFile.path!);
-            
-            // Check if file exists
-            if (!await file.exists()) {
-              _error = 'ไม่พบไฟล์: ${platformFile.name}';
-              notifyListeners();
-              return null;
-            }
-            
-            // Check file size (max 10MB)
-            final fileSize = await file.length();
-            if (fileSize > 10 * 1024 * 1024) {
-              _error = 'ไฟล์ ${platformFile.name} มีขนาดเกิน 10 MB';
-              notifyListeners();
-              return null;
-            }
-            
-            // Check if file is empty
-            if (fileSize == 0) {
-              _error = 'ไฟล์ ${platformFile.name} ว่างเปล่า';
-              notifyListeners();
-              return null;
-            }
-            
-            selectedFiles.add(file);
+        // Validate each selected image
+        for (final xFile in selectedImages) {
+          final file = File(xFile.path);
+          
+          // Check if file exists
+          if (!await file.exists()) {
+            _error = 'ไม่พบไฟล์: ${xFile.name}';
+            notifyListeners();
+            return null;
           }
+          
+          // Check file size (max 10MB)
+          final fileSize = await file.length();
+          if (fileSize > 10 * 1024 * 1024) {
+            _error = 'รูปภาพ ${xFile.name} มีขนาดเกิน 10 MB';
+            notifyListeners();
+            return null;
+          }
+          
+          // Check if file is empty
+          if (fileSize == 0) {
+            _error = 'รูปภาพ ${xFile.name} ว่างเปล่า';
+            notifyListeners();
+            return null;
+          }
+          
+          selectedFiles.add(file);
         }
         
         if (selectedFiles.isEmpty) {
-          _error = 'ไม่พบไฟล์ที่ถูกต้อง';
+          _error = 'ไม่พบรูปภาพที่ถูกต้อง';
           notifyListeners();
           return null;
         }
@@ -233,7 +241,53 @@ class VerificationProvider with ChangeNotifier {
       }
       return null;
     } catch (e) {
-      _error = 'เกิดข้อผิดพลาดในการเลือกไฟล์: ${e.toString()}';
+      _error = 'เกิดข้อผิดพลาดในการเลือกรูปภาพ: ${e.toString()}';
+      notifyListeners();
+      return null;
+    }
+  }
+
+  // Pick a single image from Photo Gallery (alternative method)
+  Future<File?> pickSingleVerificationDocument() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      
+      // Pick single image from gallery
+      final XFile? selectedImage = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85, // Compress image to reduce file size
+      );
+
+      if (selectedImage != null) {
+        final file = File(selectedImage.path);
+        
+        // Check if file exists
+        if (!await file.exists()) {
+          _error = 'ไม่พบรูปภาพ';
+          notifyListeners();
+          return null;
+        }
+        
+        // Check file size (max 10MB)
+        final fileSize = await file.length();
+        if (fileSize > 10 * 1024 * 1024) {
+          _error = 'รูปภาพมีขนาดเกิน 10 MB';
+          notifyListeners();
+          return null;
+        }
+        
+        // Check if file is empty
+        if (fileSize == 0) {
+          _error = 'รูปภาพว่างเปล่า';
+          notifyListeners();
+          return null;
+        }
+        
+        return file;
+      }
+      return null;
+    } catch (e) {
+      _error = 'เกิดข้อผิดพลาดในการเลือกรูปภาพ: ${e.toString()}';
       notifyListeners();
       return null;
     }
@@ -282,7 +336,10 @@ class VerificationProvider with ChangeNotifier {
         'verificationRejectionReason': reason,
         'updatedAt': FieldValue.serverTimestamp(),
         // Optionally clear old documents if deleted
-        if (deleteOldDocuments) 'verificationDocuments': [],
+        if (deleteOldDocuments) ...{
+          'verificationDocuments': [],
+          'verificationDocumentCounts': 0,
+        },
       });
     } catch (e) {
       throw Exception('เกิดข้อผิดพลาดในการปฏิเสธ: ${e.toString()}');
@@ -316,8 +373,32 @@ class VerificationProvider with ChangeNotifier {
   double getVerificationProgress(UserModel user) {
     if (user.verificationStatus == 'verified') return 1.0;
     if (user.verificationStatus == 'pending') return 0.7;
-    if (user.verificationDocuments != null && user.verificationDocuments!.isNotEmpty) return 0.5;
+    // Use verificationDocumentCounts for better performance, fallback to checking array
+    if ((user.verificationDocumentCounts != null && user.verificationDocumentCounts! > 0) ||
+        (user.verificationDocuments != null && user.verificationDocuments!.isNotEmpty)) {
+      return 0.5;
+    }
     return 0.0;
+  }
+
+  // Get the number of verification documents (optimized with count field)
+  int getVerificationDocumentCount(UserModel user) {
+    // Use the new count field if available for better performance
+    if (user.verificationDocumentCounts != null) {
+      return user.verificationDocumentCounts!;
+    }
+    // Fallback to checking array length if count field is not available
+    return user.verificationDocuments?.length ?? 0;
+  }
+
+  // Check if user has any verification documents (optimized with count field)
+  bool hasVerificationDocuments(UserModel user) {
+    // Use the new count field if available for better performance
+    if (user.verificationDocumentCounts != null) {
+      return user.verificationDocumentCounts! > 0;
+    }
+    // Fallback to checking array if count field is not available
+    return user.verificationDocuments != null && user.verificationDocuments!.isNotEmpty;
   }
 
   // Delete verification documents from Firebase Storage
@@ -336,6 +417,64 @@ class VerificationProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('Error deleting verification documents: $e');
       // Don't throw error here as this might be called during cleanup
+    }
+  }
+
+  // Delete a single verification document by index
+  Future<void> deleteSingleVerificationDocument({
+    required String userId,
+    required int documentIndex,
+  }) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      // Get current user data
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final userData = userDoc.data() ?? <String, dynamic>{};
+      
+      // Get current documents array
+      final currentDocuments = List<String>.from(userData['verificationDocuments'] ?? []);
+      
+      // Validate index
+      if (documentIndex < 0 || documentIndex >= currentDocuments.length) {
+        throw Exception('ดัชนีเอกสารไม่ถูกต้อง');
+      }
+      
+      // Get the document URL to delete from Storage
+      final documentUrlToDelete = currentDocuments[documentIndex];
+      
+      // Delete from Firebase Storage
+      try {
+        final ref = _storage.refFromURL(documentUrlToDelete);
+        await ref.delete();
+        debugPrint('Successfully deleted document from Storage: $documentUrlToDelete');
+      } catch (storageError) {
+        debugPrint('Failed to delete document from Storage: $storageError');
+        // Continue with Firestore update even if Storage deletion fails
+      }
+      
+      // Remove document from array
+      currentDocuments.removeAt(documentIndex);
+      
+      // Update Firestore with new array and count
+      await _firestore.collection('users').doc(userId).update({
+        'verificationDocuments': currentDocuments,
+        'verificationDocumentCounts': currentDocuments.length,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      
+      _isLoading = false;
+      notifyListeners();
+      
+      debugPrint('Successfully deleted document at index $documentIndex. Remaining documents: ${currentDocuments.length}');
+      
+    } catch (e) {
+      _error = 'เกิดข้อผิดพลาดในการลบเอกสาร: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
     }
   }
 
