@@ -24,6 +24,13 @@ class UserModel {
   final String? branchName; // For sub-users, the branch they represent
   final String? branchAddress; // For sub-users, branch address
   
+  // Job Application Information fields
+  final String? educationLevel; // วุฒิการศึกษา
+  final String? jobType; // ประเภทงานที่ต้องการ
+  final double? minSalary; // รายได้ที่ต้องการขั้นต่ำ (บาท/เดือน)
+  final double? maxSalary; // รายได้ที่ต้องการสูงสุด (บาท/เดือน)
+  final String? jobReadiness; // ความพร้อมในการเริ่มงาน
+  
   // Enhanced Profile fields
   final String? phoneNumber;
   final String? address;
@@ -82,6 +89,9 @@ class UserModel {
   final String? educationSpecialist; // Institution for specialist dentistry education (if any)
   final int? experienceYears; // Years of experience after graduation
   final List<String>? coreCompetencies; // Procedures/treatments they can perform
+  final List<String>? counterSkills; // Counter/reception skills
+  final List<String>? softwareSkills; // Software skills
+  final List<String>? eqSkills; // Emotional and social skills
   final List<String>? workLimitations; // Procedures they prefer not to do
   
   UserModel({
@@ -103,6 +113,11 @@ class UserModel {
     this.subUserIds,
     this.branchName,
     this.branchAddress,
+    this.educationLevel,
+    this.jobType,
+    this.minSalary,
+    this.maxSalary,
+    this.jobReadiness,
     this.phoneNumber,
     this.address,
     this.skills,
@@ -144,6 +159,9 @@ class UserModel {
     this.educationSpecialist,
     this.experienceYears,
     this.coreCompetencies,
+    this.counterSkills,
+    this.softwareSkills,
+    this.eqSkills,
     this.workLimitations,
   });
 
@@ -167,6 +185,11 @@ class UserModel {
       subUserIds: List<String>.from(map['subUserIds'] ?? []),
       branchName: map['branchName'],
       branchAddress: map['branchAddress'],
+      educationLevel: map['educationLevel'],
+      jobType: map['jobType'],
+      minSalary: map['minSalary']?.toDouble(),
+      maxSalary: map['maxSalary']?.toDouble(),
+      jobReadiness: map['jobReadiness'],
       phoneNumber: map['phoneNumber'],
       address: map['address'],
       skills: List<String>.from(map['skills'] ?? []),
@@ -208,6 +231,9 @@ class UserModel {
       educationSpecialist: map['educationSpecialist'],
       experienceYears: map['experienceYears'],
       coreCompetencies: List<String>.from(map['coreCompetencies'] ?? []),
+      counterSkills: List<String>.from(map['counterSkills'] ?? []),
+      softwareSkills: List<String>.from(map['softwareSkills'] ?? []),
+      eqSkills: List<String>.from(map['eqSkills'] ?? []),
       workLimitations: List<String>.from(map['workLimitations'] ?? []),
     );
   }
@@ -232,6 +258,11 @@ class UserModel {
       'subUserIds': subUserIds,
       'branchName': branchName,
       'branchAddress': branchAddress,
+      'educationLevel': educationLevel,
+      'jobType': jobType,
+      'minSalary': minSalary,
+      'maxSalary': maxSalary,
+      'jobReadiness': jobReadiness,
       'phoneNumber': phoneNumber,
       'address': address,
       'skills': skills,
@@ -273,6 +304,9 @@ class UserModel {
       'educationSpecialist': educationSpecialist,
       'experienceYears': experienceYears,
       'coreCompetencies': coreCompetencies,
+      'counterSkills': counterSkills,
+      'softwareSkills': softwareSkills,
+      'eqSkills': eqSkills,
       'workLimitations': workLimitations,
     };
   }
@@ -296,6 +330,11 @@ class UserModel {
     List<String>? subUserIds,
     String? branchName,
     String? branchAddress,
+    String? educationLevel,
+    String? jobType,
+    double? minSalary,
+    double? maxSalary,
+    String? jobReadiness,
     String? phoneNumber,
     String? address,
     List<String>? skills,
@@ -337,6 +376,9 @@ class UserModel {
     String? educationSpecialist,
     int? experienceYears,
     List<String>? coreCompetencies,
+    List<String>? counterSkills,
+    List<String>? softwareSkills,
+    List<String>? eqSkills,
     List<String>? workLimitations,
   }) {
     return UserModel(
@@ -358,6 +400,11 @@ class UserModel {
       subUserIds: subUserIds ?? this.subUserIds,
       branchName: branchName ?? this.branchName,
       branchAddress: branchAddress ?? this.branchAddress,
+      educationLevel: educationLevel ?? this.educationLevel,
+      jobType: jobType ?? this.jobType,
+      minSalary: minSalary ?? this.minSalary,
+      maxSalary: maxSalary ?? this.maxSalary,
+      jobReadiness: jobReadiness ?? this.jobReadiness,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       address: address ?? this.address,
       skills: skills ?? this.skills,
@@ -399,6 +446,9 @@ class UserModel {
       educationSpecialist: educationSpecialist ?? this.educationSpecialist,
       experienceYears: experienceYears ?? this.experienceYears,
       coreCompetencies: coreCompetencies ?? this.coreCompetencies,
+      counterSkills: counterSkills ?? this.counterSkills,
+      softwareSkills: softwareSkills ?? this.softwareSkills,
+      eqSkills: eqSkills ?? this.eqSkills,
       workLimitations: workLimitations ?? this.workLimitations,
     );
   }
