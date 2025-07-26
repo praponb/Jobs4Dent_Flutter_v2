@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/auth_provider.dart';
+import 'widgets/personal_info_section.dart';
 
 class DentistMiniResumeScreen extends StatefulWidget {
   const DentistMiniResumeScreen({super.key});
@@ -15,6 +16,12 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
   final _educationController = TextEditingController();
   final _experienceController = TextEditingController();
   final _educationSpecialistController = TextEditingController(); // Added missing controller
+  
+  // Personal Info Controllers
+  final _fullNameController = TextEditingController();
+  final _nickNameController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
   
   List<String> _selectedCompetencies = [];
   List<String> _selectedLimitations = [];
@@ -77,6 +84,12 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
             _educationSpecialistController.text = data['educationSpecialist']?.toString() ?? ''; // Load educationSpecialist
             _selectedCompetencies = List<String>.from(data['coreCompetencies'] ?? []);
             _selectedLimitations = List<String>.from(data['workLimitations'] ?? []);
+            
+            // Load personal info fields
+            _fullNameController.text = data['fullName']?.toString() ?? '';
+            _nickNameController.text = data['nickName']?.toString() ?? '';
+            _ageController.text = data['age']?.toString() ?? '';
+            _phoneNumberController.text = data['phoneNumber']?.toString() ?? '';
           });
 
           debugPrint('Successfully loaded dentist mini-resume data from Firestore');
@@ -116,6 +129,10 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
     _educationController.dispose();
     _experienceController.dispose();
     _educationSpecialistController.dispose(); // Dispose new controller
+    _fullNameController.dispose();
+    _nickNameController.dispose();
+    _ageController.dispose();
+    _phoneNumberController.dispose();
     super.dispose();
   }
 
@@ -165,6 +182,16 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Personal Information Section
+              PersonalInfoSection(
+                fullNameController: _fullNameController,
+                nickNameController: _nickNameController,
+                ageController: _ageController,
+                phoneNumberController: _phoneNumberController,
+              ),
+
+              const SizedBox(height: 16),
+
               // Education Institute Section
               Container(
                 width: double.infinity,
@@ -566,6 +593,10 @@ class _DentistMiniResumeScreenState extends State<DentistMiniResumeScreen> {
           'educationSpecialist': _educationSpecialistController.text.trim(), // Save educationSpecialist
           'coreCompetencies': _selectedCompetencies,
           'workLimitations': _selectedLimitations,
+          'fullName': _fullNameController.text.trim(),
+          'nickName': _nickNameController.text.trim(),
+          'age': _ageController.text.trim().isNotEmpty ? int.parse(_ageController.text.trim()) : null,
+          'phoneNumber': _phoneNumberController.text.trim(),
           'updatedAt': FieldValue.serverTimestamp(),
         });
 
