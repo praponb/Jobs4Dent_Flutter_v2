@@ -6,7 +6,7 @@ import '../../jobs/my_applications_screen.dart';
 import '../../profile/dentist_mini_resume_screen.dart';
 import '../../profile/assistant_mini_resume_screen.dart';
 import '../../profile/document_verification_screen.dart';
-import '../../marketplace/marketplace_screen.dart';
+// import '../../marketplace/marketplace_screen.dart';
 import '../../../providers/auth_provider.dart';
 
 /// Quick actions widget for dentist dashboard
@@ -109,35 +109,35 @@ class DentistQuickActions extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _ActionCard(
-                title: 'ตลาด',
-                subtitle: 'ซื้อ/ขายผลิตภัณฑ์',
-                icon: Icons.store,
-                color: Colors.green,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MarketplaceScreen()),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionCard(
-                title: 'ความพร้อม',
-                subtitle: 'จัดการปฏิทิน',
-                icon: Icons.event_available,
-                color: Colors.purple,
-                onTap: onAvailabilityTap,
-              ),
-            ),
-          ],
-        ),
+        // const SizedBox(height: 12),
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: _ActionCard(
+        //         title: 'ตลาด',
+        //         subtitle: 'ซื้อ/ขายผลิตภัณฑ์',
+        //         icon: Icons.store,
+        //         color: Colors.green,
+        //         onTap: () {
+        //           Navigator.push(
+        //             context,
+        //             MaterialPageRoute(builder: (context) => const MarketplaceScreen()),
+        //           );
+        //         },
+        //       ),
+        //     ),
+        //     const SizedBox(width: 12),
+        //     Expanded(
+        //       child: _ActionCard(
+        //         title: 'ความพร้อม',
+        //         subtitle: 'จัดการปฏิทิน',
+        //         icon: Icons.event_available,
+        //         color: Colors.purple,
+        //         onTap: onAvailabilityTap,
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }

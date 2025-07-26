@@ -107,9 +107,9 @@ class _DentistDashboardState extends State<DentistDashboard> {
                   const SizedBox(height: 24),
 
                   // Availability Calendar Section
-                  DentistAvailabilitySection(
-                    onManageTap: () => _showAvailabilityDialog(),
-                  ),
+                  // DentistAvailabilitySection(
+                  //   onManageTap: () => _showAvailabilityDialog(),
+                  // ),
                 ],
               ),
             ),
