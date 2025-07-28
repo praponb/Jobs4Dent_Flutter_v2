@@ -164,7 +164,7 @@ class JobPostingUtils {
       experienceLevel: experienceLevel,
       salaryType: salaryType,
       minSalary: minSalary != null && minSalary.isNotEmpty 
-          ? double.tryParse(minSalary) 
+          ? minSalary.trim() 
           : null,
       perks: perks != null && perks.trim().isNotEmpty 
           ? perks.trim() 
@@ -216,9 +216,10 @@ class JobPostingUtils {
     }
     
     if (minSalary != null && minSalary.isNotEmpty) {
-      if (double.tryParse(minSalary) == null) {
+      final parsedSalary = double.tryParse(minSalary);
+      if (parsedSalary == null) {
         errors['minSalary'] = 'กรุณาใส่ตัวเลขที่ถูกต้อง';
-      } else if (double.parse(minSalary) < 0) {
+      } else if (parsedSalary < 0) {
         errors['minSalary'] = 'เงินเดือนต้องเป็นจำนวนเงินที่ถูกต้อง';
       }
     }

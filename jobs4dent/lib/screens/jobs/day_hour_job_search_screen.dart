@@ -299,7 +299,7 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
               ),
               const SizedBox(height: 8),
               
-              if (job.minSalary != null)
+              if (job.minSalary != null && job.minSalary!.isNotEmpty)
                 Row(
                   children: [
                     const Icon(Icons.monetization_on, size: 16, color: Colors.grey),
@@ -382,8 +382,11 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
   }
 
   String _formatSalary(JobModel job) {
-    if (job.minSalary != null) {
-      return 'เริ่มต้น ${_formatNumber(job.minSalary!)} บาท';
+    if (job.minSalary != null && job.minSalary!.isNotEmpty) {
+      final salary = double.tryParse(job.minSalary!);
+      if (salary != null) {
+        return 'เริ่มต้น ${_formatNumber(salary)} บาท';
+      }
     }
     return 'ตามตกลง';
   }
@@ -466,7 +469,7 @@ class _DayHourJobSearchScreenState extends State<DayHourJobSearchScreen> {
                         _buildDetailRow('หมวดหมู่', job.jobCategory),
                         _buildDetailRow('ประสบการณ์', job.experienceLevel),
                         _buildDetailRow('ประเภทเงินเดือน', job.salaryType),
-                        if (job.minSalary != null)
+                        if (job.minSalary != null && job.minSalary!.isNotEmpty)
                           _buildDetailRow('เงินเดือน', _formatSalary(job)),
                         _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
                         if (job.workingDays != null && job.workingDays!.isNotEmpty)

@@ -80,11 +80,11 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
       jobCategory: _selectedCategory,
       experienceLevel: _selectedExperienceLevel,
       province: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
-      minSalary: _minSalaryController.text.trim().isEmpty ? null : double.tryParse(_minSalaryController.text.trim()),
+      minSalary: _minSalaryController.text.trim().isEmpty ? null : _minSalaryController.text.trim(),
       userId: authProvider.userModel?.userId,
       title: _titleController.text.trim().isEmpty ? null : _titleController.text.trim(),
       description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
-      minExperienceYears: _minExperienceYearsController.text.trim().isEmpty ? null : int.tryParse(_minExperienceYearsController.text.trim()),
+      minExperienceYears: _minExperienceYearsController.text.trim().isEmpty ? null : _minExperienceYearsController.text.trim(),
       salaryType: _selectedSalaryType,
       perks: _selectedPerks,
       city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
@@ -426,8 +426,11 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
   }
 
   String _formatSalary(JobModel job) {
-    if (job.minSalary != null) {
-      return 'เริ่มต้น ${_formatNumber(job.minSalary!)} บาท';
+    if (job.minSalary != null && job.minSalary!.isNotEmpty) {
+      final salary = double.tryParse(job.minSalary!);
+      if (salary != null) {
+        return 'เริ่มต้น ${_formatNumber(salary)} บาท';
+      }
     }
     return 'ตามตกลง';
   }

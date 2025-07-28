@@ -28,7 +28,7 @@ class UserModel {
   final String? educationLevel; // วุฒิการศึกษา
   final String? jobType; // ประเภทงานที่ต้องการ
   final double? minSalary; // รายได้ที่ต้องการขั้นต่ำ (บาท/เดือน)
-  final double? maxSalary; // รายได้ที่ต้องการสูงสุด (บาท/เดือน)
+  final String? maxSalary; // รายได้ที่ต้องการสูงสุด (บาท/เดือน)
   final String? jobReadiness; // ความพร้อมในการเริ่มงาน
   
   // Enhanced Profile fields
@@ -190,7 +190,7 @@ class UserModel {
       educationLevel: map['educationLevel'],
       jobType: map['jobType'],
       minSalary: map['minSalary']?.toDouble(),
-      maxSalary: map['maxSalary']?.toDouble(),
+      maxSalary: map['maxSalary']?.toString(),
       jobReadiness: map['jobReadiness'],
       phoneNumber: map['phoneNumber'],
       address: map['address'],
@@ -337,7 +337,7 @@ class UserModel {
     String? educationLevel,
     String? jobType,
     double? minSalary,
-    double? maxSalary,
+    String? maxSalary,
     String? jobReadiness,
     String? phoneNumber,
     String? address,
