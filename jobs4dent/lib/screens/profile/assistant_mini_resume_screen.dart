@@ -387,7 +387,7 @@ class _AssistantMiniResumeScreenState extends State<AssistantMiniResumeScreen> {
           'educationLevel': _selectedEducationLevel,
           'jobType': _selectedJobType,
           'minSalary': double.tryParse(_requestedMinSalaryController.text.trim()),
-          'maxSalary': double.tryParse(_requestedMaxSalaryController.text.trim()),
+          'maxSalary': _requestedMaxSalaryController.text.trim().isEmpty ? null : _requestedMaxSalaryController.text.trim(),
           'jobReadiness': _selectedJobReadiness,
           // Legacy fields - keeping existing data, not updating from UI
           'educationInstitute': _educationController.text.trim().isEmpty ? '' : _educationController.text.trim(),

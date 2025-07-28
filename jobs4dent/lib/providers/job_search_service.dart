@@ -13,11 +13,11 @@ class JobSearchService {
     String? province,
     String? jobCategory,
     String? experienceLevel,
-    double? minSalary,
+    String? minSalary,
     String? userId, // For matching calculation
     String? title,
     String? description,
-    int? minExperienceYears,
+    String? minExperienceYears,
     String? salaryType,
     String? perks,
     String? city,
@@ -65,8 +65,15 @@ class JobSearchService {
         jobs = jobs.where((job) => job.experienceLevel == experienceLevel).toList();
       }
 
-      if (minSalary != null) {
-        jobs = jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
+      if (minSalary != null && minSalary.isNotEmpty) {
+        final minSalaryNum = double.tryParse(minSalary);
+        if (minSalaryNum != null) {
+          jobs = jobs.where((job) {
+            if (job.minSalary == null || job.minSalary!.isEmpty) return false;
+            final jobSalary = double.tryParse(job.minSalary!);
+            return jobSalary != null && jobSalary >= minSalaryNum;
+          }).toList();
+        }
       }
 
       if (title != null && title.isNotEmpty) {
@@ -77,8 +84,15 @@ class JobSearchService {
         jobs = jobs.where((job) => job.description.toLowerCase().contains(description.toLowerCase())).toList();
       }
 
-      if (minExperienceYears != null) {
-        jobs = jobs.where((job) => job.minExperienceYears != null && job.minExperienceYears! >= minExperienceYears).toList();
+      if (minExperienceYears != null && minExperienceYears.isNotEmpty) {
+        final minExpNum = int.tryParse(minExperienceYears);
+        if (minExpNum != null) {
+          jobs = jobs.where((job) {
+            if (job.minExperienceYears == null || job.minExperienceYears!.isEmpty) return false;
+            final jobExp = int.tryParse(job.minExperienceYears!);
+            return jobExp != null && jobExp >= minExpNum;
+          }).toList();
+        }
       }
 
       if (salaryType != null && salaryType.isNotEmpty) {
@@ -138,7 +152,7 @@ class JobSearchService {
     String? province,
     String? jobCategory,
     String? experienceLevel,
-    double? minSalary,
+    String? minSalary,
     String? userId, // For matching calculation
   }) async {
     try {
@@ -177,8 +191,15 @@ class JobSearchService {
         jobs = jobs.where((job) => job.experienceLevel == experienceLevel).toList();
       }
 
-      if (minSalary != null) {
-        jobs = jobs.where((job) => job.minSalary != null && job.minSalary! >= minSalary).toList();
+      if (minSalary != null && minSalary.isNotEmpty) {
+        final minSalaryNum = double.tryParse(minSalary);
+        if (minSalaryNum != null) {
+          jobs = jobs.where((job) {
+            if (job.minSalary == null || job.minSalary!.isEmpty) return false;
+            final jobSalary = double.tryParse(job.minSalary!);
+            return jobSalary != null && jobSalary >= minSalaryNum;
+          }).toList();
+        }
       }
 
       // Limit results to 50 after filtering
@@ -217,12 +238,13 @@ class JobSearchService {
         factors++;
 
         // Experience matching (20% weight)
-        if (job.minExperienceYears != null && user.yearsOfExperience != null) {
+        if (job.minExperienceYears != null && job.minExperienceYears!.isNotEmpty && user.yearsOfExperience != null) {
           final userExperience = int.tryParse(user.yearsOfExperience!) ?? 0;
-          if (userExperience >= job.minExperienceYears!) {
+          final jobMinExp = int.tryParse(job.minExperienceYears!) ?? 0;
+          if (userExperience >= jobMinExp) {
             score += 20;
-          } else {
-            score += (userExperience / job.minExperienceYears!) * 20;
+          } else if (jobMinExp > 0) {
+            score += (userExperience / jobMinExp) * 20;
           }
         }
         factors++;

@@ -6,11 +6,11 @@ class JobModel {
   final String description;
   final String jobCategory;
   final String experienceLevel;
-  final int? minExperienceYears;
+  final String? minExperienceYears;
   
   // Salary Information
   final String salaryType;
-  final double? minSalary;
+  final String? minSalary;
   final String? perks;
   
   // Location Information  
@@ -78,9 +78,9 @@ class JobModel {
       description: map['description'] ?? '',
       jobCategory: map['jobCategory'] ?? '',
       experienceLevel: map['experienceLevel'] ?? '1',
-      minExperienceYears: map['minExperienceYears'],
+      minExperienceYears: map['minExperienceYears']?.toString(),
       salaryType: map['salaryType'] ?? '50:50',
-      minSalary: map['minSalary']?.toDouble(),
+      minSalary: map['minSalary']?.toString(),
       perks: map['perks'],
       province: map['province'] ?? '',
       city: map['city'] ?? '',
@@ -154,9 +154,9 @@ class JobModel {
     String? description,
     String? jobCategory,
     String? experienceLevel,
-    int? minExperienceYears,
+    String? minExperienceYears,
     String? salaryType,
-    double? minSalary,
+    String? minSalary,
     String? perks,
     String? province,
     String? city,

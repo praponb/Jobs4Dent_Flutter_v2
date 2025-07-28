@@ -254,7 +254,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                     Icon(Icons.monetization_on, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      'เงินเดือนขั้นต่ำ: ${_formatNumber(job.minSalary!)} บาท',
+                      'เงินเดือนขั้นต่ำ: ${job.minSalary != null && job.minSalary!.isNotEmpty ? _formatNumber(double.tryParse(job.minSalary!) ?? 0) : "ตามตกลง"} บาท',
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                   ],
@@ -500,8 +500,8 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                           _buildDetailSection('รายละเอียดงาน', [
                             _buildDetailRow('ประสบการณ์', job.experienceLevel),
                             _buildDetailRow('ประเภทเงินเดือน', job.salaryType),
-                            if (job.minSalary != null)
-                              _buildDetailRow('เงินเดือนขั้นต่ำ', '${_formatNumber(job.minSalary!)} บาท'),
+                            if (job.minSalary != null && job.minSalary!.isNotEmpty)
+                              _buildDetailRow('เงินเดือนขั้นต่ำ', '${double.tryParse(job.minSalary!) != null ? _formatNumber(double.tryParse(job.minSalary!)!) : "ตามตกลง"} บาท'),
                             if (job.workingDays != null && job.workingDays!.isNotEmpty)
                               _buildDetailRow('วันทำงาน', job.workingDays!),
                             if (job.workingHours != null)
