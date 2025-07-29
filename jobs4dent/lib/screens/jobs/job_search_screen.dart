@@ -4,8 +4,8 @@ import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_model.dart';
 import 'job_application_screen.dart';
-import 'advanced_job_search_screen.dart';
-import 'day_hour_job_search_screen.dart';
+// import 'advanced_job_search_screen.dart';
+// import 'day_hour_job_search_screen.dart';
 
 class JobSearchScreen extends StatefulWidget {
   const JobSearchScreen({super.key});
@@ -138,42 +138,42 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DayHourJobSearchScreen(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.tune),
-                          label: const Text('เลือกวัน/เวลาทำงาน'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AdvancedJobSearchScreen(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.tune),
-                          label: const Text('ค้นหาขั้นสูง'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: Row(
+                //     children: [
+                //       Expanded(
+                //         child: OutlinedButton.icon(
+                //           onPressed: () {
+                //             Navigator.push(
+                //               context,
+                //               MaterialPageRoute(
+                //                 builder: (context) => const DayHourJobSearchScreen(),
+                //               ),
+                //             );
+                //           },
+                //           icon: const Icon(Icons.tune),
+                //           label: const Text('เลือกวัน/เวลาทำงาน'),
+                //         ),
+                //       ),
+                //       const SizedBox(width: 8),
+                //       Expanded(
+                //         child: OutlinedButton.icon(
+                //           onPressed: () {
+                //             Navigator.push(
+                //               context,
+                //               MaterialPageRoute(
+                //                 builder: (context) => const AdvancedJobSearchScreen(),
+                //               ),
+                //             );
+                //           },
+                //           icon: const Icon(Icons.tune),
+                //           label: const Text('ค้นหาขั้นสูง'),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),

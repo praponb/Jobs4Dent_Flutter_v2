@@ -30,20 +30,18 @@ class JobSearchService {
     String? endDate,
   }) async {
     try {
-      // Use a simple query without composite index requirements
-      // Only filter by isActive and do all other filtering client-side
-      Query query = _firestore.collection('job_posts')
+      // Use a simple query to get newest 50 jobs by highest ID
+      // Order by jobId descending to get newest posts first
+      Query query = _firestore.collection('job_posts_dentist')
           .where('isActive', isEqualTo: true)
-          .limit(500); // Increase limit to get more results for client-side filtering
+          .orderBy('jobId', descending: true)
+          .limit(50); // Get only 50 newest jobs directly from Firebase
 
       final querySnapshot = await query.get();
 
       List<JobModel> jobs = querySnapshot.docs
           .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
-
-      // Sort by createdAt descending (client-side)
-      jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       // Apply all filters client-side to avoid composite index issues
       if (keyword != null && keyword.isNotEmpty) {
@@ -130,10 +128,7 @@ class JobSearchService {
                                    job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
       }
 
-      // Limit results to 50 after filtering
-      if (jobs.length > 50) {
-        jobs = jobs.take(50).toList();
-      }
+      // No need to limit here since we already got 50 from Firebase
 
       // Calculate matching scores if userId is provided
       if (userId != null) {
@@ -156,20 +151,17 @@ class JobSearchService {
     String? userId, // For matching calculation
   }) async {
     try {
-      // Use the simplest possible query - no composite indexes required
-      Query query = _firestore.collection('job_posts').limit(1000);
+      // Use the simplest query to get newest 50 jobs by highest ID
+      Query query = _firestore.collection('job_posts_dentist')
+          .where('isActive', isEqualTo: true)
+          .orderBy('jobId', descending: true)
+          .limit(50);
 
       final querySnapshot = await query.get();
 
       List<JobModel> jobs = querySnapshot.docs
           .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
-
-      // Filter by isActive first (client-side)
-      jobs = jobs.where((job) => job.isActive).toList();
-
-      // Sort by createdAt descending (client-side)
-      jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       // Apply all filters client-side
       if (keyword != null && keyword.isNotEmpty) {
@@ -202,10 +194,7 @@ class JobSearchService {
         }
       }
 
-      // Limit results to 50 after filtering
-      if (jobs.length > 50) {
-        jobs = jobs.take(50).toList();
-      }
+      // No need to limit here since we already got 50 from Firebase
 
       // Calculate matching scores if userId is provided
       if (userId != null) {
