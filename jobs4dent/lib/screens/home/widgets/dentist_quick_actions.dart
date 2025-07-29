@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../dashboard_utils.dart';
-import '../../jobs/job_search_screen.dart';
+import '../../jobs/dentist_job_search_screen.dart';
 import '../../jobs/my_applications_screen.dart';
 import '../../profile/dentist_mini_resume_screen.dart';
 import '../../profile/assistant_mini_resume_screen.dart';
@@ -43,7 +43,7 @@ class DentistQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const JobSearchScreen()),
+                    MaterialPageRoute(builder: (context) => const DentistJobSearchScreen()),
                   );
                 },
               ),

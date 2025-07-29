@@ -497,11 +497,11 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      // Get newest 50 active jobs by highest ID
+      // Get newest 1000 active jobs by highest ID
       Query query = _firestore.collection('job_posts_dentist')
           .where('isActive', isEqualTo: true)
           .orderBy('jobId', descending: true)
-          .limit(50);
+          .limit(1000);
 
       final querySnapshot = await query.get();
       final allJobs = querySnapshot.docs

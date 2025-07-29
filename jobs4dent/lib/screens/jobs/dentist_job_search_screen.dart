@@ -7,14 +7,14 @@ import 'job_application_screen.dart';
 // import 'advanced_job_search_screen.dart';
 // import 'day_hour_job_search_screen.dart';
 
-class JobSearchScreen extends StatefulWidget {
-  const JobSearchScreen({super.key});
+class DentistJobSearchScreen extends StatefulWidget {
+  const DentistJobSearchScreen({super.key});
 
   @override
-  State<JobSearchScreen> createState() => _JobSearchScreenState();
+  State<DentistJobSearchScreen> createState() => _DentistJobSearchScreenState();
 }
 
-class _JobSearchScreenState extends State<JobSearchScreen> {
+class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
   final TextEditingController _keywordController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _minSalaryController = TextEditingController();
@@ -107,7 +107,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ค้นหางาน'),
+        title: const Text('ค้นหางานทันตแพทย์'),
         actions: [],
       ),
       body: Column(

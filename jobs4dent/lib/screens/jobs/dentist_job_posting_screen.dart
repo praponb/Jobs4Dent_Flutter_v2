@@ -9,16 +9,16 @@ import 'job_posting_constants.dart';
 import 'job_posting_form_widgets.dart';
 import 'job_posting_utils.dart';
 
-class JobPostingScreen extends StatefulWidget {
+class DentistJobPostingScreen extends StatefulWidget {
   final JobModel? jobToEdit;
-  
-  const JobPostingScreen({super.key, this.jobToEdit});
+
+  const DentistJobPostingScreen({super.key, this.jobToEdit});
 
   @override
-  State<JobPostingScreen> createState() => _JobPostingScreenState();
+  State<DentistJobPostingScreen> createState() => _DentistJobPostingScreenState();
 }
 
-class _JobPostingScreenState extends State<JobPostingScreen> {
+class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -288,7 +288,7 @@ class _JobPostingScreenState extends State<JobPostingScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 36),
             ],
           ),
         ),

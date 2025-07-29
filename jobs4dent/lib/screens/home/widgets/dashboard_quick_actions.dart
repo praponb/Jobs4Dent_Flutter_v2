@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../dashboard_utils.dart';
-import '../../jobs/job_posting_screen.dart';
+import '../../jobs/dentist_job_posting_screen.dart';
 import '../../jobs/applicant_management_screen.dart';
 import '../../profile/branch_management_screen.dart';
 import '../../profile/document_verification_screen.dart';
@@ -30,13 +30,13 @@ class DashboardQuickActions extends StatelessWidget {
             Expanded(
               child: _ActionCard(
                 title: 'ประกาศงานใหม่',
-                subtitle: 'หาผู้เชี่ยวชาญทันตกรรม',
+                subtitle: 'หาทันตแพทย์',
                 icon: Icons.add_circle,
                 color: const Color(0xFF2196F3),
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const JobPostingScreen()),
+                    MaterialPageRoute(builder: (context) => const DentistJobPostingScreen()),
                   );
                 },
               ),
