@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/job_constants.dart';
 import '../../providers/auth_provider.dart';
-import 'job_search_screen.dart';
+import 'dentist_job_search_screen.dart';
 import 'job_posting_form_widgets.dart';
 import 'advanced_search_form_helper.dart';
 
@@ -45,7 +45,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const JobSearchScreen(),
+                        builder: (context) => const DentistJobSearchScreen(),
       ),
     );
   }

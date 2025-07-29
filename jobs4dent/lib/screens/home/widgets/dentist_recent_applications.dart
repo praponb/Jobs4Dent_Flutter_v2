@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../models/job_application_model.dart';
 import '../dashboard_utils.dart';
 import '../../jobs/my_applications_screen.dart';
-import '../../jobs/job_search_screen.dart';
+import '../../jobs/dentist_job_search_screen.dart';
 
 /// Recent applications widget for dentist dashboard
 class DentistRecentApplications extends StatelessWidget {
@@ -85,7 +85,7 @@ class DentistRecentApplications extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const JobSearchScreen(),
+                  builder: (context) => const DentistJobSearchScreen(),
                 ),
               );
             },

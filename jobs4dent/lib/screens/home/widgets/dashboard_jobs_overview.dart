@@ -3,8 +3,8 @@ import '../../../models/job_model.dart';
 import '../../../models/job_application_model.dart';
 import '../dashboard_data_processor.dart';
 import '../dashboard_utils.dart';
-import '../../jobs/job_posting_screen.dart';
-import '../../jobs/my_posted_jobs_screen.dart';
+import '../../jobs/dentist_job_posting_screen.dart';
+import '../../jobs/my_posted_dentist_jobs_screen.dart';
 
 /// Dashboard active jobs overview widget
 class DashboardJobsOverview extends StatelessWidget {
@@ -29,7 +29,7 @@ class DashboardJobsOverview extends StatelessWidget {
           children: [
             const Expanded(
               child: Text(
-                'ประกาศงานที่เปิดอยู่',
+                'ประกาศงาน(ทันตแพทย์)ที่เปิดอยู่',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class DashboardJobsOverview extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MyPostedJobsScreen(),
+                    builder: (context) => const MyPostedDentistJobsScreen(),
                   ),
                 );
               },
@@ -96,7 +96,7 @@ class DashboardJobsOverview extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const JobPostingScreen(),
+                  builder: (context) => const DentistJobPostingScreen(),
                 ),
               );
             },

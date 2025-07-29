@@ -4,17 +4,17 @@ import 'package:intl/intl.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_model.dart';
-import 'job_posting_screen.dart';
+import 'dentist_job_posting_screen.dart';
 import 'applicant_management_screen.dart';
 
-class MyPostedJobsScreen extends StatefulWidget {
-  const MyPostedJobsScreen({super.key});
+class MyPostedDentistJobsScreen extends StatefulWidget {
+  const MyPostedDentistJobsScreen({super.key});
 
   @override
-  State<MyPostedJobsScreen> createState() => _MyPostedJobsScreenState();
+  State<MyPostedDentistJobsScreen> createState() => _MyPostedDentistJobsScreenState();
 }
 
-class _MyPostedJobsScreenState extends State<MyPostedJobsScreen> 
+class _MyPostedDentistJobsScreenState extends State<MyPostedDentistJobsScreen> 
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
@@ -44,7 +44,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('งานที่ประกาศทั้งหมด'),
+        title: const Text('งาน(ทันตแพทย์)ที่ประกาศทั้งหมด'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -73,7 +73,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const JobPostingScreen(),
+                              builder: (context) => const DentistJobPostingScreen(),
             ),
           ).then((_) => _loadJobs());
         },
@@ -145,7 +145,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const JobPostingScreen(),
+                        builder: (context) => const DentistJobPostingScreen(),
                       ),
                     ).then((_) => _loadJobs());
                   },
@@ -335,7 +335,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => JobPostingScreen(jobToEdit: job),
+                            builder: (context) => DentistJobPostingScreen(jobToEdit: job),
                           ),
                         ).then((_) => _loadJobs());
                       },
@@ -446,7 +446,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => JobPostingScreen(jobToEdit: job),
+                                  builder: (context) => DentistJobPostingScreen(jobToEdit: job),
                                 ),
                               ).then((_) => _loadJobs());
                             },
@@ -575,7 +575,7 @@ class _MyPostedJobsScreenState extends State<MyPostedJobsScreen>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => JobPostingScreen(jobToEdit: job),
+                                builder: (context) => DentistJobPostingScreen(jobToEdit: job),
                               ),
                             ).then((_) => _loadJobs());
                           },

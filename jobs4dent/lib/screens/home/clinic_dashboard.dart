@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/job_provider.dart';
-import '../jobs/job_posting_screen.dart';
+import '../jobs/dentist_job_posting_screen.dart';
 import '../profile/profile_screen.dart';
 import '../profile/sub_branch_management_screen.dart';
 import 'dashboard_data_processor.dart';
@@ -127,7 +127,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const JobPostingScreen()),
+                          MaterialPageRoute(builder: (context) => const DentistJobPostingScreen()),
           );
         },
         icon: const Icon(Icons.add),
