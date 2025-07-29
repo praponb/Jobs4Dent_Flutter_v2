@@ -8,7 +8,7 @@ class JobManagementService {
   /// Post a new job (for clinics)
   Future<bool> postJob(JobModel job) async {
     try {
-      await _firestore.collection('job_posts').doc(job.jobId).set(job.toMap());
+      await _firestore.collection('job_posts_dentist').doc(job.jobId).set(job.toMap());
       return true;
     } catch (e) {
       throw Exception('การโพสต์งานไม่สำเร็จ: $e');
@@ -18,7 +18,7 @@ class JobManagementService {
   /// Update an existing job
   Future<bool> updateJob(JobModel updatedJob) async {
     try {
-      await _firestore.collection('job_posts').doc(updatedJob.jobId).update(
+      await _firestore.collection('job_posts_dentist').doc(updatedJob.jobId).update(
         updatedJob.copyWith(updatedAt: DateTime.now()).toMap(),
       );
       return true;
@@ -30,7 +30,7 @@ class JobManagementService {
   /// Delete a job
   Future<bool> deleteJob(String jobId) async {
     try {
-      await _firestore.collection('job_posts').doc(jobId).delete();
+      await _firestore.collection('job_posts_dentist').doc(jobId).delete();
       return true;
     } catch (e) {
       throw Exception('การลบงานไม่สำเร็จ: $e');
@@ -41,7 +41,7 @@ class JobManagementService {
   Future<List<JobModel>> getMyPostedJobs(String clinicId) async {
     try {
       final querySnapshot = await _firestore
-          .collection('job_posts')
+          .collection('job_posts_dentist')
           .where('clinicId', isEqualTo: clinicId)
           .get();
 
@@ -61,7 +61,7 @@ class JobManagementService {
   /// Get job by ID
   Future<JobModel?> getJobById(String jobId) async {
     try {
-      final doc = await _firestore.collection('job_posts').doc(jobId).get();
+      final doc = await _firestore.collection('job_posts_dentist').doc(jobId).get();
       if (doc.exists) {
         return JobModel.fromMap(doc.data()!);
       }

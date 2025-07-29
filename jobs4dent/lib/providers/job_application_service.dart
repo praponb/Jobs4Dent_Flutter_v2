@@ -16,7 +16,7 @@ class JobApplicationService {
   }) async {
     try {
       // Get job details
-      final jobDoc = await _firestore.collection('job_posts').doc(jobId).get();
+      final jobDoc = await _firestore.collection('job_posts_dentist').doc(jobId).get();
       if (!jobDoc.exists) {
         throw Exception('ไม่พบงาน');
       }
@@ -64,7 +64,7 @@ class JobApplicationService {
       await _firestore.collection('job_applications').doc(applicationId).set(application.toMap());
 
       // Update job application count
-      await _firestore.collection('job_posts').doc(jobId).update({
+      await _firestore.collection('job_posts_dentist').doc(jobId).update({
         'applicationCount': FieldValue.increment(1),
         'applicationIds': FieldValue.arrayUnion([applicationId]),
       });
@@ -147,7 +147,7 @@ class JobApplicationService {
   Future<List<JobApplicationModel>> loadJobApplications(String jobId) async {
     try {
       final querySnapshot = await _firestore
-          .collection('job_posts')
+          .collection('job_posts_dentist')
           .doc(jobId)
           .collection('applications')
           .orderBy('appliedAt', descending: true)
@@ -205,9 +205,9 @@ class JobApplicationService {
       if (interviewDate != null) updateData['interviewDate'] = interviewDate.millisecondsSinceEpoch;
       if (interviewLocation != null) updateData['interviewLocation'] = interviewLocation;
 
-      // Update in job_posts sub-collection
+      // Update in job_posts_dentist sub-collection
       await _firestore
-          .collection('job_posts')
+          .collection('job_posts_dentist')
           .doc(jobId)
           .collection('applications')
           .doc(applicationId)
@@ -238,7 +238,7 @@ class JobApplicationService {
 
       // Store application under jobPosting
       await _firestore
-          .collection('job_posts')
+          .collection('job_posts_dentist')
           .doc(jobId)
           .collection('applications')
           .doc(applicationId)
@@ -253,7 +253,7 @@ class JobApplicationService {
           .set(application.toMap());
 
       // Update job application count
-      await _firestore.collection('job_posts').doc(jobId).update({
+      await _firestore.collection('job_posts_dentist').doc(jobId).update({
         'applicationCount': FieldValue.increment(1),
         'applicationIds': FieldValue.arrayUnion([applicationId]),
       });

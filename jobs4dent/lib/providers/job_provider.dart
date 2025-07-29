@@ -219,6 +219,8 @@ class JobProvider with ChangeNotifier {
         endDate: endDate,
       );
 
+      // Jobs are already sorted by ID (newest first) from Firebase query
+      
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -248,6 +250,8 @@ class JobProvider with ChangeNotifier {
         userId: userId,
       );
 
+      // Jobs are already sorted by ID (newest first) from Firebase query
+      
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -493,10 +497,11 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      // Get all active jobs first
-      Query query = _firestore.collection('job_posts')
+      // Get newest 50 active jobs by highest ID
+      Query query = _firestore.collection('job_posts_dentist')
           .where('isActive', isEqualTo: true)
-          .limit(500);
+          .orderBy('jobId', descending: true)
+          .limit(50);
 
       final querySnapshot = await query.get();
       final allJobs = querySnapshot.docs
@@ -597,6 +602,8 @@ class JobProvider with ChangeNotifier {
         _jobs = await _jobSearchService.calculateMatchingScores(_jobs, userId);
       }
 
+      // Jobs are already sorted by ID (newest first) from Firebase query
+      
       notifyListeners();
     } catch (e) {
       _setError(e.toString());

@@ -12,7 +12,7 @@ class JobAIService {
   Future<List<JobModel>> searchJobsByDayHours(String searchQuery) async {
     try {
       // First, get all active jobs
-      final query = _firestore.collection('job_posts')
+      final query = _firestore.collection('job_posts_dentist')
           .where('isActive', isEqualTo: true)
           .limit(500);
 
