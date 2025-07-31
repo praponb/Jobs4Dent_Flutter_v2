@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import '../../models/job_model.dart';
+import '../../models/assistant_job_model.dart';
 import '../../models/job_application_model.dart';
 
 /// Data processor for dashboard metrics and charts
@@ -52,6 +54,28 @@ class DashboardDataProcessor {
         .where((job) => job.isActive)
         .take(limit)
         .toList();
+  }
+
+  /// Get active assistant jobs (limited number for overview)
+  static List<AssistantJobModel> getActiveAssistantJobsForOverview(
+    List<AssistantJobModel> assistantJobs,
+    {int limit = 3}
+  ) {
+    debugPrint('Processing ${assistantJobs.length} assistant jobs for overview');
+    final activeJobs = assistantJobs
+        .where((job) => job.isActive)
+        .take(limit)
+        .toList();
+    debugPrint('Found ${activeJobs.length} active assistant jobs');
+    return activeJobs;
+  }
+
+  /// Get applications for a specific assistant job
+  static List<JobApplicationModel> getApplicationsForAssistantJob(
+    String jobId,
+    List<JobApplicationModel> applications,
+  ) {
+    return applications.where((app) => app.jobId == jobId).toList();
   }
 
   /// Process monthly applications data for chart

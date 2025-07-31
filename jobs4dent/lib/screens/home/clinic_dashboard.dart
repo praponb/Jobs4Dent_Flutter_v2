@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/job_provider.dart';
-import '../jobs/dentist_job_posting_screen.dart';
+
 import '../profile/profile_screen.dart';
 import '../profile/sub_branch_management_screen.dart';
 import 'dashboard_data_processor.dart';
@@ -31,10 +31,19 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.userModel != null) {
       final jobProvider = Provider.of<JobProvider>(context, listen: false);
+      
+      debugPrint('Clinic Dashboard: Loading data for user ${authProvider.userModel!.userId}');
+      debugPrint('Clinic Dashboard: User type: ${authProvider.userModel!.userType}');
+      
+      // Load clinic's posted jobs (both dentist and assistant) and their applicants
       await Future.wait([
         jobProvider.loadMyPostedJobs(authProvider.userModel!.userId),
+        jobProvider.loadMyPostedAssistantJobs(authProvider.userModel!.userId),
         jobProvider.loadApplicantsForMyJobs(authProvider.userModel!.userId),
       ]);
+      
+      debugPrint('Clinic Dashboard: Data loading completed');
+      debugPrint('Clinic Dashboard: Assistant jobs count: ${jobProvider.myPostedAssistantJobs.length}');
     }
   }
 
@@ -105,6 +114,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                   // Active Jobs Overview
                   DashboardJobsOverview(
                     jobs: jobProvider.myPostedJobs,
+                    assistantJobs: jobProvider.myPostedAssistantJobs,
                     applications: jobProvider.applicantsForMyJobs,
                   ),
                   const SizedBox(height: 24),
@@ -123,17 +133,17 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-                          MaterialPageRoute(builder: (context) => const DentistJobPostingScreen()),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('ประกาศงาน'),
-        backgroundColor: const Color(0xFF2196F3),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //                     MaterialPageRoute(builder: (context) => const DentistJobPostingScreen()),
+      //     );
+      //   },
+      //   icon: const Icon(Icons.add),
+      //   label: const Text('ประกาศงาน'),
+      //   backgroundColor: const Color(0xFF2196F3),
+      // ),
     );
   }
 

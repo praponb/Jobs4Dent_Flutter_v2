@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/job_model.dart';
+import '../models/assistant_job_model.dart';
 import '../models/job_application_model.dart';
 import 'job_constants.dart';
 import 'job_management_service.dart';
@@ -19,6 +20,7 @@ class JobProvider with ChangeNotifier {
   
   List<JobModel> _jobs = [];
   List<JobModel> _myPostedJobs = [];
+  List<AssistantJobModel> _myPostedAssistantJobs = [];
   List<JobApplicationModel> _myApplications = [];
   List<JobApplicationModel> _applicantsForMyJobs = [];
   bool _isLoading = false;
@@ -29,6 +31,7 @@ class JobProvider with ChangeNotifier {
   // Getters
   List<JobModel> get jobs => _jobs;
   List<JobModel> get myPostedJobs => _myPostedJobs;
+  List<AssistantJobModel> get myPostedAssistantJobs => _myPostedAssistantJobs;
   List<JobApplicationModel> get myApplications => _myApplications;
   List<JobApplicationModel> get userApplications => _myApplications; // Alias for dashboard
   List<JobApplicationModel> get applicantsForMyJobs => _applicantsForMyJobs;
@@ -136,6 +139,64 @@ class JobProvider with ChangeNotifier {
       _myPostedJobs = await _jobManagementService.getMyPostedJobs(clinicId);
       notifyListeners();
     } catch (e) {
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> getMyPostedAssistantJobs(String clinicId) async {
+    try {
+      _setLoading(true);
+      _setError(null);
+
+      debugPrint('Loading assistant jobs for clinic ID: $clinicId');
+      
+      // Query assistant jobs from Firestore
+      QuerySnapshot querySnapshot;
+      try {
+        querySnapshot = await _firestore
+            .collection('job_posts_assistant')
+            .where('clinicId', isEqualTo: clinicId)
+            .orderBy('createdAt', descending: true)
+            .get();
+      } catch (indexError) {
+        debugPrint('Index error, falling back to query without orderBy: $indexError');
+        // Fallback: Query without orderBy if index doesn't exist
+        querySnapshot = await _firestore
+            .collection('job_posts_assistant')
+            .where('clinicId', isEqualTo: clinicId)
+            .get();
+      }
+
+      final assistantJobs = <AssistantJobModel>[];
+      
+      for (var doc in querySnapshot.docs) {
+        try {
+          final jobData = doc.data() as Map<String, dynamic>;
+          // Add document ID to the data if it's missing
+          jobData['jobId'] = jobData['jobId'] ?? doc.id;
+          final job = AssistantJobModel.fromMap(jobData);
+          assistantJobs.add(job);
+        } catch (parseError) {
+          debugPrint('Error parsing assistant job document ${doc.id}: $parseError');
+          // Continue with other documents instead of failing entirely
+        }
+      }
+
+      // Sort jobs by createdAt if we used the fallback query
+      if (querySnapshot.docs.isNotEmpty) {
+        assistantJobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      }
+
+      _myPostedAssistantJobs = assistantJobs;
+      debugPrint('Loaded ${assistantJobs.length} assistant jobs for clinic $clinicId');
+      for (var job in assistantJobs) {
+        debugPrint('Assistant Job: ${job.jobId}, Title: ${job.titlePost}, Active: ${job.isActive}');
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error in getMyPostedAssistantJobs: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -616,6 +677,7 @@ class JobProvider with ChangeNotifier {
   void clearData() {
     _jobs.clear();
     _myPostedJobs.clear();
+    _myPostedAssistantJobs.clear();
     _myApplications.clear();
     _applicantsForMyJobs.clear();
     _error = null;
@@ -627,6 +689,10 @@ class JobProvider with ChangeNotifier {
   // Legacy method aliases for backward compatibility
   Future<void> loadMyPostedJobs(String clinicId) async {
     return getMyPostedJobs(clinicId);
+  }
+
+  Future<void> loadMyPostedAssistantJobs(String clinicId) async {
+    return getMyPostedAssistantJobs(clinicId);
   }
 
   Future<void> loadApplicantsForMyJobs(String clinicId) async {

@@ -163,7 +163,12 @@ class _MyPostedDentistJobsScreenState extends State<MyPostedDentistJobsScreen>
             itemCount: jobs.length,
             itemBuilder: (context, index) {
               final job = jobs[index];
-              return _buildJobCard(job, jobProvider);
+              return Column(
+                children: [
+                  _buildJobCard(job, jobProvider),
+                  const SizedBox(height: 30),
+                ],
+              );
             },
           ),
         );
@@ -360,6 +365,7 @@ class _MyPostedDentistJobsScreenState extends State<MyPostedDentistJobsScreen>
                   ),
                 ],
               ),
+              const SizedBox(height: 36),
             ],
           ),
         ),
