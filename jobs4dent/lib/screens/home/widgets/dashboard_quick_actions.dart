@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../dashboard_utils.dart';
 import '../../jobs/dentist_job_posting_screen.dart';
+import '../../jobs/assistant_job_posting_screen.dart';
+import '../../jobs/my_posted_assistant_jobs_screen.dart';
 import '../../jobs/applicant_management_screen.dart';
 import '../../profile/branch_management_screen.dart';
 import '../../profile/document_verification_screen.dart';
@@ -29,7 +31,7 @@ class DashboardQuickActions extends StatelessWidget {
           children: [
             Expanded(
               child: _ActionCard(
-                title: 'ประกาศงานใหม่',
+                title: 'ประกาศงานทันตแพทย์',
                 subtitle: 'หาทันตแพทย์',
                 icon: Icons.add_circle,
                 color: const Color(0xFF2196F3),
@@ -44,10 +46,44 @@ class DashboardQuickActions extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _ActionCard(
+                title: 'ประกาศงานผู้ช่วยทันตแพทย์',
+                subtitle: 'หาผู้ช่วยทันตแพทย์',
+                icon: Icons.person_add,
+                color: Colors.orange,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AssistantJobPostingScreen()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _ActionCard(
+                title: 'งานที่ประกาศ',
+                subtitle: 'ดูงานผู้ช่วยทันตแพทย์',
+                icon: Icons.work_history,
+                color: Colors.teal,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MyPostedAssistantJobsScreen()),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ActionCard(
                 title: 'ดูใบสมัคร',
                 subtitle: 'ตรวจสอบผู้สมัคร',
                 icon: Icons.inbox,
-                color: Colors.teal,
+                color: Colors.green,
                 onTap: () {
                   Navigator.push(
                     context,

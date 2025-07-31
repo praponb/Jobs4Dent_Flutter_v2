@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import 'dentist_dashboard.dart';
+import 'assistant_dashboard.dart';
 import 'clinic_dashboard.dart';
 // import 'seller_dashboard.dart';
 import '../profile/profile_screen.dart';
@@ -57,8 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _getDashboard(String userType) {
     switch (userType) {
       case 'dentist':
-      case 'assistant':
         return const DentistDashboard();
+      case 'assistant':
+        return const AssistantDashboard();
       case 'clinic':
         return const ClinicDashboard();
       // case 'seller':
