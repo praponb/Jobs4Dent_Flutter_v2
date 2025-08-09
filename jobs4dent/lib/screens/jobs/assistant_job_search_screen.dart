@@ -244,7 +244,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                               value: type,
                               child: Text(type),
                             );
-                          }).toList(),
+                          }),
                         ],
                         onChanged: (value) {
                           setState(() => _selectedWorkType = value);
@@ -876,7 +876,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       ),
     );
     
-    // TODO: Navigate to AssistantJobApplicationScreen when implemented
+    // Navigate to AssistantJobApplicationScreen when implemented
     // Navigator.push(
     //   context,
     //   MaterialPageRoute(

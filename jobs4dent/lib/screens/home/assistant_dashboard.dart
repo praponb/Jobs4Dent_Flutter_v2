@@ -3,10 +3,11 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/job_provider.dart';
 import '../profile/profile_screen.dart';
-import '../jobs/assistant_job_search_screen.dart';
 import '../jobs/my_applications_screen.dart';
 import '../profile/assistant_mini_resume_screen.dart';
 import '../profile/document_verification_screen.dart';
+import '../jobs/assistant_job_posting_screen.dart';
+import '../jobs/assistant_job_search_screen.dart';
 import 'dashboard_utils.dart';
 import 'dentist_data_processor.dart';
 
@@ -21,7 +22,12 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Defer provider-loading until after first frame to avoid notify during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadData();
+      }
+    });
   }
 
   Future<void> _loadData() async {
@@ -295,6 +301,7 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
                 icon: Icons.search,
                 color: const Color(0xFF2196F3),
                 onTap: () {
+                  debugPrint('AssistantDashboard: Navigating to AssistantJobSearchScreen');
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const AssistantJobSearchScreen()),
@@ -353,6 +360,26 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
             ),
           ],
         ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                title: 'ประกาศงานผู้ช่วย',
+                subtitle: 'สร้างประกาศให้คลินิก',
+                icon: Icons.post_add,
+                color: Colors.purple,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AssistantJobPostingScreen()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        
       ],
     );
   }
