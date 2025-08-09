@@ -61,6 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
         return const DentistDashboard();
       case 'assistant':
         return const AssistantDashboard();
+      case 'admin':
+        // Treat admin as assistant for dashboard access
+        return const AssistantDashboard();
       case 'clinic':
         return const ClinicDashboard();
       // case 'seller':
@@ -96,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (userType) {
       case 'dentist':
       case 'assistant':
+      case 'admin':
         items = [
           const BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),

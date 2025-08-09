@@ -22,7 +22,12 @@ class _DentistDashboardState extends State<DentistDashboard> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Defer provider-loading until after first frame to avoid notify during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadData();
+      }
+    });
   }
 
   Future<void> _loadData() async {

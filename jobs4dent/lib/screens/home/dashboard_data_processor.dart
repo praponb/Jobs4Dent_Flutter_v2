@@ -7,14 +7,25 @@ import '../../models/job_application_model.dart';
 class DashboardDataProcessor {
   /// Calculate key metrics from jobs and applications
   static DashboardMetrics calculateMetrics(
-    List<JobModel> jobs,
+    List<JobModel> dentistJobs,
+    List<AssistantJobModel> assistantJobs,
     List<JobApplicationModel> applications,
   ) {
-    final activeJobs = jobs.where((job) => job.isActive).length;
-    final expiredJobs = jobs.where((job) => 
+    final activeDentistJobs = dentistJobs.where((job) => job.isActive).length;
+    final activeAssistantJobs = assistantJobs.where((job) => job.isActive).length;
+    final activeJobs = activeDentistJobs + activeAssistantJobs;
+
+    // Expired is based on dentist jobs only (assistant jobs have no deadline field)
+    final expiredJobs = dentistJobs.where((job) =>
         job.deadline != null && job.deadline!.isBefore(DateTime.now())).length;
-    final filledJobs = jobs.where((job) => 
+
+    // Filled jobs = jobs (dentist + assistant) with at least one 'hired' application
+    final filledDentistJobs = dentistJobs.where((job) =>
         applications.any((app) => app.jobId == job.jobId && app.status == 'hired')).length;
+    final filledAssistantJobs = assistantJobs.where((job) =>
+        applications.any((app) => app.jobId == job.jobId && app.status == 'hired')).length;
+    final filledJobs = filledDentistJobs + filledAssistantJobs;
+
     final totalApplications = applications.length;
 
     return DashboardMetrics(

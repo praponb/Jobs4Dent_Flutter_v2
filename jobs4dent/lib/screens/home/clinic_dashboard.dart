@@ -83,6 +83,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
 
           final metrics = DashboardDataProcessor.calculateMetrics(
             jobProvider.myPostedJobs,
+            jobProvider.myPostedAssistantJobs,
             jobProvider.applicantsForMyJobs,
           );
 

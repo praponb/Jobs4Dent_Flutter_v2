@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/assistant_job_model.dart';
 import 'assistant_job_constants.dart';
-// import 'job_posting_form_widgets.dart';
+import 'job_posting_form_widgets.dart';
+import 'job_posting_constants.dart';
+import 'job_posting_utils.dart';
 
 class AssistantJobPostingScreen extends StatefulWidget {
   final AssistantJobModel? jobToEdit;
@@ -30,6 +32,13 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
   final _workTimeEndController = TextEditingController();
   final _perkController = TextEditingController();
   final _perkPostController = TextEditingController();
+
+  //--------------------Add manually by Aek---------------------------------------
+  String _selectedProvinceZones = JobPostingConstants.thaiProvinceZones.first;
+  String _selectedLocationZones = JobPostingConstants.thaiLocationZones.first.first;
+  String _selectedTrainLine = JobPostingConstants.thaiTrainLines.last;
+  String _selectedTrainStation = JobPostingConstants.thaiTrainStations.last.first;
+  //-------------------------------------------------------------------------------
 
   // State variables
   bool _isLoading = false;
@@ -98,18 +107,8 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // หัวข้อโพส Section
-              // _buildSectionHeader('หัวข้อโพส'),
-              // const SizedBox(height: 16),
-              _buildTextFormField(
-                controller: _clinicNameAndBranchController,
-                label: 'ชื่อคลินิกและสาขา',
-                hintText: 'คลินิกที่รับสมัคร',
-                maxLength: 80,
-                validator: (value) => _requiredValidator(value, 'Branch'),
-              ),
-
+              _buildSectionHeader('หัวข้อโพส'),
               const SizedBox(height: 16),
-
               // Title Post
               _buildTextFormField(
                 controller: _titlePostController,
@@ -118,9 +117,62 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
                 maxLength: 180,
                 validator: (value) => _requiredValidator(value, 'หัวข้อโพส'),
               ),
-
               const SizedBox(height: 24),
+              _buildTextFormField(
+                controller: _clinicNameAndBranchController,
+                label: 'ชื่อคลินิกและสาขา',
+                hintText: 'คลินิกที่รับสมัคร',
+                maxLength: 80,
+                validator: (value) => _requiredValidator(value, 'Branch'),
+              ),
+              const SizedBox(height: 16),
 
+  //--------------------Add manually by Aek---------------------------------------
+              // Location Information Section
+              JobPostingFormWidgets.buildSectionHeader(context, 'ข้อมูลสถานที่'),
+              const SizedBox(height: 16),
+
+              // Province
+              JobPostingFormWidgets.buildDropdownField<String>(
+                'โซนที่ตั้ง',
+                _selectedProvinceZones,
+                JobPostingConstants.thaiProvinceZones,
+                (value) => _onProvinceChanged(value!),
+                isRequired: true,
+              ),
+              const SizedBox(height: 16),
+
+              // City/Location Zone
+              JobPostingFormWidgets.buildDropdownField<String>(
+                'จังหวัด/โซนในจังหวัด',
+                JobPostingUtils.getValidLocationZone(_selectedProvinceZones, _selectedLocationZones),
+                JobPostingUtils.getCurrentLocationZones(_selectedProvinceZones),
+                (value) => setState(() => _selectedLocationZones = value!),
+                isRequired: true,
+              ),
+              const SizedBox(height: 16),
+
+              // Train Line
+              JobPostingFormWidgets.buildDropdownField<String>(
+                'รถไฟฟ้า',
+                _selectedTrainLine,
+                JobPostingConstants.thaiTrainLines,
+                (value) => _onTrainLineChanged(value!),
+                isRequired: true,
+              ),
+              const SizedBox(height: 16),
+
+              // Train Station
+              JobPostingFormWidgets.buildDropdownField<String>(
+                'สถานีรถไฟฟ้า',
+                JobPostingUtils.getValidTrainStation(_selectedTrainLine, _selectedTrainStation),
+                JobPostingUtils.getCurrentTrainStations(_selectedTrainLine),
+                (value) => setState(() => _selectedTrainStation = value!),
+                isRequired: true,
+              ),
+              const SizedBox(height: 24),
+  //-------------------------------------------------------------------------------
+  
               // ประเภทงาน Section
               _buildSectionHeader('ประเภทงาน'),
               const SizedBox(height: 16),
@@ -514,7 +566,31 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
       // ),
     ];
   }
+  //--------------------Add manually by Aek---------------------------------------
+  void _onProvinceChanged(String newProvince) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _selectedProvinceZones = newProvince;
+        final newLocations = JobPostingUtils.getCurrentLocationZones(newProvince);
+        if (newLocations.isNotEmpty) {
+          _selectedLocationZones = newLocations.first;
+        }
+      });
+    });
+  }
 
+  void _onTrainLineChanged(String newTrainLine) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _selectedTrainLine = newTrainLine;
+        final newStations = JobPostingUtils.getCurrentTrainStations(newTrainLine);
+        if (newStations.isNotEmpty) {
+          _selectedTrainStation = newStations.first;
+        }
+      });
+    });
+  }
+//---------------------------------------------------------------------------------
   Widget _buildDropdownField({
     required String value,
     required List<String> items,
