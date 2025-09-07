@@ -431,20 +431,32 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: job.workType == 'Full-time' ? Colors.green.shade50 : Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      job.workType,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: job.workType == 'Full-time' ? Colors.green.shade700 : Colors.orange.shade700,
-                        fontWeight: FontWeight.w500,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: job.workType == 'Full-time' ? Colors.green.shade50 : Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          job.workType,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: job.workType == 'Full-time' ? Colors.green.shade700 : Colors.orange.shade700,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () => _showReportDialog(job),
+                        icon: const Icon(Icons.flag_outlined, size: 20),
+                        color: Colors.red,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -470,35 +482,47 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  children: job.skillAssistant.take(3).map((skill) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(4),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: job.skillAssistant.take(3).map((skill) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            skill,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    if (job.skillAssistant.length > 3) ...[
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: job.skillAssistant.skip(3).map((skill) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              skill,
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                          );
+                        }).toList(),
                       ),
-                      child: Text(
-                        skill,
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                    );
-                  }).toList()..addAll([
-                    if (job.skillAssistant.length > 3)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '+${job.skillAssistant.length - 3}',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                  ]),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 8),
               ],
@@ -852,6 +876,71 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       return formattedDays.join(', ');
     } else {
       return '${formattedDays.take(3).join(', ')} และอีก ${formattedDays.length - 3} วัน';
+    }
+  }
+
+  void _showReportDialog(AssistantJobModel job) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('รายงานโพสต์งาน'),
+          content: const Text('คุณต้องการรายงานโพสต์งานนี้ว่าไม่เหมาะสมหรือไม่?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _reportJob(job);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('รายงาน'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _reportJob(AssistantJobModel job) async {
+    try {
+      await _firestore.collection('job_posts_assistant').doc(job.jobId).update({
+        'reported': true,
+        'updatedAt': DateTime.now(),
+      });
+
+      // Update local state
+      setState(() {
+        final index = _jobs.indexWhere((j) => j.jobId == job.jobId);
+        if (index != -1) {
+          _jobs[index] = job.copyWith(reported: true);
+        }
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('รายงานโพสต์งานเรียบร้อยแล้ว'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error reporting job: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('เกิดข้อผิดพลาดในการรายงาน'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

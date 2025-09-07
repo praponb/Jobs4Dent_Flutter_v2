@@ -313,6 +313,13 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                       ),
                     ),
                   ),
+                  IconButton(
+                    onPressed: () => _showReportDialog(job),
+                    icon: const Icon(Icons.flag_outlined, size: 20),
+                    color: Colors.red,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -606,6 +613,61 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
         ],
       ),
     );
+  }
+
+  void _showReportDialog(JobModel job) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('รายงานโพสต์งาน'),
+          content: const Text('คุณต้องการรายงานโพสต์งานนี้ว่าไม่เหมาะสมหรือไม่?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _reportJob(job);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('รายงาน'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _reportJob(JobModel job) async {
+    try {
+      final jobProvider = Provider.of<JobProvider>(context, listen: false);
+      await jobProvider.reportJob(job.jobId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('รายงานโพสต์งานเรียบร้อยแล้ว'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error reporting job: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('เกิดข้อผิดพลาดในการรายงาน'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _applyForJob(JobModel job) {

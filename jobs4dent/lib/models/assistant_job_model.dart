@@ -22,6 +22,7 @@ class AssistantJobModel {
   
   // System fields
   final bool isActive;
+  final bool reported;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int applicationCount;
@@ -45,6 +46,7 @@ class AssistantJobModel {
     this.workTimeEnd,
     this.perk,
     this.isActive = true,
+    this.reported = false,
     required this.createdAt,
     required this.updatedAt,
     this.applicationCount = 0,
@@ -85,6 +87,7 @@ class AssistantJobModel {
       workTimeEnd: map['workTimeEnd'],
       perk: map['perk'],
       isActive: map['isActive'] ?? true,
+      reported: map['reported'] ?? false,
       createdAt: _parseTimestamp(map['createdAt']) ?? DateTime.now(),
       updatedAt: _parseTimestamp(map['updatedAt']) ?? DateTime.now(),
       applicationCount: map['applicationCount'] ?? 0,
@@ -130,6 +133,7 @@ class AssistantJobModel {
       'workTimeEnd': workTimeEnd,
       'perk': perk,
       'isActive': isActive,
+      'reported': reported,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'applicationCount': applicationCount,
@@ -155,6 +159,7 @@ class AssistantJobModel {
     String? workTimeEnd,
     String? perk,
     bool? isActive,
+    bool? reported,
     DateTime? createdAt,
     DateTime? updatedAt,
     int? applicationCount,
@@ -178,6 +183,7 @@ class AssistantJobModel {
       workTimeEnd: workTimeEnd ?? this.workTimeEnd,
       perk: perk ?? this.perk,
       isActive: isActive ?? this.isActive,
+      reported: reported ?? this.reported,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       applicationCount: applicationCount ?? this.applicationCount,
