@@ -786,4 +786,24 @@ class JobProvider with ChangeNotifier {
   void clearAdvancedSearchState() {
     _savedAdvancedSearchState = null;
   }
+
+  // Report a job as inappropriate
+  Future<void> reportJob(String jobId) async {
+    try {
+      await _firestore.collection('job_posts_dentist').doc(jobId).update({
+        'reported': true,
+        'updatedAt': DateTime.now().millisecondsSinceEpoch,
+      });
+
+      // Update local state if the job is in the current list
+      final index = _jobs.indexWhere((job) => job.jobId == jobId);
+      if (index != -1) {
+        _jobs[index] = _jobs[index].copyWith(reported: true);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error reporting job: $e');
+      rethrow;
+    }
+  }
 } 

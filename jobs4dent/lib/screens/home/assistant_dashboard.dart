@@ -6,7 +6,7 @@ import '../profile/profile_screen.dart';
 import '../jobs/my_applications_screen.dart';
 import '../profile/assistant_mini_resume_screen.dart';
 import '../profile/document_verification_screen.dart';
-import '../jobs/assistant_job_posting_screen.dart';
+// import '../jobs/assistant_job_posting_screen.dart';
 import '../jobs/assistant_job_search_screen.dart';
 import 'dashboard_utils.dart';
 import 'dentist_data_processor.dart';
@@ -361,25 +361,24 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
           ],
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionCard(
-                title: 'ประกาศงานผู้ช่วย',
-                subtitle: 'สร้างประกาศให้คลินิก',
-                icon: Icons.post_add,
-                color: Colors.purple,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AssistantJobPostingScreen()),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: _buildActionCard(
+        //         title: 'ประกาศงานผู้ช่วย',
+        //         subtitle: 'สร้างประกาศให้คลินิก',
+        //         icon: Icons.post_add,
+        //         color: Colors.purple,
+        //         onTap: () {
+        //           Navigator.push(
+        //             context,
+        //             MaterialPageRoute(builder: (context) => const AssistantJobPostingScreen()),
+        //           );
+        //         },
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
@@ -583,7 +582,7 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
               Icon(Icons.lightbulb, color: Colors.blue[700], size: 24),
               const SizedBox(width: 8),
               const Text(
-                'เทิบสำหรับการหางาน',
+                'คำแนะนำสำหรับการหางาน',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

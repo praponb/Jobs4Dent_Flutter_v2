@@ -32,6 +32,7 @@ class JobModel {
   final List<String> applicationIds;
   final int applicationCount;
   final bool isActive;
+  final bool reported;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deadline;
@@ -63,6 +64,7 @@ class JobModel {
     this.applicationIds = const [],
     this.applicationCount = 0,
     this.isActive = true,
+    this.reported = false,
     required this.createdAt,
     required this.updatedAt,
     this.deadline,
@@ -94,6 +96,7 @@ class JobModel {
       applicationIds: List<String>.from(map['applicationIds'] ?? []),
       applicationCount: map['applicationCount'] ?? 0,
       isActive: map['isActive'] ?? true,
+      reported: map['reported'] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] ?? 0),
       deadline: map['deadline'] != null ? DateTime.fromMillisecondsSinceEpoch(map['deadline']) : null,
@@ -139,6 +142,7 @@ class JobModel {
       'applicationIds': applicationIds,
       'applicationCount': applicationCount,
       'isActive': isActive,
+      'reported': reported,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'updatedAt': updatedAt.millisecondsSinceEpoch,
       'deadline': deadline?.millisecondsSinceEpoch,
@@ -170,6 +174,7 @@ class JobModel {
     List<String>? applicationIds,
     int? applicationCount,
     bool? isActive,
+    bool? reported,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? deadline,
@@ -199,6 +204,7 @@ class JobModel {
       applicationIds: applicationIds ?? this.applicationIds,
       applicationCount: applicationCount ?? this.applicationCount,
       isActive: isActive ?? this.isActive,
+      reported: reported ?? this.reported,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deadline: deadline ?? this.deadline,
