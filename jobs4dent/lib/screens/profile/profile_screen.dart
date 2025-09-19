@@ -44,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
                       // Profile Picture with Upload functionality
                       ProfilePhotoWidget(user: user),
                       const SizedBox(height: 16),
-                      
+
                       // User Name
                       Text(
                         user.userName,
@@ -55,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      
+
                       // User Type
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -67,7 +67,7 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          _getUserTypeLabel(user.currentRole),
+                          _getUserTypeLabel(user.userType),
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF2196F3),
@@ -75,63 +75,69 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      
-                      // Role switcher button (only show if user has multiple roles)
-                      if (user.roles.length > 1) ...[
-                        const SizedBox(height: 8),
-                        InkWell(
-                          onTap: () {
-                            // Navigate to role switcher
-                            final menuItems = ProfileMenuData.getMenuItems(user, context);
-                            final roleSwitcherItem = menuItems.firstWhere(
-                              (item) => item.title == 'เปลี่ยนบทบาท',
-                              orElse: () => throw StateError('Role switcher not found'),
-                            );
-                            roleSwitcherItem.onTap();
-                          },
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFF2196F3).withValues(alpha: 0.3),
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.swap_horiz,
-                                  size: 16,
-                                  color: Color(0xFF2196F3),
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'เปลี่ยนบทบาท',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF2196F3),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                SizedBox(width: 4),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 12,
-                                  color: Color(0xFF2196F3),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                      
+
+                      // // Role switcher button (show for users who can switch roles)
+                      // if (_canSwitchRoles(user.userType)) ...[
+                      //   const SizedBox(height: 8),
+                      //   InkWell(
+                      //     onTap: () {
+                      //       // Navigate to role switcher
+                      //       final menuItems = ProfileMenuData.getMenuItems(
+                      //         user,
+                      //         context,
+                      //       );
+                      //       final roleSwitcherItem = menuItems.firstWhere(
+                      //         (item) => item.title == 'เปลี่ยนบทบาท',
+                      //         orElse: () =>
+                      //             throw StateError('Role switcher not found'),
+                      //       );
+                      //       roleSwitcherItem.onTap();
+                      //     },
+                      //     borderRadius: BorderRadius.circular(8),
+                      //     child: Container(
+                      //       padding: const EdgeInsets.symmetric(
+                      //         horizontal: 12,
+                      //         vertical: 8,
+                      //       ),
+                      //       decoration: BoxDecoration(
+                      //         border: Border.all(
+                      //           color: const Color(
+                      //             0xFF2196F3,
+                      //           ).withValues(alpha: 0.3),
+                      //         ),
+                      //         borderRadius: BorderRadius.circular(8),
+                      //       ),
+                      //       child:
+                      //       // const Row(
+                      //       //   mainAxisSize: MainAxisSize.min,
+                      //       //   children: [
+                      //       //     Icon(
+                      //       //       Icons.swap_horiz,
+                      //       //       size: 16,
+                      //       //       color: Color(0xFF2196F3),
+                      //       //     ),
+                      //       //     SizedBox(width: 4),
+                      //       //     Text(
+                      //       //       'เปลี่ยนบทบาท',
+                      //       //       style: TextStyle(
+                      //       //         fontSize: 12,
+                      //       //         color: Color(0xFF2196F3),
+                      //       //         fontWeight: FontWeight.w500,
+                      //       //       ),
+                      //       //     ),
+                      //       //     SizedBox(width: 4),
+                      //       //     Icon(
+                      //       //       Icons.arrow_forward_ios,
+                      //       //       size: 12,
+                      //       //       color: Color(0xFF2196F3),
+                      //       //     ),
+                      //       //   ],
+                      //       // ),
+                      //     ),
+                      //   ),
+                      // ],
                       const SizedBox(height: 8),
-                      
+
                       // Email
                       Text(
                         user.email,
@@ -170,15 +176,13 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: Colors.red.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: const Row(
                         children: [
-                          Icon(
-                            Icons.logout,
-                            color: Colors.red,
-                            size: 20,
-                          ),
+                          Icon(Icons.logout, color: Colors.red, size: 20),
                           SizedBox(width: 12),
                           Text(
                             'ออกจากระบบ',
@@ -211,7 +215,7 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildMenuItems(dynamic user, BuildContext context) {
     final menuItems = ProfileMenuData.getMenuItems(user, context);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -230,13 +234,10 @@ class ProfileScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: isLast 
-                    ? null 
+                border: isLast
+                    ? null
                     : Border(
-                        bottom: BorderSide(
-                          color: Colors.grey[200]!,
-                          width: 1,
-                        ),
+                        bottom: BorderSide(color: Colors.grey[200]!, width: 1),
                       ),
               ),
               child: Row(
@@ -374,4 +375,18 @@ class ProfileScreen extends StatelessWidget {
         return userType;
     }
   }
-} 
+
+  bool _canSwitchRoles(String userType) {
+    // Define which user types can switch roles
+    switch (userType) {
+      case 'dentist':
+      case 'assistant':
+      case 'admin':
+        return true; // These user types can switch roles
+      case 'clinic':
+      case 'seller':
+      default:
+        return false; // These user types typically have one role
+    }
+  }
+}

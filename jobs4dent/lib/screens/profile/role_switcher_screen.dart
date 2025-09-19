@@ -16,15 +16,14 @@ class RoleSwitcherScreen extends StatelessWidget {
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           final userModel = authProvider.userModel;
-          
+
           if (userModel == null) {
-            return const Center(
-              child: Text('ไม่มีข้อมูลผู้ใช้'),
-            );
+            return const Center(child: Text('ไม่มีข้อมูลผู้ใช้'));
           }
 
-          final availableRoles = userModel.roles;
-          final currentRole = userModel.currentRole;
+          // Define available roles based on user type
+          final availableRoles = _getAvailableRoles(userModel.userType);
+          final currentRole = userModel.userType;
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -40,7 +39,7 @@ class RoleSwitcherScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -84,39 +83,46 @@ class RoleSwitcherScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   Expanded(
                     child: ListView.builder(
                       itemCount: availableRoles.length,
                       itemBuilder: (context, index) {
                         final role = availableRoles[index];
                         final isCurrentRole = role == currentRole;
-                        
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           child: InkWell(
-                            onTap: isCurrentRole ? null : () async {
-                              final success = await authProvider.switchRole(role);
-                              if (success && context.mounted) {
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('เปลี่ยนเป็น ${_getRoleTitle(role)} แล้ว'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              }
-                            },
+                            onTap: isCurrentRole
+                                ? null
+                                : () async {
+                                    final success = await authProvider
+                                        .switchRole(role);
+                                    if (success && context.mounted) {
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'เปลี่ยนเป็น ${_getRoleTitle(role)} แล้ว',
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    }
+                                  },
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: isCurrentRole 
+                                color: isCurrentRole
                                     ? Colors.grey[100]
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: isCurrentRole 
+                                  color: isCurrentRole
                                       ? Colors.grey[300]!
                                       : Colors.grey[200]!,
                                 ),
@@ -125,7 +131,7 @@ class RoleSwitcherScreen extends StatelessWidget {
                                 children: [
                                   Icon(
                                     _getRoleIcon(role),
-                                    color: isCurrentRole 
+                                    color: isCurrentRole
                                         ? Colors.grey[500]
                                         : const Color(0xFF2196F3),
                                     size: 24,
@@ -133,14 +139,15 @@ class RoleSwitcherScreen extends StatelessWidget {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           _getRoleTitle(role),
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
-                                            color: isCurrentRole 
+                                            color: isCurrentRole
                                                 ? Colors.grey[500]
                                                 : Colors.black87,
                                           ),
@@ -297,4 +304,35 @@ class RoleSwitcherScreen extends StatelessWidget {
         return 'บทบาทมืออาชีพ';
     }
   }
-} 
+
+  List<String> _getAvailableRoles(String userType) {
+    // Define available roles based on user type
+    // You can customize this based on your business requirements
+    switch (userType) {
+      case 'dentist':
+        return [
+          'dentist',
+          'assistant',
+        ]; // Dentists can switch to assistant role
+      case 'assistant':
+        return [
+          'assistant',
+          'dentist',
+        ]; // Assistants can switch to dentist role
+      case 'clinic':
+        return ['clinic']; // Clinics typically have one role
+      case 'seller':
+        return ['seller']; // Sellers typically have one role
+      case 'admin':
+        return [
+          'admin',
+          'dentist',
+          'assistant',
+          'clinic',
+          'seller',
+        ]; // Admins can switch to any role
+      default:
+        return [userType]; // Default to current user type
+    }
+  }
+}

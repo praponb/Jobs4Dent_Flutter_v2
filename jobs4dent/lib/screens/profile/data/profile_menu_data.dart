@@ -4,7 +4,7 @@ import '../../../models/user_model.dart';
 // import '../skills_specialties_screen.dart';
 // import '../work_location_preference_screen.dart';
 // import '../branch_management_screen.dart';
-import '../role_switcher_screen.dart';
+// import '../role_switcher_screen.dart';
 import '../document_verification_screen.dart';
 // import '../dentist_mini_resume_screen.dart';
 // import '../assistant_mini_resume_screen.dart';
@@ -30,7 +30,10 @@ class ProfileMenuItem {
 }
 
 class ProfileMenuData {
-  static List<ProfileMenuItem> getMenuItems(UserModel user, BuildContext context) {
+  static List<ProfileMenuItem> getMenuItems(
+    UserModel user,
+    BuildContext context,
+  ) {
     List<ProfileMenuItem> items = [];
 
     // Common menu items for all users
@@ -74,29 +77,35 @@ class ProfileMenuData {
         icon: Icons.verified_user,
         title: 'การตรวจสอบตัวตน',
         subtitle: _getVerificationSubtitle(user.verificationStatus),
-        showBadge: user.verificationStatus == 'unverified' || user.verificationStatus == 'rejected',
-        badgeColor: user.verificationStatus == 'rejected' ? Colors.red : Colors.orange,
+        showBadge:
+            user.verificationStatus == 'unverified' ||
+            user.verificationStatus == 'rejected',
+        badgeColor: user.verificationStatus == 'rejected'
+            ? Colors.red
+            : Colors.orange,
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const DocumentVerificationScreen()),
+          MaterialPageRoute(
+            builder: (context) => const DocumentVerificationScreen(),
+          ),
         ),
       ),
     ]);
 
-    // Role management for multi-role users
-    if (user.roles.length > 1) {
-      items.add(
-        ProfileMenuItem(
-          icon: Icons.swap_horiz,
-          title: 'เปลี่ยนบทบาท',
-          subtitle: 'เปลี่ยนระหว่างบทบาทของคุณ',
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RoleSwitcherScreen()),
-          ),
-        ),
-      );
-    }
+    // // Role management for users who can switch roles
+    // if (_canSwitchRoles(user.userType)) {
+    //   items.add(
+    //     ProfileMenuItem(
+    //       icon: Icons.swap_horiz,
+    //       title: 'เปลี่ยนบทบาท',
+    //       subtitle: 'เปลี่ยนระหว่างบทบาทของคุณ',
+    //       onTap: () => Navigator.push(
+    //         context,
+    //         MaterialPageRoute(builder: (context) => const RoleSwitcherScreen()),
+    //       ),
+    //     ),
+    //   );
+    // }
 
     return items;
   }
@@ -185,4 +194,18 @@ class ProfileMenuData {
         return 'ยังไม่ได้ตรวจสอบ - โปรดอัปโหลดเอกสาร';
     }
   }
-} 
+
+  static bool _canSwitchRoles(String userType) {
+    // Define which user types can switch roles
+    switch (userType) {
+      case 'dentist':
+      case 'assistant':
+      case 'admin':
+        return true; // These user types can switch roles
+      case 'clinic':
+      case 'seller':
+      default:
+        return false; // These user types typically have one role
+    }
+  }
+}
