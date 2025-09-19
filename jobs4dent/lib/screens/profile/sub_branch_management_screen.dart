@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
-//import 'create_sub_user_screen.dart';
 
 class SubBranchManagementScreen extends StatefulWidget {
   const SubBranchManagementScreen({super.key});
 
   @override
-  State<SubBranchManagementScreen> createState() => _SubBranchManagementScreenState();
+  State<SubBranchManagementScreen> createState() =>
+      _SubBranchManagementScreenState();
 }
 
 class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
@@ -41,17 +41,13 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           final userModel = authProvider.userModel;
-          
+
           if (userModel == null || userModel.userType != 'clinic') {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.block,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
+                  Icon(Icons.block, size: 64, color: Colors.grey),
                   SizedBox(height: 16),
                   Text(
                     'ไม่อนุญาตให้เข้าถึง',
@@ -72,9 +68,7 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
           }
 
           if (_isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           return RefreshIndicator(
@@ -87,11 +81,7 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                   // Header
                   Row(
                     children: [
-                      Icon(
-                        Icons.business,
-                        color: Colors.grey[600],
-                        size: 24,
-                      ),
+                      Icon(Icons.business, color: Colors.grey[600], size: 24),
                       const SizedBox(width: 8),
                       Text(
                         userModel.clinicName ?? 'คลินิกของฉัน',
@@ -102,19 +92,16 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   Text(
                     'จัดการบัญชีสาขาและสิทธิ์การเข้าถึงของคุณ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Stats
                   Row(
                     children: [
@@ -122,7 +109,9 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                            color: const Color(
+                              0xFF2196F3,
+                            ).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(
@@ -181,20 +170,17 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Sub-users list
                   const Text(
                     'บัญชีสาขา',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   if (_subUsers.isEmpty) ...[
                     Expanded(
                       child: Center(
@@ -218,9 +204,7 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                             const SizedBox(height: 8),
                             Text(
                               'สร้างบัญชีสาขาเพื่อจัดการคลินิกหลายแห่ง',
-                              style: TextStyle(
-                                color: Colors.grey[500],
-                              ),
+                              style: TextStyle(color: Colors.grey[500]),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -250,15 +234,21 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                                         Container(
                                           padding: const EdgeInsets.all(8),
                                           decoration: BoxDecoration(
-                                            color: subUser.isActive 
-                                                ? Colors.green.withValues(alpha: 0.1)
-                                                : Colors.grey.withValues(alpha: 0.1),
-                                            borderRadius: BorderRadius.circular(8),
+                                            color: subUser.isActive
+                                                ? Colors.green.withValues(
+                                                    alpha: 0.1,
+                                                  )
+                                                : Colors.grey.withValues(
+                                                    alpha: 0.1,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: Icon(
                                             Icons.store_mall_directory,
-                                            color: subUser.isActive 
-                                                ? Colors.green 
+                                            color: subUser.isActive
+                                                ? Colors.green
                                                 : Colors.grey,
                                             size: 20,
                                           ),
@@ -266,7 +256,8 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 subUser.branchName ?? 'สาขา',
@@ -276,7 +267,8 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                subUser.branchAddress ?? 'ไม่มีที่อยู่',
+                                                subUser.branchAddress ??
+                                                    'ไม่มีที่อยู่',
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.grey[600],
@@ -291,17 +283,25 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: subUser.isActive 
-                                                ? Colors.green.withValues(alpha: 0.1)
-                                                : Colors.red.withValues(alpha: 0.1),
-                                            borderRadius: BorderRadius.circular(12),
+                                            color: subUser.isActive
+                                                ? Colors.green.withValues(
+                                                    alpha: 0.1,
+                                                  )
+                                                : Colors.red.withValues(
+                                                    alpha: 0.1,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                           child: Text(
-                                            subUser.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
+                                            subUser.isActive
+                                                ? 'เปิดใช้งาน'
+                                                : 'ปิดใช้งาน',
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
-                                              color: subUser.isActive 
+                                              color: subUser.isActive
                                                   ? Colors.green[700]
                                                   : Colors.red[700],
                                             ),
@@ -309,9 +309,9 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                                         ),
                                       ],
                                     ),
-                                    
+
                                     const SizedBox(height: 12),
-                                    
+
                                     Row(
                                       children: [
                                         Icon(
@@ -346,28 +346,28 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
                                         ),
                                       ],
                                     ),
-                                    
+
                                     const SizedBox(height: 8),
-                                    
+
                                     Row(
                                       children: [
                                         Icon(
-                                          subUser.isEmailVerified 
-                                              ? Icons.verified_user 
+                                          subUser.isEmailVerified
+                                              ? Icons.verified_user
                                               : Icons.warning,
                                           size: 16,
-                                          color: subUser.isEmailVerified 
-                                              ? Colors.green 
+                                          color: subUser.isEmailVerified
+                                              ? Colors.green
                                               : Colors.orange,
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          subUser.isEmailVerified 
-                                                              ? 'อีเมลยืนยันแล้ว'
-                : 'อีเมลยังไม่ยืนยัน',
+                                          subUser.isEmailVerified
+                                              ? 'อีเมลยืนยันแล้ว'
+                                              : 'อีเมลยังไม่ยืนยัน',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: subUser.isEmailVerified 
+                                            color: subUser.isEmailVerified
                                                 ? Colors.green[700]
                                                 : Colors.orange[700],
                                           ),
@@ -403,4 +403,4 @@ class _SubBranchManagementScreenState extends State<SubBranchManagementScreen> {
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
-} 
+}

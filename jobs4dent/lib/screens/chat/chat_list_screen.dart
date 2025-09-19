@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import '../../models/chat_model.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/auth_provider.dart';
-// import 'chat_room_screen.dart'; // Note: Chat room screen implementation pending
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -26,14 +25,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   Future<void> _loadChatRooms() async {
     setState(() => _isLoading = true);
-    
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    
+
     if (authProvider.userModel != null) {
       await chatProvider.loadChatRooms(authProvider.userModel!.userId);
     }
-    
+
     setState(() => _isLoading = false);
   }
 
@@ -63,7 +62,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
             return const Center(child: Text('กรุณาเข้าสู่ระบบเพื่อดูข้อความ'));
           }
 
-          final filteredChatRooms = _getFilteredChatRooms(chatProvider.chatRooms);
+          final filteredChatRooms = _getFilteredChatRooms(
+            chatProvider.chatRooms,
+          );
 
           if (filteredChatRooms.isEmpty) {
             return _buildEmptyState();
@@ -126,11 +127,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             _searchQuery.isNotEmpty ? 'ไม่พบข้อความ' : 'ยังไม่มีข้อความ',
@@ -142,13 +139,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            _searchQuery.isNotEmpty 
+            _searchQuery.isNotEmpty
                 ? 'ลองปรับเปลี่ยนคำค้นหา'
                 : 'เริ่มแชทโดยการสมัครงาน',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
             textAlign: TextAlign.center,
           ),
           if (_searchQuery.isNotEmpty) ...[
@@ -174,10 +168,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   Widget _buildChatRoomItem(ChatRoom chatRoom, String currentUserId) {
     final isUnread = chatRoom.unreadCount > 0;
-    final otherParticipantName = chatRoom.clinicId == currentUserId 
-        ? chatRoom.applicantName 
+    final otherParticipantName = chatRoom.clinicId == currentUserId
+        ? chatRoom.applicantName
         : chatRoom.clinicName;
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       elevation: isUnread ? 2 : 1,
@@ -187,7 +181,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             CircleAvatar(
               backgroundColor: const Color(0xFF1976D2),
               child: Text(
-                otherParticipantName.isNotEmpty 
+                otherParticipantName.isNotEmpty
                     ? otherParticipantName[0].toUpperCase()
                     : '?',
                 style: const TextStyle(
@@ -211,7 +205,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     minHeight: 16,
                   ),
                   child: Text(
-                    chatRoom.unreadCount > 99 ? '99+' : chatRoom.unreadCount.toString(),
+                    chatRoom.unreadCount > 99
+                        ? '99+'
+                        : chatRoom.unreadCount.toString(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -265,7 +261,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     Icon(
                       _getMessageStatusIcon(chatRoom.lastMessage!.status),
                       size: 16,
-                      color: _getMessageStatusColor(chatRoom.lastMessage!.status),
+                      color: _getMessageStatusColor(
+                        chatRoom.lastMessage!.status,
+                      ),
                     ),
                   if (chatRoom.lastMessage!.senderId == currentUserId)
                     const SizedBox(width: 4),
@@ -275,7 +273,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         color: isUnread ? Colors.black : Colors.grey[600],
-                        fontWeight: isUnread ? FontWeight.w500 : FontWeight.normal,
+                        fontWeight: isUnread
+                            ? FontWeight.w500
+                            : FontWeight.normal,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -287,7 +287,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ],
         ),
         onTap: () => _openChatRoom(chatRoom),
-        trailing: isUnread 
+        trailing: isUnread
             ? const Icon(Icons.circle, color: Colors.red, size: 8)
             : null,
       ),
@@ -334,20 +334,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
   void _openChatRoom(ChatRoom chatRoom) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    
+
     // Mark messages as read
     if (authProvider.userModel != null) {
       await chatProvider.markMessagesAsRead(
-        chatRoom.chatRoomId, 
+        chatRoom.chatRoomId,
         authProvider.userModel!.userId,
       );
     }
-    
+
     if (mounted) {
-              // Note: Chat room screen navigation pending implementation
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ฟีเจอร์แชทจะมาเร็วๆ นี้!')),
-      );
+      // Note: Chat room screen navigation pending implementation
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('ฟีเจอร์แชทจะมาเร็วๆ นี้!')));
     }
   }
 
@@ -355,20 +355,24 @@ class _ChatListScreenState extends State<ChatListScreen> {
     if (_searchQuery.isEmpty) {
       return chatRooms;
     }
-    
+
     final query = _searchQuery.toLowerCase();
     return chatRooms.where((chatRoom) {
       return chatRoom.clinicName.toLowerCase().contains(query) ||
-             chatRoom.applicantName.toLowerCase().contains(query) ||
-             chatRoom.jobTitle.toLowerCase().contains(query);
+          chatRoom.applicantName.toLowerCase().contains(query) ||
+          chatRoom.jobTitle.toLowerCase().contains(query);
     }).toList();
   }
 
   String _formatMessageTime(DateTime timestamp) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final messageDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
-    
+    final messageDate = DateTime(
+      timestamp.year,
+      timestamp.month,
+      timestamp.day,
+    );
+
     if (messageDate == today) {
       return DateFormat('HH:mm').format(timestamp);
     } else if (messageDate == today.subtract(const Duration(days: 1))) {
@@ -428,4 +432,4 @@ class _ChatListScreenState extends State<ChatListScreen> {
     _searchController.dispose();
     super.dispose();
   }
-} 
+}

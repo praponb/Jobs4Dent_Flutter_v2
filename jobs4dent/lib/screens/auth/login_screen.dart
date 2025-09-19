@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     bool success = await authProvider.signInWithEmail(
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _signInWithGoogle() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     bool success = await authProvider.signInWithGoogle();
     if (success && mounted) {
       _navigateAfterSignIn(authProvider);
@@ -81,9 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     }
   }
@@ -102,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 40),
-                  
+
                   // Logo and Title Section
                   Column(
                     children: [
@@ -114,7 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(50),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF2196F3).withValues(alpha: 0.3),
+                              color: const Color(
+                                0xFF2196F3,
+                              ).withValues(alpha: 0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -139,17 +139,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       const Text(
                         'ประตูสู่โอกาสในการทำงานด้านทันตกรรม',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                         textAlign: TextAlign.center,
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 60),
-                  
+
                   // Welcome Text
                   const Text(
                     'ยินดีต้อนรับกลับมา!',
@@ -163,13 +160,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 8),
                   const Text(
                     'เข้าสู่ระบบเพื่อเข้าถึงบัญชีของคุณ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
-                  
+
                   const SizedBox(height: 40),
 
                   // Sign-in method toggle
@@ -180,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Row(
                       children: [
-                       Expanded(
+                        Expanded(
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -190,15 +184,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
-                                color: _isEmailLogin 
-                                    ? const Color(0xFF2196F3) 
+                                color: _isEmailLogin
+                                    ? const Color(0xFF2196F3)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 'อีเมลและรหัสผ่าน',
                                 style: TextStyle(
-                                  color: _isEmailLogin ? Colors.white : Colors.grey[600],
+                                  color: _isEmailLogin
+                                      ? Colors.white
+                                      : Colors.grey[600],
                                   fontWeight: FontWeight.w600,
                                 ),
                                 textAlign: TextAlign.center,
@@ -234,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fillColor: Colors.grey[50],
                             ),
                           ),
-                          
+
                           const SizedBox(height: 16),
 
                           // Password Field
@@ -247,7 +243,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               prefixIcon: const Icon(Icons.lock),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                  _obscurePassword
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -273,7 +271,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const ForgotPasswordScreen(),
+                                    builder: (context) =>
+                                        const ForgotPasswordScreen(),
                                   ),
                                 );
                               },
@@ -291,7 +290,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Email Sign-in Button
                           ElevatedButton(
-                            onPressed: authProvider.isLoading ? null : _signInWithEmail,
+                            onPressed: authProvider.isLoading
+                                ? null
+                                : _signInWithEmail,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF2196F3),
                               foregroundColor: Colors.white,
@@ -307,7 +308,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
                                     ),
                                   )
                                 : const Text(
@@ -324,14 +327,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ] else ...[
                     // Google Sign In Button
                     ElevatedButton.icon(
-                      onPressed: authProvider.isLoading ? null : _signInWithGoogle,
+                      onPressed: authProvider.isLoading
+                          ? null
+                          : _signInWithGoogle,
                       icon: authProvider.isLoading
                           ? const SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : const Icon(
@@ -340,7 +347,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               size: 24,
                             ),
                       label: Text(
-                        authProvider.isLoading ? 'กำลังเข้าสู่ระบบ...' : 'ดำเนินการต่อด้วย Google',
+                        authProvider.isLoading
+                            ? 'กำลังเข้าสู่ระบบ...'
+                            : 'ดำเนินการต่อด้วย Google',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -357,7 +366,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
-                  
+
                   const SizedBox(height: 24),
 
                   // Create Account Link
@@ -387,9 +396,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Error Message
                   if (authProvider.error != null) ...[
                     Container(
@@ -423,7 +432,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                   ],
-                  
+
                   // Features List
                   const Column(
                     children: [
@@ -437,10 +446,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: 'เชื่อมต่อกับผู้เชี่ยวชาญทันตกรรม',
                       ),
                       SizedBox(height: 12),
-                      // _FeatureItem(
-                      //   icon: Icons.store,
-                      //   text: 'เข้าถึงตลาดเครื่องมือทันตกรรม',
-                      // ),
                     ],
                   ),
                 ],
@@ -457,10 +462,7 @@ class _FeatureItem extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _FeatureItem({
-    required this.icon,
-    required this.text,
-  });
+  const _FeatureItem({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -472,21 +474,11 @@ class _FeatureItem extends StatelessWidget {
             color: const Color(0xFF2196F3).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            color: const Color(0xFF2196F3),
-            size: 20,
-          ),
+          child: Icon(icon, color: const Color(0xFF2196F3), size: 20),
         ),
         const SizedBox(width: 12),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
-        ),
+        Text(text, style: const TextStyle(fontSize: 14, color: Colors.grey)),
       ],
     );
   }
-} 
+}

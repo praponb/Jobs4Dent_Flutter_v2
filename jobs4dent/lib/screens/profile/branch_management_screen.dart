@@ -5,7 +5,6 @@ import '../../providers/branch_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/branch_model.dart';
 import 'branch_edit_screen.dart';
-// import 'branch_map_view_screen.dart';
 
 class BranchManagementScreen extends StatefulWidget {
   const BranchManagementScreen({super.key});
@@ -22,22 +21,31 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
   }
 
   Future<void> _loadBranchesOnInit() async {
-    debugPrint('Branch Management Screen initialized - loading branches for first time');
+    debugPrint(
+      'Branch Management Screen initialized - loading branches for first time',
+    );
     await _loadBranches();
   }
 
   Future<void> _loadBranches() async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final branchProvider = Provider.of<BranchProvider>(context, listen: false);
+      final branchProvider = Provider.of<BranchProvider>(
+        context,
+        listen: false,
+      );
       final user = authProvider.userModel;
 
       if (user != null) {
-        debugPrint('Loading branches from Firestore collection "branches" for user: ${user.userId}');
+        debugPrint(
+          'Loading branches from Firestore collection "branches" for user: ${user.userId}',
+        );
         await branchProvider.loadBranchesForClinic(user.userId);
-        
+
         if (mounted) {
-          debugPrint('Successfully loaded ${branchProvider.branches.length} branches from Firestore');
+          debugPrint(
+            'Successfully loaded ${branchProvider.branches.length} branches from Firestore',
+          );
         }
       } else {
         debugPrint('User not found - cannot load branches');
@@ -81,10 +89,10 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
 
       final double latitude = branch.coordinates!.latitude;
       final double longitude = branch.coordinates!.longitude;
-      
+
       // Create Google Maps URL with coordinates and branch name as label
       final String encodedBranchName = Uri.encodeComponent(branch.branchName);
-      
+
       // Try different Google Maps URL formats for better compatibility
       final List<String> mapUrls = [
         // Google Maps app URL showing location with marker (not navigation)
@@ -102,14 +110,14 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
       // Try each URL until one works
       for (String mapUrl in mapUrls) {
         final Uri uri = Uri.parse(mapUrl);
-        
+
         if (await canLaunchUrl(uri)) {
           await launchUrl(
             uri,
             mode: LaunchMode.externalApplication, // Open in external app
           );
           mapOpened = true;
-          
+
           debugPrint('🗺️ Opened Google Maps for branch: ${branch.branchName}');
           debugPrint('📍 Coordinates: $latitude, $longitude');
           debugPrint('🔗 URL used: $mapUrl');
@@ -122,13 +130,14 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('ไม่สามารถเปิดแผนที่ได้ กรุณาตรวจสอบการติดตั้ง Google Maps'),
+              content: Text(
+                'ไม่สามารถเปิดแผนที่ได้ กรุณาตรวจสอบการติดตั้ง Google Maps',
+              ),
               backgroundColor: Colors.red,
             ),
           );
         }
       }
-
     } catch (e) {
       debugPrint('❌ Error opening Google Maps: $e');
       if (mounted) {
@@ -171,10 +180,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
                   SizedBox(height: 16),
                   Text(
                     'กำลังโหลดข้อมูลสาขาจาก Firebase...',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 ],
               ),
@@ -220,11 +226,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.business,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.business, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'ยังไม่มีข้อมูลสาขา',
@@ -237,10 +239,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
           const SizedBox(height: 8),
           Text(
             'เพิ่มสาขาแรกของคุณเพื่อให้ผู้สมัครงานเห็นข้อมูลที่ชัดเจน',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey[500]),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -264,11 +263,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 80,
-            color: Colors.red[400],
-          ),
+          Icon(Icons.error_outline, size: 80, color: Colors.red[400]),
           const SizedBox(height: 16),
           Text(
             'เกิดข้อผิดพลาด',
@@ -283,17 +278,17 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
               errorMessage,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
-              final branchProvider = Provider.of<BranchProvider>(context, listen: false);
+              final branchProvider = Provider.of<BranchProvider>(
+                context,
+                listen: false,
+              );
               branchProvider.clearError();
               _loadBranches();
             },
@@ -333,11 +328,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.business,
-                  color: Colors.blue[600],
-                  size: 24,
-                ),
+                Icon(Icons.business, color: Colors.blue[600], size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -409,7 +400,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
                 _buildDetailRow(
                   Icons.access_time,
                   'เวลาทำการ',
-                  branch.operatingHours.isNotEmpty 
+                  branch.operatingHours.isNotEmpty
                       ? _formatOperatingHours(branch.operatingHours)
                       : 'ไม่ได้ระบุ',
                 ),
@@ -419,7 +410,9 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
                 _buildDetailRow(
                   Icons.local_parking,
                   'ที่จอดรถ',
-                  branch.parkingInfo.isNotEmpty ? branch.parkingInfo : 'ไม่ได้ระบุ',
+                  branch.parkingInfo.isNotEmpty
+                      ? branch.parkingInfo
+                      : 'ไม่ได้ระบุ',
                 ),
                 const SizedBox(height: 12),
 
@@ -496,11 +489,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: Colors.grey[600],
-        ),
+        Icon(icon, size: 18, color: Colors.grey[600]),
         const SizedBox(width: 8),
         Text(
           '$label: ',
@@ -513,10 +502,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ),
       ],
@@ -525,7 +511,7 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
 
   String _formatOperatingHours(Map<String, String> operatingHours) {
     if (operatingHours.isEmpty) return 'ไม่ได้ระบุ';
-    
+
     final first = operatingHours.entries.first;
     if (operatingHours.length == 1) {
       return '${_getDayName(first.key)}: ${first.value}';
@@ -561,38 +547,16 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
   void _addNewBranch() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const BranchEditScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const BranchEditScreen()),
     ).then((_) => _loadBranches());
   }
 
   void _editBranch(BranchModel branch) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => BranchEditScreen(branch: branch),
-      ),
+      MaterialPageRoute(builder: (context) => BranchEditScreen(branch: branch)),
     ).then((_) => _loadBranches());
   }
-
-  // void _viewOnMap(BranchModel branch) {
-  //   if (branch.coordinates == null) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('ไม่มีข้อมูลพิกัดของสาขานี้'),
-  //         backgroundColor: Colors.orange,
-  //       ),
-  //     );
-  //     return;
-  //   }
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => BranchMapViewScreen(branch: branch),
-  //     ),
-  //   );
-  // }
 
   void _confirmDeleteBranch(BranchModel branch) {
     showDialog(
@@ -620,7 +584,10 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
 
   Future<void> _deleteBranch(BranchModel branch) async {
     try {
-      final branchProvider = Provider.of<BranchProvider>(context, listen: false);
+      final branchProvider = Provider.of<BranchProvider>(
+        context,
+        listen: false,
+      );
       await branchProvider.deleteBranch(branch.branchId);
 
       if (mounted) {
@@ -642,4 +609,4 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
       }
     }
   }
-} 
+}
