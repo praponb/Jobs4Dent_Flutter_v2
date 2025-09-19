@@ -13,10 +13,7 @@ import '../../../providers/auth_provider.dart';
 class DentistQuickActions extends StatelessWidget {
   final VoidCallback? onAvailabilityTap;
 
-  const DentistQuickActions({
-    super.key,
-    this.onAvailabilityTap,
-  });
+  const DentistQuickActions({super.key, this.onAvailabilityTap});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +40,9 @@ class DentistQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const DentistJobSearchScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const DentistJobSearchScreen(),
+                    ),
                   );
                 },
               ),
@@ -58,7 +57,9 @@ class DentistQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const MyApplicationsScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const MyApplicationsScreen(),
+                    ),
                   );
                 },
               ),
@@ -75,18 +76,25 @@ class DentistQuickActions extends StatelessWidget {
                 icon: Icons.assignment,
                 color: Colors.orange,
                 onTap: () {
-                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  final authProvider = Provider.of<AuthProvider>(
+                    context,
+                    listen: false,
+                  );
                   final user = authProvider.userModel;
-                  
-                  if (user?.currentRole == 'assistant') {
+
+                  if (user?.userType == 'assistant') {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const AssistantMiniResumeScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const AssistantMiniResumeScreen(),
+                      ),
                     );
                   } else {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const DentistMiniResumeScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const DentistMiniResumeScreen(),
+                      ),
                     );
                   }
                 },
@@ -102,7 +110,9 @@ class DentistQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const DocumentVerificationScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const DocumentVerificationScreen(),
+                    ),
                   );
                 },
               ),
@@ -182,14 +192,11 @@ class _ActionCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
       ),
     );
   }
-} 
+}

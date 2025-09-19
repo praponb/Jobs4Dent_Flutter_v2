@@ -4,55 +4,57 @@ class UserModel {
   final String userName;
   final String? profilePhotoUrl;
   final bool isDentist; // True for Dentist, False for Clinic Owner
-  final String userType; // 'dentist', 'assistant', 'clinic', 'seller', 'sales', 'admin'
+  final String
+  userType; // 'dentist', 'assistant', 'clinic', 'seller', 'sales', 'admin'
   final DateTime createdAt;
   final DateTime updatedAt;
-  
+
   // Authentication fields
   final bool isEmailVerified;
   final String authProvider; // 'email', 'google', 'apple', etc.
-  
+
   // Role and permissions
-  final List<String> roles; // Multiple roles support
-  final String currentRole; // Currently active role
   final Map<String, dynamic>? permissions; // Role-based permissions
-  
+
   // Sub-user support
   final String? parentUserId; // For sub-users, references parent account
   final bool isMainAccount; // True for main accounts, false for sub-users
   final List<String>? subUserIds; // For main accounts, list of sub-user IDs
   final String? branchName; // For sub-users, the branch they represent
   final String? branchAddress; // For sub-users, branch address
-  
+
   // Job Application Information fields
   final String? educationLevel; // วุฒิการศึกษา
   final String? jobType; // ประเภทงานที่ต้องการ
   final double? minSalary; // รายได้ที่ต้องการขั้นต่ำ (บาท/เดือน)
   final String? maxSalary; // รายได้ที่ต้องการสูงสุด (บาท/เดือน)
   final String? jobReadiness; // ความพร้อมในการเริ่มงาน
-  
+
   // Enhanced Profile fields
   final String? phoneNumber;
   final String? address;
   final List<String>? skills;
   final List<String>? workLocationPreference;
   final Map<String, dynamic>? availability;
-  final List<Map<String, dynamic>>? education; // Enhanced education with institution, year, degree
-  final List<Map<String, dynamic>>? experience; // Enhanced experience with details
+  final List<Map<String, dynamic>>?
+  education; // Enhanced education with institution, year, degree
+  final List<Map<String, dynamic>>?
+  experience; // Enhanced experience with details
   final String? clinicName;
   final String? clinicAddress;
   final List<String>? serviceTypes;
-  
+
   // New Enhanced Fields for Profile Management
-  
+
   // For Dentists/Assistants
   final List<String>? specialties; // Areas of expertise
   final List<String>? certifications; // Professional certifications
-  final List<String>? documentUrls; // URLs of uploaded documents (licenses, CV, etc.)
+  final List<String>?
+  documentUrls; // URLs of uploaded documents (licenses, CV, etc.)
   final String? currentPosition; // Current job position
   final String? yearsOfExperience; // Years of professional experience
   final List<String>? languages; // Languages spoken
-  
+
   // For Clinics
   final String? website; // Clinic website
   final String? description; // Clinic overview/description
@@ -61,40 +63,47 @@ class UserModel {
   final List<Map<String, dynamic>>? branches; // Branch information
   final String? licenseNumber; // Clinic license number
   final String? establishedYear; // Year clinic was established
-  
+
   // For Sales
   final List<String>? responsibilityAreas; // Areas/regions of responsibility
   final String? salesTerritory; // Sales territory
   final String? managerUserId; // ID of reporting manager
-  
+
   // For Admin
   final bool? isSuperAdmin; // Super admin privileges
   final List<String>? managedUserTypes; // User types this admin can manage
-  
+
   // Account status
   final bool isActive;
   final bool isProfileComplete;
   final DateTime? lastLoginAt;
-  
+
   // Verification System
-  final String verificationStatus; // 'unverified', 'pending', 'verified', 'rejected'
-  final List<String>? verificationDocuments; // URLs of uploaded verification documents
-  final int? verificationDocumentCounts; // Number of documents in verificationDocuments array
-  final String? verificationRejectionReason; // Reason for rejection if status is 'rejected'
+  final String
+  verificationStatus; // 'unverified', 'pending', 'verified', 'rejected'
+  final List<String>?
+  verificationDocuments; // URLs of uploaded verification documents
+  final int?
+  verificationDocumentCounts; // Number of documents in verificationDocuments array
+  final String?
+  verificationRejectionReason; // Reason for rejection if status is 'rejected'
   final DateTime? verificationSubmittedAt; // When documents were submitted
   final DateTime? verificationReviewedAt; // When documents were reviewed
   final String? reviewedByAdminId; // Admin who reviewed the documents
-  
+
   // Dentist Mini-Resume
-  final String? educationInstitute; // University/Institution where graduated from dental school
-  final String? educationSpecialist; // Institution for specialist dentistry education (if any)
+  final String?
+  educationInstitute; // University/Institution where graduated from dental school
+  final String?
+  educationSpecialist; // Institution for specialist dentistry education (if any)
   final int? experienceYears; // Years of experience after graduation
-  final List<String>? coreCompetencies; // Procedures/treatments they can perform
+  final List<String>?
+  coreCompetencies; // Procedures/treatments they can perform
   final List<String>? counterSkills; // Counter/reception skills
   final List<String>? softwareSkills; // Software skills
   final List<String>? eqSkills; // Emotional and social skills
   final List<String>? workLimitations; // Procedures they prefer not to do
-  
+
   UserModel({
     required this.userId,
     required this.email,
@@ -106,8 +115,6 @@ class UserModel {
     required this.updatedAt,
     this.isEmailVerified = false,
     this.authProvider = 'email',
-    this.roles = const [],
-    required this.currentRole,
     this.permissions,
     this.parentUserId,
     this.isMainAccount = true,
@@ -179,8 +186,6 @@ class UserModel {
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] ?? 0),
       isEmailVerified: map['isEmailVerified'] ?? false,
       authProvider: map['authProvider'] ?? 'email',
-      roles: List<String>.from(map['roles'] ?? []),
-      currentRole: map['currentRole'] ?? '',
       permissions: map['permissions'],
       parentUserId: map['parentUserId'],
       isMainAccount: map['isMainAccount'] ?? true,
@@ -195,7 +200,9 @@ class UserModel {
       phoneNumber: map['phoneNumber'],
       address: map['address'],
       skills: List<String>.from(map['skills'] ?? []),
-      workLocationPreference: List<String>.from(map['workLocationPreference'] ?? []),
+      workLocationPreference: List<String>.from(
+        map['workLocationPreference'] ?? [],
+      ),
       availability: map['availability'],
       education: List<Map<String, dynamic>>.from(map['education'] ?? []),
       experience: List<Map<String, dynamic>>.from(map['experience'] ?? []),
@@ -222,13 +229,21 @@ class UserModel {
       managedUserTypes: List<String>.from(map['managedUserTypes'] ?? []),
       isActive: map['isActive'] ?? true,
       isProfileComplete: map['isProfileComplete'] ?? false,
-      lastLoginAt: map['lastLoginAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['lastLoginAt']) : null,
+      lastLoginAt: map['lastLoginAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['lastLoginAt'])
+          : null,
       verificationStatus: map['verificationStatus'] ?? 'unverified',
-      verificationDocuments: List<String>.from(map['verificationDocuments'] ?? []),
+      verificationDocuments: List<String>.from(
+        map['verificationDocuments'] ?? [],
+      ),
       verificationDocumentCounts: map['verificationDocumentCounts'],
       verificationRejectionReason: map['verificationRejectionReason'],
-      verificationSubmittedAt: map['verificationSubmittedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['verificationSubmittedAt']) : null,
-      verificationReviewedAt: map['verificationReviewedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['verificationReviewedAt']) : null,
+      verificationSubmittedAt: map['verificationSubmittedAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['verificationSubmittedAt'])
+          : null,
+      verificationReviewedAt: map['verificationReviewedAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['verificationReviewedAt'])
+          : null,
       reviewedByAdminId: map['reviewedByAdminId'],
       educationInstitute: map['educationInstitute'],
       educationSpecialist: map['educationSpecialist'],
@@ -253,8 +268,6 @@ class UserModel {
       'updatedAt': updatedAt.millisecondsSinceEpoch,
       'isEmailVerified': isEmailVerified,
       'authProvider': authProvider,
-      'roles': roles,
-      'currentRole': currentRole,
       'permissions': permissions,
       'parentUserId': parentUserId,
       'isMainAccount': isMainAccount,
@@ -301,7 +314,8 @@ class UserModel {
       'verificationDocuments': verificationDocuments,
       'verificationDocumentCounts': verificationDocumentCounts,
       'verificationRejectionReason': verificationRejectionReason,
-      'verificationSubmittedAt': verificationSubmittedAt?.millisecondsSinceEpoch,
+      'verificationSubmittedAt':
+          verificationSubmittedAt?.millisecondsSinceEpoch,
       'verificationReviewedAt': verificationReviewedAt?.millisecondsSinceEpoch,
       'reviewedByAdminId': reviewedByAdminId,
       'educationInstitute': educationInstitute,
@@ -326,8 +340,6 @@ class UserModel {
     DateTime? updatedAt,
     bool? isEmailVerified,
     String? authProvider,
-    List<String>? roles,
-    String? currentRole,
     Map<String, dynamic>? permissions,
     String? parentUserId,
     bool? isMainAccount,
@@ -397,8 +409,6 @@ class UserModel {
       updatedAt: updatedAt ?? this.updatedAt,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       authProvider: authProvider ?? this.authProvider,
-      roles: roles ?? this.roles,
-      currentRole: currentRole ?? this.currentRole,
       permissions: permissions ?? this.permissions,
       parentUserId: parentUserId ?? this.parentUserId,
       isMainAccount: isMainAccount ?? this.isMainAccount,
@@ -413,7 +423,8 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       address: address ?? this.address,
       skills: skills ?? this.skills,
-      workLocationPreference: workLocationPreference ?? this.workLocationPreference,
+      workLocationPreference:
+          workLocationPreference ?? this.workLocationPreference,
       availability: availability ?? this.availability,
       education: education ?? this.education,
       experience: experience ?? this.experience,
@@ -442,11 +453,16 @@ class UserModel {
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       verificationStatus: verificationStatus ?? this.verificationStatus,
-      verificationDocuments: verificationDocuments ?? this.verificationDocuments,
-      verificationDocumentCounts: verificationDocumentCounts ?? this.verificationDocumentCounts,
-      verificationRejectionReason: verificationRejectionReason ?? this.verificationRejectionReason,
-      verificationSubmittedAt: verificationSubmittedAt ?? this.verificationSubmittedAt,
-      verificationReviewedAt: verificationReviewedAt ?? this.verificationReviewedAt,
+      verificationDocuments:
+          verificationDocuments ?? this.verificationDocuments,
+      verificationDocumentCounts:
+          verificationDocumentCounts ?? this.verificationDocumentCounts,
+      verificationRejectionReason:
+          verificationRejectionReason ?? this.verificationRejectionReason,
+      verificationSubmittedAt:
+          verificationSubmittedAt ?? this.verificationSubmittedAt,
+      verificationReviewedAt:
+          verificationReviewedAt ?? this.verificationReviewedAt,
       reviewedByAdminId: reviewedByAdminId ?? this.reviewedByAdminId,
       educationInstitute: educationInstitute ?? this.educationInstitute,
       educationSpecialist: educationSpecialist ?? this.educationSpecialist,
@@ -458,4 +474,4 @@ class UserModel {
       workLimitations: workLimitations ?? this.workLimitations,
     );
   }
-} 
+}

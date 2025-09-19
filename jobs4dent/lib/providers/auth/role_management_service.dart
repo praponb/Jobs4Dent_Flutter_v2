@@ -14,21 +14,17 @@ class RoleManagementService {
     String newRole,
   ) async {
     try {
-      if (!userModel.roles.contains(newRole)) {
-        return RoleResult.error(AuthErrorHandler.invalidRoleOrAccess);
-      }
+      // Since we removed roles array, we'll allow switching to any valid role
+      // You can add validation here if needed for specific business rules
 
       final updatedUser = userModel.copyWith(
-        currentRole: newRole,
+        userType: newRole,
         isDentist: newRole == 'dentist' || newRole == 'assistant',
         updatedAt: DateTime.now(),
       );
 
-      await _firestore
-          .collection('users')
-          .doc(userModel.userId)
-          .update({
-        'currentRole': newRole,
+      await _firestore.collection('users').doc(userModel.userId).update({
+        'userType': newRole,
         'isDentist': updatedUser.isDentist,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       });
@@ -40,36 +36,10 @@ class RoleManagementService {
     }
   }
 
-  /// Add role to user
-  static Future<RoleResult> addRole(
-    UserModel userModel,
-    String role,
-  ) async {
-    try {
-      if (userModel.roles.contains(role)) {
-        return RoleResult.error('Role already exists');
-      }
-
-      List<String> newRoles = List.from(userModel.roles)..add(role);
-      
-      final updatedUser = userModel.copyWith(
-        roles: newRoles,
-        updatedAt: DateTime.now(),
-      );
-
-      await _firestore
-          .collection('users')
-          .doc(userModel.userId)
-          .update({
-        'roles': newRoles,
-        'updatedAt': DateTime.now().millisecondsSinceEpoch,
-      });
-
-      return RoleResult.success(updatedUser);
-    } catch (e) {
-      debugPrint('❌ Error adding role: $e');
-      return RoleResult.error('Error adding role: $e');
-    }
+  /// Add role to user - DEPRECATED: Roles array removed, use userType instead
+  static Future<RoleResult> addRole(UserModel userModel, String role) async {
+    // Since we removed roles array, this method now just switches the userType
+    return switchRole(userModel, role);
   }
 
   /// Create sub-user (for clinic branches)
@@ -95,7 +65,9 @@ class RoleManagementService {
       );
 
       if (!authResult.success || authResult.user == null) {
-        return SubUserResult.error(authResult.error ?? 'Failed to create sub-user account');
+        return SubUserResult.error(
+          authResult.error ?? 'Failed to create sub-user account',
+        );
       }
 
       // Create sub-user document
@@ -105,8 +77,6 @@ class RoleManagementService {
         userName: userName,
         isDentist: false,
         userType: 'clinic',
-        currentRole: 'clinic',
-        roles: ['clinic'],
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         authProvider: 'email',
@@ -120,19 +90,22 @@ class RoleManagementService {
         isProfileComplete: true,
       );
 
+      Map<String, dynamic> subUserData = subUserModel.toMap();
+      // Explicitly remove the 'roles' field to ensure it's not preserved from old documents
+      subUserData.remove('roles');
+
       await _firestore
           .collection('users')
           .doc(authResult.user!.uid)
-          .set(subUserModel.toMap());
+          .set(subUserData);
 
       // Update main account with sub-user ID
       List<String> currentSubUsers = List.from(parentUser.subUserIds ?? []);
       currentSubUsers.add(authResult.user!.uid);
 
-      await _firestore
-          .collection('users')
-          .doc(parentUser.userId)
-          .update({'subUserIds': currentSubUsers});
+      await _firestore.collection('users').doc(parentUser.userId).update({
+        'subUserIds': currentSubUsers,
+      });
 
       // Update parent user model
       final updatedParent = parentUser.copyWith(subUserIds: currentSubUsers);
@@ -161,13 +134,13 @@ class RoleManagementService {
             .collection('users')
             .doc(subUserId)
             .get();
-        
+
         if (doc.exists) {
           final data = doc.data() as Map<String, dynamic>;
-          
+
           // Process the data to handle Firestore Timestamps
           final processedData = _processUserData(data, subUserId);
-          
+
           subUsers.add(UserModel.fromMap(processedData));
         }
       }
@@ -179,59 +152,69 @@ class RoleManagementService {
   }
 
   /// Process user data to ensure all required fields exist and handle timestamps
-  static Map<String, dynamic> _processUserData(Map<String, dynamic> data, String uid) {
+  static Map<String, dynamic> _processUserData(
+    Map<String, dynamic> data,
+    String uid,
+  ) {
     // Add missing required fields with defaults if they don't exist
     data['userId'] = data['userId'] ?? uid;
     data['email'] = data['email'] ?? '';
     data['userName'] = data['userName'] ?? 'User';
-    data['isDentist'] = data['isDentist'] ?? (data['userType'] == 'dentist' || data['userType'] == 'assistant');
+    data['isDentist'] =
+        data['isDentist'] ??
+        (data['userType'] == 'dentist' || data['userType'] == 'assistant');
     data['userType'] = data['userType'] ?? 'clinic';
-    data['currentRole'] = data['currentRole'] ?? data['userType'] ?? 'clinic';
-    data['roles'] = data['roles'] ?? [data['userType'] ?? 'clinic'];
     data['isMainAccount'] = data['isMainAccount'] ?? false;
     data['isActive'] = data['isActive'] ?? true;
     data['isProfileComplete'] = data['isProfileComplete'] ?? true;
     data['authProvider'] = data['authProvider'] ?? 'email';
     data['isEmailVerified'] = data['isEmailVerified'] ?? false;
     data['verificationStatus'] = data['verificationStatus'] ?? 'unverified';
-    
+
     // Handle timestamps - convert Firestore Timestamp to int milliseconds
     data = _processTimestamps(data);
-    
+
     return data;
   }
 
   /// Process timestamp fields
   static Map<String, dynamic> _processTimestamps(Map<String, dynamic> data) {
     final now = DateTime.now().millisecondsSinceEpoch;
-    
+
     // Handle createdAt
     if (data['createdAt'] == null) {
       data['createdAt'] = now;
     } else if (data['createdAt'] is Timestamp) {
-      data['createdAt'] = (data['createdAt'] as Timestamp).millisecondsSinceEpoch;
+      data['createdAt'] =
+          (data['createdAt'] as Timestamp).millisecondsSinceEpoch;
     }
-    
+
     // Handle updatedAt
     if (data['updatedAt'] == null) {
       data['updatedAt'] = now;
     } else if (data['updatedAt'] is Timestamp) {
-      data['updatedAt'] = (data['updatedAt'] as Timestamp).millisecondsSinceEpoch;
+      data['updatedAt'] =
+          (data['updatedAt'] as Timestamp).millisecondsSinceEpoch;
     }
-    
+
     // Handle other potential timestamp fields
     if (data['lastLoginAt'] != null && data['lastLoginAt'] is Timestamp) {
-      data['lastLoginAt'] = (data['lastLoginAt'] as Timestamp).millisecondsSinceEpoch;
+      data['lastLoginAt'] =
+          (data['lastLoginAt'] as Timestamp).millisecondsSinceEpoch;
     }
-    
-    if (data['verificationSubmittedAt'] != null && data['verificationSubmittedAt'] is Timestamp) {
-      data['verificationSubmittedAt'] = (data['verificationSubmittedAt'] as Timestamp).millisecondsSinceEpoch;
+
+    if (data['verificationSubmittedAt'] != null &&
+        data['verificationSubmittedAt'] is Timestamp) {
+      data['verificationSubmittedAt'] =
+          (data['verificationSubmittedAt'] as Timestamp).millisecondsSinceEpoch;
     }
-    
-    if (data['verificationReviewedAt'] != null && data['verificationReviewedAt'] is Timestamp) {
-      data['verificationReviewedAt'] = (data['verificationReviewedAt'] as Timestamp).millisecondsSinceEpoch;
+
+    if (data['verificationReviewedAt'] != null &&
+        data['verificationReviewedAt'] is Timestamp) {
+      data['verificationReviewedAt'] =
+          (data['verificationReviewedAt'] as Timestamp).millisecondsSinceEpoch;
     }
-    
+
     return data;
   }
 
@@ -241,10 +224,7 @@ class RoleManagementService {
     List<String> permissions,
   ) async {
     try {
-      await _firestore
-          .collection('users')
-          .doc(subUserId)
-          .update({
+      await _firestore.collection('users').doc(subUserId).update({
         'permissions': {'permissions': permissions},
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       });
@@ -262,10 +242,7 @@ class RoleManagementService {
     bool isActive,
   ) async {
     try {
-      await _firestore
-          .collection('users')
-          .doc(subUserId)
-          .update({
+      await _firestore.collection('users').doc(subUserId).update({
         'isActive': isActive,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       });
@@ -284,24 +261,14 @@ class RoleResult {
   final UserModel? userModel;
   final String? error;
 
-  RoleResult._({
-    required this.success,
-    this.userModel,
-    this.error,
-  });
+  RoleResult._({required this.success, this.userModel, this.error});
 
   factory RoleResult.success(UserModel userModel) {
-    return RoleResult._(
-      success: true,
-      userModel: userModel,
-    );
+    return RoleResult._(success: true, userModel: userModel);
   }
 
   factory RoleResult.error(String error) {
-    return RoleResult._(
-      success: false,
-      error: error,
-    );
+    return RoleResult._(success: false, error: error);
   }
 }
 
@@ -335,9 +302,6 @@ class SubUserResult {
   }
 
   factory SubUserResult.error(String error) {
-    return SubUserResult._(
-      success: false,
-      error: error,
-    );
+    return SubUserResult._(success: false, error: error);
   }
-} 
+}

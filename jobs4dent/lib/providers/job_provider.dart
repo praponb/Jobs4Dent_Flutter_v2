@@ -11,13 +11,13 @@ import 'job_ai_service.dart';
 
 class JobProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   // Services
   final JobManagementService _jobManagementService = JobManagementService();
   final JobSearchService _jobSearchService = JobSearchService();
   final JobApplicationService _jobApplicationService = JobApplicationService();
   final JobAIService _jobAIService = JobAIService();
-  
+
   List<JobModel> _jobs = [];
   List<JobModel> _myPostedJobs = [];
   List<AssistantJobModel> _myPostedAssistantJobs = [];
@@ -33,18 +33,21 @@ class JobProvider with ChangeNotifier {
   List<JobModel> get myPostedJobs => _myPostedJobs;
   List<AssistantJobModel> get myPostedAssistantJobs => _myPostedAssistantJobs;
   List<JobApplicationModel> get myApplications => _myApplications;
-  List<JobApplicationModel> get userApplications => _myApplications; // Alias for dashboard
+  List<JobApplicationModel> get userApplications =>
+      _myApplications; // Alias for dashboard
   List<JobApplicationModel> get applicantsForMyJobs => _applicantsForMyJobs;
   bool get isLoading => _isLoading;
   String? get error => _error;
   Map<String, dynamic>? get lastSearchCriteria => _lastSearchCriteria;
-  Map<String, dynamic>? get savedAdvancedSearchState => _savedAdvancedSearchState;
+  Map<String, dynamic>? get savedAdvancedSearchState =>
+      _savedAdvancedSearchState;
 
   // Static constants from JobConstants
   static List<String> get jobCategories => JobConstants.jobCategories;
   static List<String> get experienceLevels => JobConstants.experienceLevels;
   static List<String> get salaryTypes => JobConstants.salaryTypes;
-  static List<String> get applicationStatuses => JobConstants.applicationStatuses;
+  static List<String> get applicationStatuses =>
+      JobConstants.applicationStatuses;
 
   void _setLoading(bool loading) {
     _isLoading = loading;
@@ -63,12 +66,12 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       final success = await _jobManagementService.postJob(job);
-      
+
       if (success) {
         _myPostedJobs.insert(0, job);
         notifyListeners();
       }
-      
+
       return success;
     } catch (e) {
       _setError(e.toString());
@@ -84,22 +87,26 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       final success = await _jobManagementService.updateJob(updatedJob);
-      
+
       if (success) {
         // Update local lists
-        final index = _myPostedJobs.indexWhere((job) => job.jobId == updatedJob.jobId);
+        final index = _myPostedJobs.indexWhere(
+          (job) => job.jobId == updatedJob.jobId,
+        );
         if (index != -1) {
           _myPostedJobs[index] = updatedJob;
         }
-        
-        final jobIndex = _jobs.indexWhere((job) => job.jobId == updatedJob.jobId);
+
+        final jobIndex = _jobs.indexWhere(
+          (job) => job.jobId == updatedJob.jobId,
+        );
         if (jobIndex != -1) {
           _jobs[jobIndex] = updatedJob;
         }
-        
+
         notifyListeners();
       }
-      
+
       return success;
     } catch (e) {
       _setError(e.toString());
@@ -115,13 +122,13 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       final success = await _jobManagementService.deleteJob(jobId);
-      
+
       if (success) {
         _myPostedJobs.removeWhere((job) => job.jobId == jobId);
         _jobs.removeWhere((job) => job.jobId == jobId);
         notifyListeners();
       }
-      
+
       return success;
     } catch (e) {
       _setError(e.toString());
@@ -151,7 +158,7 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       debugPrint('Loading assistant jobs for clinic ID: $clinicId');
-      
+
       // Query assistant jobs from Firestore
       QuerySnapshot querySnapshot;
       try {
@@ -161,7 +168,9 @@ class JobProvider with ChangeNotifier {
             .orderBy('createdAt', descending: true)
             .get();
       } catch (indexError) {
-        debugPrint('Index error, falling back to query without orderBy: $indexError');
+        debugPrint(
+          'Index error, falling back to query without orderBy: $indexError',
+        );
         // Fallback: Query without orderBy if index doesn't exist
         querySnapshot = await _firestore
             .collection('job_posts_assistant')
@@ -170,7 +179,7 @@ class JobProvider with ChangeNotifier {
       }
 
       final assistantJobs = <AssistantJobModel>[];
-      
+
       for (var doc in querySnapshot.docs) {
         try {
           final jobData = doc.data() as Map<String, dynamic>;
@@ -179,7 +188,9 @@ class JobProvider with ChangeNotifier {
           final job = AssistantJobModel.fromMap(jobData);
           assistantJobs.add(job);
         } catch (parseError) {
-          debugPrint('Error parsing assistant job document ${doc.id}: $parseError');
+          debugPrint(
+            'Error parsing assistant job document ${doc.id}: $parseError',
+          );
           // Continue with other documents instead of failing entirely
         }
       }
@@ -190,9 +201,13 @@ class JobProvider with ChangeNotifier {
       }
 
       _myPostedAssistantJobs = assistantJobs;
-      debugPrint('Loaded ${assistantJobs.length} assistant jobs for clinic $clinicId');
+      debugPrint(
+        'Loaded ${assistantJobs.length} assistant jobs for clinic $clinicId',
+      );
       for (var job in assistantJobs) {
-        debugPrint('Assistant Job: ${job.jobId}, Title: ${job.titlePost}, Active: ${job.isActive}');
+        debugPrint(
+          'Assistant Job: ${job.jobId}, Title: ${job.titlePost}, Active: ${job.isActive}',
+        );
       }
       notifyListeners();
     } catch (e) {
@@ -281,7 +296,7 @@ class JobProvider with ChangeNotifier {
       );
 
       // Jobs are already sorted by ID (newest first) from Firebase query
-      
+
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -312,7 +327,7 @@ class JobProvider with ChangeNotifier {
       );
 
       // Jobs are already sorted by ID (newest first) from Firebase query
-      
+
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -358,7 +373,9 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      _myApplications = await _jobApplicationService.getMyApplications(applicantId);
+      _myApplications = await _jobApplicationService.getMyApplications(
+        applicantId,
+      );
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -372,7 +389,8 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      _applicantsForMyJobs = await _jobApplicationService.getApplicantsForMyJobs(clinicId);
+      _applicantsForMyJobs = await _jobApplicationService
+          .getApplicantsForMyJobs(clinicId);
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -402,7 +420,9 @@ class JobProvider with ChangeNotifier {
 
       if (success) {
         // Update local list
-        final index = _applicantsForMyJobs.indexWhere((app) => app.applicationId == applicationId);
+        final index = _applicantsForMyJobs.indexWhere(
+          (app) => app.applicationId == applicationId,
+        );
         if (index != -1) {
           _applicantsForMyJobs[index] = _applicantsForMyJobs[index].copyWith(
             status: newStatus,
@@ -429,7 +449,9 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      _applicantsForMyJobs = await _jobApplicationService.loadJobApplications(jobId);
+      _applicantsForMyJobs = await _jobApplicationService.loadJobApplications(
+        jobId,
+      );
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -443,7 +465,8 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      _myApplications = await _jobApplicationService.loadUserApplicationsFromUserCollection(userId);
+      _myApplications = await _jobApplicationService
+          .loadUserApplicationsFromUserCollection(userId);
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -465,19 +488,22 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      final success = await _jobApplicationService.updateApplicationStatusNewStructure(
-        jobId: jobId,
-        userId: userId,
-        applicationId: applicationId,
-        newStatus: newStatus,
-        notes: notes,
-        interviewDate: interviewDate,
-        interviewLocation: interviewLocation,
-      );
+      final success = await _jobApplicationService
+          .updateApplicationStatusNewStructure(
+            jobId: jobId,
+            userId: userId,
+            applicationId: applicationId,
+            newStatus: newStatus,
+            notes: notes,
+            interviewDate: interviewDate,
+            interviewLocation: interviewLocation,
+          );
 
       if (success) {
         // Update local list
-        final index = _applicantsForMyJobs.indexWhere((app) => app.applicationId == applicationId);
+        final index = _applicantsForMyJobs.indexWhere(
+          (app) => app.applicationId == applicationId,
+        );
         if (index != -1) {
           _applicantsForMyJobs[index] = _applicantsForMyJobs[index].copyWith(
             status: newStatus,
@@ -559,7 +585,8 @@ class JobProvider with ChangeNotifier {
       _setError(null);
 
       // Get newest 1000 active jobs by highest ID
-      Query query = _firestore.collection('job_posts_dentist')
+      Query query = _firestore
+          .collection('job_posts_dentist')
           .where('isActive', isEqualTo: true)
           .orderBy('jobId', descending: true)
           .limit(1000);
@@ -577,7 +604,7 @@ class JobProvider with ChangeNotifier {
 
       // Build search criteria from non-empty fields only
       final searchCriteria = <String, dynamic>{};
-      
+
       if (keyword != null && keyword.trim().isNotEmpty) {
         searchCriteria['keyword'] = keyword.trim();
       }
@@ -614,10 +641,14 @@ class JobProvider with ChangeNotifier {
       if (isUrgent == true) {
         searchCriteria['isUrgent'] = isUrgent;
       }
-      if (trainLine != null && trainLine.trim().isNotEmpty && trainLine != 'ไม่ใกล้รถไฟฟ้า') {
+      if (trainLine != null &&
+          trainLine.trim().isNotEmpty &&
+          trainLine != 'ไม่ใกล้รถไฟฟ้า') {
         searchCriteria['trainLine'] = trainLine.trim();
       }
-      if (trainStation != null && trainStation.trim().isNotEmpty && trainStation != 'ไม่ใกล้รถไฟฟ้า') {
+      if (trainStation != null &&
+          trainStation.trim().isNotEmpty &&
+          trainStation != 'ไม่ใกล้รถไฟฟ้า') {
         searchCriteria['trainStation'] = trainStation.trim();
       }
       if (workingDays != null && workingDays.isNotEmpty) {
@@ -626,8 +657,10 @@ class JobProvider with ChangeNotifier {
       if (workingHours != null && workingHours.trim().isNotEmpty) {
         searchCriteria['workingHours'] = workingHours.trim();
       }
-      if (additionalRequirements != null && additionalRequirements.trim().isNotEmpty) {
-        searchCriteria['additionalRequirements'] = additionalRequirements.trim();
+      if (additionalRequirements != null &&
+          additionalRequirements.trim().isNotEmpty) {
+        searchCriteria['additionalRequirements'] = additionalRequirements
+            .trim();
       }
       if (workingType != null && workingType.trim().isNotEmpty) {
         searchCriteria['workingType'] = workingType.trim();
@@ -657,14 +690,14 @@ class JobProvider with ChangeNotifier {
         additionalRequirements: additionalRequirements,
         workingType: workingType,
       );
-      
+
       // Calculate matching scores if userId is provided
       if (userId != null) {
         _jobs = await _jobSearchService.calculateMatchingScores(_jobs, userId);
       }
 
       // Jobs are already sorted by ID (newest first) from Firebase query
-      
+
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -710,10 +743,10 @@ class JobProvider with ChangeNotifier {
     }
 
     final List<String> criteria = [];
-    
+
     _lastSearchCriteria!.forEach((key, value) {
       String displayText = '';
-      
+
       switch (key) {
         case 'keyword':
           displayText = 'คำค้นหา: $value';
@@ -734,12 +767,12 @@ class JobProvider with ChangeNotifier {
           displayText = 'เงินเดือนขั้นต่ำ: ${value.toString()} บาท';
           break;
       }
-      
+
       if (displayText.isNotEmpty) {
         criteria.add(displayText);
       }
     });
-    
+
     return criteria;
   }
 
@@ -790,10 +823,30 @@ class JobProvider with ChangeNotifier {
   // Report a job as inappropriate
   Future<void> reportJob(String jobId) async {
     try {
-      await _firestore.collection('job_posts_dentist').doc(jobId).update({
-        'reported': true,
-        'updatedAt': DateTime.now().millisecondsSinceEpoch,
-      });
+      // First try updating by assuming jobId is also the document ID
+      try {
+        await _firestore.collection('job_posts_dentist').doc(jobId).update({
+          'reported': true,
+          'updatedAt': DateTime.now().millisecondsSinceEpoch,
+        });
+      } catch (e) {
+        // Fallback: some documents may use an auto-generated document ID
+        // and store the logical ID in the 'jobId' field
+        final query = await _firestore
+            .collection('job_posts_dentist')
+            .where('jobId', isEqualTo: jobId)
+            .limit(1)
+            .get();
+
+        if (query.docs.isEmpty) {
+          rethrow;
+        }
+
+        await query.docs.first.reference.update({
+          'reported': true,
+          'updatedAt': DateTime.now().millisecondsSinceEpoch,
+        });
+      }
 
       // Update local state if the job is in the current list
       final index = _jobs.indexWhere((job) => job.jobId == jobId);
@@ -806,4 +859,4 @@ class JobProvider with ChangeNotifier {
       rethrow;
     }
   }
-} 
+}
