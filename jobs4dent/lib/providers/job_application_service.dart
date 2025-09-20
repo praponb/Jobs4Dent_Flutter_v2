@@ -16,7 +16,10 @@ class JobApplicationService {
   }) async {
     try {
       // Get job details
-      final jobDoc = await _firestore.collection('job_posts_dentist').doc(jobId).get();
+      final jobDoc = await _firestore
+          .collection('job_posts_dentist')
+          .doc(jobId)
+          .get();
       if (!jobDoc.exists) {
         throw Exception('ไม่พบงาน');
       }
@@ -24,7 +27,10 @@ class JobApplicationService {
       final job = JobModel.fromMap(jobDoc.data()!);
 
       // Get applicant details
-      final userDoc = await _firestore.collection('users').doc(applicantId).get();
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(applicantId)
+          .get();
       if (!userDoc.exists) {
         throw Exception('ไม่พบผู้ใช้');
       }
@@ -61,7 +67,10 @@ class JobApplicationService {
         applicantProfile: user.toMap(),
       );
 
-      await _firestore.collection('job_applications').doc(applicationId).set(application.toMap());
+      await _firestore
+          .collection('job_applications')
+          .doc(applicationId)
+          .set(application.toMap());
 
       // Update job application count
       await _firestore.collection('job_posts_dentist').doc(jobId).update({
@@ -76,7 +85,9 @@ class JobApplicationService {
   }
 
   /// Get my applications (for dentists/assistants)
-  Future<List<JobApplicationModel>> getMyApplications(String applicantId) async {
+  Future<List<JobApplicationModel>> getMyApplications(
+    String applicantId,
+  ) async {
     try {
       final querySnapshot = await _firestore
           .collection('job_applications')
@@ -86,7 +97,7 @@ class JobApplicationService {
       final applications = querySnapshot.docs
           .map((doc) => JobApplicationModel.fromMap(doc.data()))
           .toList();
-      
+
       // Sort by appliedAt in descending order
       applications.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
 
@@ -96,8 +107,38 @@ class JobApplicationService {
     }
   }
 
+  /// Get my assistant job applications
+  Future<List<JobApplicationModel>> getMyAssistantApplications(
+    String applicantId,
+  ) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('job_applications_assistant')
+          .where('applicantId', isEqualTo: applicantId)
+          .get();
+
+      final applications = querySnapshot.docs
+          .map(
+            (doc) => JobApplicationModel.fromMap({
+              ...doc.data(),
+              'applicationId': doc.id,
+            }),
+          )
+          .toList();
+
+      // Sort by appliedAt in descending order locally
+      applications.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+
+      return applications;
+    } catch (e) {
+      throw Exception('การดึงใบสมัครงานผู้ช่วยทันตแพทย์ไม่สำเร็จ: $e');
+    }
+  }
+
   /// Get applicants for my jobs (for clinics)
-  Future<List<JobApplicationModel>> getApplicantsForMyJobs(String clinicId) async {
+  Future<List<JobApplicationModel>> getApplicantsForMyJobs(
+    String clinicId,
+  ) async {
     try {
       final querySnapshot = await _firestore
           .collection('job_applications')
@@ -107,7 +148,7 @@ class JobApplicationService {
       final applicants = querySnapshot.docs
           .map((doc) => JobApplicationModel.fromMap(doc.data()))
           .toList();
-      
+
       // Sort by appliedAt in descending order
       applicants.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
 
@@ -131,11 +172,20 @@ class JobApplicationService {
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       };
 
-      if (notes != null) updateData['notes'] = notes;
-      if (interviewDate != null) updateData['interviewDate'] = interviewDate.millisecondsSinceEpoch;
-      if (interviewLocation != null) updateData['interviewLocation'] = interviewLocation;
+      if (notes != null) {
+        updateData['notes'] = notes;
+      }
+      if (interviewDate != null) {
+        updateData['interviewDate'] = interviewDate.millisecondsSinceEpoch;
+      }
+      if (interviewLocation != null) {
+        updateData['interviewLocation'] = interviewLocation;
+      }
 
-      await _firestore.collection('job_applications').doc(applicationId).update(updateData);
+      await _firestore
+          .collection('job_applications')
+          .doc(applicationId)
+          .update(updateData);
 
       return true;
     } catch (e) {
@@ -154,10 +204,12 @@ class JobApplicationService {
           .get();
 
       return querySnapshot.docs
-          .map((doc) => JobApplicationModel.fromMap({
-                ...doc.data(),
-                'applicationId': doc.id,
-              }))
+          .map(
+            (doc) => JobApplicationModel.fromMap({
+              ...doc.data(),
+              'applicationId': doc.id,
+            }),
+          )
           .toList();
     } catch (e) {
       throw Exception('การโหลดใบสมัครงานไม่สำเร็จ: $e');
@@ -165,7 +217,9 @@ class JobApplicationService {
   }
 
   /// Load user applications from user sub-collection (new structure)
-  Future<List<JobApplicationModel>> loadUserApplicationsFromUserCollection(String userId) async {
+  Future<List<JobApplicationModel>> loadUserApplicationsFromUserCollection(
+    String userId,
+  ) async {
     try {
       final querySnapshot = await _firestore
           .collection('users')
@@ -175,10 +229,12 @@ class JobApplicationService {
           .get();
 
       return querySnapshot.docs
-          .map((doc) => JobApplicationModel.fromMap({
-                ...doc.data(),
-                'applicationId': doc.id,
-              }))
+          .map(
+            (doc) => JobApplicationModel.fromMap({
+              ...doc.data(),
+              'applicationId': doc.id,
+            }),
+          )
           .toList();
     } catch (e) {
       throw Exception('การโหลดใบสมัครจากคอลเลกชันผู้ใช้ไม่สำเร็จ: $e');
@@ -201,9 +257,15 @@ class JobApplicationService {
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       };
 
-      if (notes != null) updateData['notes'] = notes;
-      if (interviewDate != null) updateData['interviewDate'] = interviewDate.millisecondsSinceEpoch;
-      if (interviewLocation != null) updateData['interviewLocation'] = interviewLocation;
+      if (notes != null) {
+        updateData['notes'] = notes;
+      }
+      if (interviewDate != null) {
+        updateData['interviewDate'] = interviewDate.millisecondsSinceEpoch;
+      }
+      if (interviewLocation != null) {
+        updateData['interviewLocation'] = interviewLocation;
+      }
 
       // Update in job_posts_dentist sub-collection
       await _firestore
@@ -263,4 +325,4 @@ class JobApplicationService {
       throw Exception('การส่งใบสมัครไม่สำเร็จ: $e');
     }
   }
-} 
+}

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/job_provider.dart';
+import '../../models/assistant_job_model.dart';
+import '../../models/job_application_model.dart';
 import '../profile/profile_screen.dart';
 import '../jobs/my_applications_screen.dart';
 import '../profile/assistant_mini_resume_screen.dart';
@@ -18,6 +21,8 @@ class AssistantDashboard extends StatefulWidget {
 }
 
 class _AssistantDashboardState extends State<AssistantDashboard> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Map<String, AssistantJobModel> _jobDetails = {};
   @override
   void initState() {
     super.initState();
@@ -32,11 +37,42 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
   Future<void> _loadData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.userModel != null) {
-      // Load user's applications and related data
-      await Provider.of<JobProvider>(
-        context,
-        listen: false,
-      ).loadUserApplications(authProvider.userModel!.userId);
+      // Load user's assistant applications and related data
+      final jobProvider = Provider.of<JobProvider>(context, listen: false);
+      await jobProvider.getMyAssistantApplications(
+        authProvider.userModel!.userId,
+      );
+
+      // Load job details for applications
+      await _loadJobDetails(jobProvider.myApplications);
+    }
+  }
+
+  Future<void> _loadJobDetails(List<JobApplicationModel> applications) async {
+    final jobDetails = <String, AssistantJobModel>{};
+
+    for (final application in applications) {
+      try {
+        final doc = await _firestore
+            .collection('job_posts_assistant')
+            .doc(application.jobId)
+            .get();
+
+        if (doc.exists) {
+          final jobData = doc.data() as Map<String, dynamic>;
+          jobData['jobId'] = jobData['jobId'] ?? doc.id;
+          final job = AssistantJobModel.fromMap(jobData);
+          jobDetails[application.jobId] = job;
+        }
+      } catch (e) {
+        debugPrint('Error loading job details for ${application.jobId}: $e');
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _jobDetails = jobDetails;
+      });
     }
   }
 
@@ -480,6 +516,14 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
   }
 
   Widget _buildRecentApplications(List recentApplications) {
+    if (recentApplications.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Get the newest application (first in the list since they're sorted by date)
+    final newestApplication = recentApplications.first;
+    final job = _jobDetails[newestApplication.jobId];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -492,68 +536,227 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: DashboardUtils.cardDecoration,
-          child: Column(
-            children: recentApplications.map((application) {
-              Color statusColor = Colors.grey;
-              if (application.status == 'interview_scheduled') {
-                statusColor = Colors.orange;
-              } else if (application.status == 'offer_made') {
-                statusColor = Colors.green;
-              } else if (application.status == 'hired') {
-                statusColor = Colors.purple;
-              }
+        _buildApplicationCard(newestApplication, job),
+      ],
+    );
+  }
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+  Widget _buildApplicationCard(
+    JobApplicationModel application,
+    AssistantJobModel? job,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        onTap: () => _showApplicationDetails(application),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with job title and status
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          job?.titlePost ??
+                              application.jobTitle ??
+                              'งานผู้ช่วยทันตแพทย์',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          job?.clinicNameAndBranch ??
+                              application.clinicName ??
+                              'คลินิกทันตกรรม',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.blue[700]),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            application.jobTitle ?? 'ตำแหน่งงาน',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                  ),
+                  _buildStatusChip(application.status),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Application info
+              Row(
+                children: [
+                  Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Text(
+                    'สมัครเมื่อ: ${_formatDate(application.appliedAt)}',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.update, size: 16, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Text(
+                    'อัปเดต: ${_formatDate(application.updatedAt)}',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+
+              // Interview info (if applicable)
+              if (application.interviewDate != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange[200]!),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.event, color: Colors.orange[700]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'นัดสัมภาษณ์แล้ว',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange[700],
+                              ),
                             ),
-                          ),
-                          Text(
-                            _getStatusText(application.status),
-                            style: TextStyle(
-                              color: statusColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                            Text(
+                              _formatDate(application.interviewDate!),
+                              style: TextStyle(color: Colors.orange[700]),
                             ),
-                          ),
-                        ],
+                            if (application.interviewLocation != null)
+                              Text(
+                                application.interviewLocation!,
+                                style: TextStyle(color: Colors.orange[700]),
+                              ),
+                          ],
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+              ],
+
+              // Notes (if any)
+              if (application.notes != null &&
+                  application.notes!.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue[200]!),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.note, color: Colors.blue[700]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'หมายเหตุจากคลินิก:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                            Text(
+                              application.notes!,
+                              style: TextStyle(color: Colors.blue[700]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              // Job details
+              if (job != null) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.work, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      'ประเภทงาน: ${job.workType}',
+                      style: TextStyle(color: Colors.grey[600]),
                     ),
                   ],
                 ),
-              );
-            }).toList(),
+                if (job.workType == 'Full-time' &&
+                    job.salaryFullTime != null) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'เงินเดือน: ${job.salaryFullTime} บาท',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ] else if (job.workType == 'Part-time') ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatPartTimeRate(job),
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ],
+                if (job.skillAssistant.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.star, size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          'ทักษะ: ${job.skillAssistant.take(3).join(', ')}${job.skillAssistant.length > 3 ? ' และอีก ${job.skillAssistant.length - 3} รายการ' : ''}',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+              const SizedBox(height: 8),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -623,22 +826,342 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
     );
   }
 
+  Widget _buildStatusChip(String status) {
+    Color backgroundColor;
+    Color textColor;
+    IconData icon;
+
+    switch (status) {
+      case 'submitted':
+        backgroundColor = Colors.blue[100]!;
+        textColor = Colors.blue[700]!;
+        icon = Icons.send;
+        break;
+      case 'under_review':
+        backgroundColor = Colors.orange[100]!;
+        textColor = Colors.orange[700]!;
+        icon = Icons.search;
+        break;
+      case 'shortlisted':
+        backgroundColor = Colors.purple[100]!;
+        textColor = Colors.purple[700]!;
+        icon = Icons.star;
+        break;
+      case 'interview_scheduled':
+        backgroundColor = Colors.indigo[100]!;
+        textColor = Colors.indigo[700]!;
+        icon = Icons.event;
+        break;
+      case 'interview_completed':
+        backgroundColor = Colors.teal[100]!;
+        textColor = Colors.teal[700]!;
+        icon = Icons.check_circle;
+        break;
+      case 'offered':
+        backgroundColor = Colors.green[100]!;
+        textColor = Colors.green[700]!;
+        icon = Icons.local_offer;
+        break;
+      case 'hired':
+        backgroundColor = Colors.green[200]!;
+        textColor = Colors.green[800]!;
+        icon = Icons.celebration;
+        break;
+      case 'rejected':
+        backgroundColor = Colors.red[100]!;
+        textColor = Colors.red[700]!;
+        icon = Icons.cancel;
+        break;
+      default:
+        backgroundColor = Colors.grey[100]!;
+        textColor = Colors.grey[700]!;
+        icon = Icons.help;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: textColor),
+          const SizedBox(width: 4),
+          Text(
+            _getStatusText(status),
+            style: TextStyle(
+              color: textColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _getStatusText(String status) {
     switch (status) {
       case 'submitted':
         return 'ส่งแล้ว';
-      case 'reviewing':
-        return 'อยู่ระหว่างพิจารณา';
+      case 'under_review':
+        return 'กำลังพิจารณา';
+      case 'shortlisted':
+        return 'คัดเลือก';
       case 'interview_scheduled':
-        return 'นัดสัมภาษณ์แล้ว';
-      case 'offer_made':
+        return 'สัมภาษณ์';
+      case 'interview_completed':
+        return 'สัมภาษณ์แล้ว';
+      case 'offered':
         return 'ได้รับข้อเสนอ';
       case 'hired':
-        return 'ได้งานแล้ว';
+        return 'ได้งาน';
       case 'rejected':
-        return 'ปฏิเสธ';
+        return 'ไม่ผ่าน';
       default:
-        return status;
+        return 'ไม่ทราบ';
     }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatPartTimeRate(AssistantJobModel job) {
+    List<String> rates = [];
+    if (job.payPerDayPartTime != null && job.payPerDayPartTime!.isNotEmpty) {
+      rates.add('${job.payPerDayPartTime}/วัน');
+    }
+    if (job.payPerHourPartTime != null && job.payPerHourPartTime!.isNotEmpty) {
+      rates.add('${job.payPerHourPartTime}/ชม.');
+    }
+    return rates.isEmpty ? 'ตามตกลง' : rates.join(', ');
+  }
+
+  void _showApplicationDetails(JobApplicationModel application) {
+    final job = _jobDetails[application.jobId];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (context, scrollController) => Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Header
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'รายละเอียดใบสมัคร',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  _buildStatusChip(application.status),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Basic Info
+                      _buildDetailRow(
+                        'วันที่สมัคร',
+                        _formatDate(application.appliedAt),
+                      ),
+                      _buildDetailRow(
+                        'อัปเดตล่าสุด',
+                        _formatDate(application.updatedAt),
+                      ),
+                      _buildDetailRow(
+                        'หมายเลขใบสมัคร',
+                        application.applicationId,
+                      ),
+
+                      // Job Information
+                      if (job != null) ...[
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 16),
+                        Text(
+                          'ข้อมูลงาน',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildDetailRow('ตำแหน่งงาน', job.titlePost),
+                        _buildDetailRow('คลินิก', job.clinicNameAndBranch),
+                        _buildDetailRow('ประเภทงาน', job.workType),
+                        if (job.workType == 'Full-time' &&
+                            job.salaryFullTime != null)
+                          _buildDetailRow(
+                            'เงินเดือน',
+                            '${job.salaryFullTime} บาท',
+                          ),
+                        if (job.workType == 'Part-time')
+                          _buildDetailRow(
+                            'อัตราค่าจ้าง',
+                            _formatPartTimeRate(job),
+                          ),
+                        if (job.skillAssistant.isNotEmpty)
+                          _buildDetailRow(
+                            'ทักษะที่ต้องการ',
+                            job.skillAssistant.join(', '),
+                          ),
+                        if (job.perk != null && job.perk!.isNotEmpty)
+                          _buildDetailRow('สวัสดิการ', job.perk!),
+                      ],
+
+                      if (application.interviewDate != null) ...[
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 16),
+                        Text(
+                          'ข้อมูลการสัมภาษณ์',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildDetailRow(
+                          'วันที่สัมภาษณ์',
+                          _formatDate(application.interviewDate!),
+                        ),
+                        if (application.interviewLocation != null)
+                          _buildDetailRow(
+                            'สถานที่',
+                            application.interviewLocation!,
+                          ),
+                        if (application.interviewNotes != null)
+                          _buildDetailRow(
+                            'หมายเหตุ',
+                            application.interviewNotes!,
+                          ),
+                      ],
+
+                      const SizedBox(height: 16),
+                      const Divider(),
+                      const SizedBox(height: 16),
+
+                      // Cover Letter
+                      Text(
+                        'จดหมายนำ',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Text(application.coverLetter),
+                      ),
+
+                      // Additional Documents
+                      if (application.additionalDocuments.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          'เอกสารเพิ่มเติม',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        ...application.additionalDocuments.map(
+                          (doc) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.description, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(doc)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+
+                      // Notes from clinic
+                      if (application.notes != null &&
+                          application.notes!.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          'หมายเหตุจากคลินิก',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.blue[200]!),
+                          ),
+                          child: Text(application.notes!),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
   }
 }

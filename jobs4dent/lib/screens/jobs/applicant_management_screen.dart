@@ -9,10 +9,12 @@ class ApplicantManagementScreen extends StatefulWidget {
   const ApplicantManagementScreen({super.key});
 
   @override
-  State<ApplicantManagementScreen> createState() => _ApplicantManagementScreenState();
+  State<ApplicantManagementScreen> createState() =>
+      _ApplicantManagementScreenState();
 }
 
-class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> with SingleTickerProviderStateMixin {
+class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -33,7 +35,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
   void _loadApplications() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
-    
+
     if (authProvider.userModel != null) {
       jobProvider.getApplicantsForMyJobs(authProvider.userModel!.userId);
     }
@@ -97,7 +99,8 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
           );
         }
 
-        List<JobApplicationModel> applications = jobProvider.applicantsForMyJobs;
+        List<JobApplicationModel> applications =
+            jobProvider.applicantsForMyJobs;
 
         // Apply status filter
         if (statusFilter == 'new') {
@@ -116,7 +119,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                 Icon(Icons.inbox, size: 64, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
-                  statusFilter == null 
+                  statusFilter == null
                       ? 'ยังไม่มีการสมัคร'
                       : 'ไม่มีการสมัคร${statusFilter.replaceAll('_', ' ')}',
                   style: Theme.of(context).textTheme.headlineSmall,
@@ -158,12 +161,12 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                 children: [
                   CircleAvatar(
                     backgroundColor: Colors.blue[100],
-                    backgroundImage: application.applicantProfilePhoto != null 
+                    backgroundImage: application.applicantProfilePhoto != null
                         ? NetworkImage(application.applicantProfilePhoto!)
                         : null,
                     child: application.applicantProfilePhoto == null
                         ? Text(
-                            application.applicantName.isNotEmpty 
+                            application.applicantName.isNotEmpty
                                 ? application.applicantName[0].toUpperCase()
                                 : 'A',
                             style: TextStyle(color: Colors.blue[700]),
@@ -177,16 +180,14 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                       children: [
                         Text(
                           application.applicantName,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           application.applicantEmail,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -238,10 +239,10 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
               // Cover letter preview
               const SizedBox(height: 12),
               Text(
-                                    'จดหมายนำ:',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                'จดหมายนำ:',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 4),
               Text(
@@ -411,7 +412,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                       Navigator.pop(context);
                       _showUpdateStatusDialog(application);
                     },
-                                          child: const Text('อัปเดตสถานะ'),
+                    child: const Text('อัปเดตสถานะ'),
                   ),
                 ],
               ),
@@ -448,21 +449,27 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                       // Additional documents
                       if (application.additionalDocuments.isNotEmpty) ...[
                         _buildSectionTitle('เอกสารเพิ่มเติม'),
-                        ...application.additionalDocuments.map((doc) => Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.description),
-                            title: Text(doc),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.download),
-                              onPressed: () {
-                                                                  // Note: Document download feature pending implementation
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('การดาวน์โหลดเอกสาร - เร็วๆ นี้')),
-                                );
-                              },
+                        ...application.additionalDocuments.map(
+                          (doc) => Card(
+                            child: ListTile(
+                              leading: const Icon(Icons.description),
+                              title: Text(doc),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.download),
+                                onPressed: () {
+                                  // Note: Document download feature pending implementation
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'การดาวน์โหลดเอกสาร - เร็วๆ นี้',
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
-                        )),
+                        ),
                         const SizedBox(height: 16),
                       ],
 
@@ -485,9 +492,9 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -499,16 +506,126 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Personal Information from AssistantMiniResumeScreen
+            if (profile['fullName'] != null &&
+                profile['fullName'].toString().isNotEmpty)
+              _buildProfileRow('ชื่อ-นามสกุล', profile['fullName']),
+            if (profile['nickName'] != null &&
+                profile['nickName'].toString().isNotEmpty)
+              _buildProfileRow('ชื่อเล่น', profile['nickName']),
+            if (profile['age'] != null)
+              _buildProfileRow('อายุ', '${profile['age']} ปี'),
+            if (profile['phoneNumber'] != null &&
+                profile['phoneNumber'].toString().isNotEmpty)
+              _buildProfileRow('เบอร์โทรศัพท์', profile['phoneNumber']),
+
+            // Job Application Information from AssistantMiniResumeScreen
+            if (profile['educationLevel'] != null)
+              _buildProfileRow('วุฒิการศึกษา', profile['educationLevel']),
+            if (profile['jobType'] != null)
+              _buildProfileRow('ประเภทงานที่ต้องการ', profile['jobType']),
+            if (profile['jobReadiness'] != null)
+              _buildProfileRow(
+                'ความพร้อมในการเริ่มงาน',
+                profile['jobReadiness'],
+              ),
+            if (profile['minSalary'] != null ||
+                profile['maxSalary'] != null) ...[
+              () {
+                String salaryRange = '';
+                if (profile['minSalary'] != null &&
+                    profile['maxSalary'] != null) {
+                  salaryRange =
+                      '${profile['minSalary']} - ${profile['maxSalary']} บาท/เดือน';
+                } else if (profile['minSalary'] != null) {
+                  salaryRange = '${profile['minSalary']} บาท/เดือนขึ้นไป';
+                } else if (profile['maxSalary'] != null) {
+                  salaryRange = 'ไม่เกิน ${profile['maxSalary']} บาท/เดือน';
+                }
+                return _buildProfileRow('เงินเดือนที่ต้องการ', salaryRange);
+              }(),
+            ],
+
+            // Education and Experience from AssistantMiniResumeScreen
+            if (profile['educationInstitute'] != null &&
+                profile['educationInstitute'].toString().isNotEmpty)
+              _buildProfileRow('สถาบันการศึกษา', profile['educationInstitute']),
+            if (profile['experienceYears'] != null)
+              _buildProfileRow(
+                'ประสบการณ์',
+                '${profile['experienceYears']} ปี',
+              ),
+            if (profile['educationSpecialist'] != null &&
+                profile['educationSpecialist'].toString().isNotEmpty)
+              _buildProfileRow('การศึกษาพิเศษ', profile['educationSpecialist']),
+
+            // Skills from AssistantMiniResumeScreen
+            if (profile['coreCompetencies'] != null &&
+                (profile['coreCompetencies'] as List).isNotEmpty)
+              _buildProfileRow(
+                'ทักษะผู้ช่วยทันตแพทย์',
+                (profile['coreCompetencies'] as List).join(', '),
+              ),
+            if (profile['counterSkills'] != null &&
+                (profile['counterSkills'] as List).isNotEmpty)
+              _buildProfileRow(
+                'ทักษะเคาน์เตอร์',
+                (profile['counterSkills'] as List).join(', '),
+              ),
+            if (profile['softwareSkills'] != null &&
+                (profile['softwareSkills'] as List).isNotEmpty)
+              _buildProfileRow(
+                'ซอฟต์แวร์ที่ใช้ได้',
+                (profile['softwareSkills'] as List).join(', '),
+              ),
+            if (profile['eqSkills'] != null &&
+                (profile['eqSkills'] as List).isNotEmpty)
+              _buildProfileRow(
+                'ทักษะด้านอารมณ์และสังคม',
+                (profile['eqSkills'] as List).join(', '),
+              ),
+            if (profile['workLimitations'] != null &&
+                (profile['workLimitations'] as List).isNotEmpty)
+              _buildProfileRow(
+                'ข้อจำกัดในการทำงาน',
+                (profile['workLimitations'] as List).join(', '),
+              ),
+
+            // Additional profile information
+            if (profile['address'] != null &&
+                profile['address'].toString().isNotEmpty)
+              _buildProfileRow('ที่อยู่', profile['address']),
+            if (profile['verificationStatus'] != null)
+              _buildProfileRow(
+                'สถานะการยืนยันตัวตน',
+                _getVerificationStatusText(profile['verificationStatus']),
+              ),
+
+            // Legacy fields (for backward compatibility)
             if (profile['currentPosition'] != null)
-                              _buildProfileRow('ตำแหน่ง', profile['currentPosition']),
-            if (profile['yearsOfExperience'] != null)
-                              _buildProfileRow('ประสบการณ์', '${profile['yearsOfExperience']} ปี'),
-            if (profile['skills'] != null && (profile['skills'] as List).isNotEmpty)
-                              _buildProfileRow('ทักษะ', (profile['skills'] as List).join(', ')),
-            if (profile['specialties'] != null && (profile['specialties'] as List).isNotEmpty)
-                              _buildProfileRow('ความเชี่ยวชาญ', (profile['specialties'] as List).join(', ')),
-            if (profile['education'] != null && (profile['education'] as List).isNotEmpty)
-                              _buildProfileRow('การศึกษา', '${(profile['education'] as List).length} รายการ'),
+              _buildProfileRow('ตำแหน่งปัจจุบัน', profile['currentPosition']),
+            if (profile['yearsOfExperience'] != null &&
+                profile['experienceYears'] == null)
+              _buildProfileRow(
+                'ประสบการณ์',
+                '${profile['yearsOfExperience']} ปี',
+              ),
+            if (profile['skills'] != null &&
+                (profile['skills'] as List).isNotEmpty &&
+                profile['coreCompetencies'] == null)
+              _buildProfileRow('ทักษะ', (profile['skills'] as List).join(', ')),
+            if (profile['specialties'] != null &&
+                (profile['specialties'] as List).isNotEmpty)
+              _buildProfileRow(
+                'ความเชี่ยวชาญ',
+                (profile['specialties'] as List).join(', '),
+              ),
+            if (profile['education'] != null &&
+                (profile['education'] as List).isNotEmpty)
+              _buildProfileRow(
+                'การศึกษา',
+                '${(profile['education'] as List).length} รายการ',
+              ),
           ],
         ),
       ),
@@ -534,6 +651,21 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
     );
   }
 
+  String _getVerificationStatusText(String status) {
+    switch (status) {
+      case 'unverified':
+        return 'ยังไม่ยืนยันตัวตน';
+      case 'pending':
+        return 'รอการตรวจสอบ';
+      case 'verified':
+        return 'ยืนยันตัวตนแล้ว';
+      case 'rejected':
+        return 'การยืนยันถูกปฏิเสธ';
+      default:
+        return 'ไม่ทราบสถานะ';
+    }
+  }
+
   Widget _buildTimelineCard(JobApplicationModel application) {
     return Card(
       child: Padding(
@@ -544,7 +676,11 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
             _buildTimelineItem('สมัครเมื่อ', application.appliedAt, true),
             _buildTimelineItem('อัปเดตล่าสุด', application.updatedAt, false),
             if (application.interviewDate != null)
-              _buildTimelineItem('กำหนดการสัมภาษณ์', application.interviewDate!, false),
+              _buildTimelineItem(
+                'กำหนดการสัมภาษณ์',
+                application.interviewDate!,
+                false,
+              ),
           ],
         ),
       ),
@@ -565,11 +701,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
               ),
             ),
             if (!isFirst)
-              Container(
-                width: 2,
-                height: 20,
-                color: Colors.grey[300],
-              ),
+              Container(width: 2, height: 20, color: Colors.grey[300]),
           ],
         ),
         const SizedBox(width: 12),
@@ -577,10 +709,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w500),
-              ),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
               Text(
                 _formatDate(date),
                 style: TextStyle(color: Colors.grey[600]),
@@ -594,9 +723,13 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
 
   void _showUpdateStatusDialog(JobApplicationModel application) {
     String selectedStatus = application.status;
-    final notesController = TextEditingController(text: application.notes ?? '');
+    final notesController = TextEditingController(
+      text: application.notes ?? '',
+    );
     DateTime? interviewDate = application.interviewDate;
-    final interviewLocationController = TextEditingController(text: application.interviewLocation ?? '');
+    final interviewLocationController = TextEditingController(
+      text: application.interviewLocation ?? '',
+    );
 
     showDialog(
       context: context,
@@ -610,7 +743,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
               children: [
                 Text('ผู้สมัคร: ${application.applicantName}'),
                 const SizedBox(height: 16),
-                
+
                 // Status dropdown
                 DropdownButtonFormField<String>(
                   value: selectedStatus,
@@ -638,7 +771,9 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                     onTap: () async {
                       final date = await showDatePicker(
                         context: context,
-                        initialDate: interviewDate ?? DateTime.now().add(const Duration(days: 1)),
+                        initialDate:
+                            interviewDate ??
+                            DateTime.now().add(const Duration(days: 1)),
                         firstDate: DateTime.now(),
                         lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
@@ -654,7 +789,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
                         border: OutlineInputBorder(),
                       ),
                       child: Text(
-                        interviewDate != null 
+                        interviewDate != null
                             ? _formatDate(interviewDate!)
                             : 'เลือกวันที่สัมภาษณ์',
                       ),
@@ -688,17 +823,21 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen> w
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-                                  child: const Text('ยกเลิก'),
+              child: const Text('ยกเลิก'),
             ),
             ElevatedButton(
               onPressed: () => _updateApplicationStatus(
                 application.applicationId,
                 selectedStatus,
-                notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+                notesController.text.trim().isEmpty
+                    ? null
+                    : notesController.text.trim(),
                 interviewDate,
-                interviewLocationController.text.trim().isEmpty ? null : interviewLocationController.text.trim(),
+                interviewLocationController.text.trim().isEmpty
+                    ? null
+                    : interviewLocationController.text.trim(),
               ),
-                                  child: const Text('อัปเดต'),
+              child: const Text('อัปเดต'),
             ),
           ],
         ),
