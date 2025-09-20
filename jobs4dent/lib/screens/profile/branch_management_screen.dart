@@ -17,7 +17,10 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
   @override
   void initState() {
     super.initState();
-    _loadBranchesOnInit();
+    // Use addPostFrameCallback to ensure the widget is fully built before loading data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadBranchesOnInit();
+    });
   }
 
   Future<void> _loadBranchesOnInit() async {

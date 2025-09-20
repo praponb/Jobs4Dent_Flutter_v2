@@ -30,37 +30,70 @@ class JobSearchService {
     String? endDate,
   }) async {
     try {
-      // Use a simple query to get newest 1000 jobs by highest ID
-      // Order by jobId descending to get newest posts first
-      Query query = _firestore.collection('job_posts_dentist')
-          .where('isActive', isEqualTo: true)
-          .orderBy('jobId', descending: true)
-          .limit(1000); // Get only 1000 newest jobs directly from Firebase
+      QuerySnapshot querySnapshot;
 
-      final querySnapshot = await query.get();
+      try {
+        // Use a simple query to get newest 1000 jobs by creation date
+        // Order by createdAt descending to get newest posts first
+        Query query = _firestore
+            .collection('job_posts_dentist')
+            .where('isActive', isEqualTo: true)
+            .orderBy('createdAt', descending: true)
+            .limit(1000); // Get only 1000 newest jobs directly from Firebase
+
+        querySnapshot = await query.get();
+      } catch (e) {
+        debugPrint(
+          'Error with createdAt ordering, falling back to simple query: $e',
+        );
+        // Fallback: simple query without ordering
+        Query fallbackQuery = _firestore
+            .collection('job_posts_dentist')
+            .where('isActive', isEqualTo: true)
+            .limit(1000);
+
+        querySnapshot = await fallbackQuery.get();
+      }
 
       List<JobModel> jobs = querySnapshot.docs
-          .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) {
+            try {
+              return JobModel.fromMap(doc.data() as Map<String, dynamic>);
+            } catch (e) {
+              debugPrint('Error parsing job document ${doc.id}: $e');
+              return null;
+            }
+          })
+          .where((job) => job != null)
+          .cast<JobModel>()
           .toList();
 
       // Apply all filters client-side to avoid composite index issues
       if (keyword != null && keyword.isNotEmpty) {
-        jobs = jobs.where((job) =>
-            job.title.toLowerCase().contains(keyword.toLowerCase()) ||
-            job.description.toLowerCase().contains(keyword.toLowerCase()) ||
-            job.clinicName.toLowerCase().contains(keyword.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) =>
+                  job.title.toLowerCase().contains(keyword.toLowerCase()) ||
+                  job.description.toLowerCase().contains(
+                    keyword.toLowerCase(),
+                  ) ||
+                  job.clinicName.toLowerCase().contains(keyword.toLowerCase()),
+            )
+            .toList();
       }
 
       if (province != null && province.isNotEmpty) {
         jobs = jobs.where((job) => job.province == province).toList();
       }
-      
+
       if (jobCategory != null && jobCategory.isNotEmpty) {
         jobs = jobs.where((job) => job.jobCategory == jobCategory).toList();
       }
-      
+
       if (experienceLevel != null && experienceLevel.isNotEmpty) {
-        jobs = jobs.where((job) => job.experienceLevel == experienceLevel).toList();
+        jobs = jobs
+            .where((job) => job.experienceLevel == experienceLevel)
+            .toList();
       }
 
       if (minSalary != null && minSalary.isNotEmpty) {
@@ -75,18 +108,31 @@ class JobSearchService {
       }
 
       if (title != null && title.isNotEmpty) {
-        jobs = jobs.where((job) => job.title.toLowerCase().contains(title.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) => job.title.toLowerCase().contains(title.toLowerCase()),
+            )
+            .toList();
       }
 
       if (description != null && description.isNotEmpty) {
-        jobs = jobs.where((job) => job.description.toLowerCase().contains(description.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) => job.description.toLowerCase().contains(
+                description.toLowerCase(),
+              ),
+            )
+            .toList();
       }
 
       if (minExperienceYears != null && minExperienceYears.isNotEmpty) {
         final minExpNum = int.tryParse(minExperienceYears);
         if (minExpNum != null) {
           jobs = jobs.where((job) {
-            if (job.minExperienceYears == null || job.minExperienceYears!.isEmpty) return false;
+            if (job.minExperienceYears == null ||
+                job.minExperienceYears!.isEmpty) {
+              return false;
+            }
             final jobExp = int.tryParse(job.minExperienceYears!);
             return jobExp != null && jobExp >= minExpNum;
           }).toList();
@@ -98,7 +144,13 @@ class JobSearchService {
       }
 
       if (perks != null && perks.isNotEmpty) {
-        jobs = jobs.where((job) => job.perks != null && job.perks!.toLowerCase().contains(perks.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) =>
+                  job.perks != null &&
+                  job.perks!.toLowerCase().contains(perks.toLowerCase()),
+            )
+            .toList();
       }
 
       if (city != null && city.isNotEmpty) {
@@ -106,26 +158,54 @@ class JobSearchService {
       }
 
       if (trainLine != null && trainLine.isNotEmpty) {
-        jobs = jobs.where((job) => job.trainLine != null && job.trainLine == trainLine).toList();
+        jobs = jobs
+            .where((job) => job.trainLine != null && job.trainLine == trainLine)
+            .toList();
       }
 
       if (trainStation != null && trainStation.isNotEmpty) {
-        jobs = jobs.where((job) => job.trainStation != null && job.trainStation == trainStation).toList();
+        jobs = jobs
+            .where(
+              (job) =>
+                  job.trainStation != null && job.trainStation == trainStation,
+            )
+            .toList();
       }
 
       if (workingDays != null && workingDays.isNotEmpty) {
-        jobs = jobs.where((job) => job.workingDays != null && 
-                                   job.workingDays!.toLowerCase().contains(workingDays.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) =>
+                  job.workingDays != null &&
+                  job.workingDays!.toLowerCase().contains(
+                    workingDays.toLowerCase(),
+                  ),
+            )
+            .toList();
       }
 
       if (workingHours != null && workingHours.isNotEmpty) {
-        jobs = jobs.where((job) => job.workingHours != null && 
-                                   job.workingHours!.toLowerCase().contains(workingHours.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) =>
+                  job.workingHours != null &&
+                  job.workingHours!.toLowerCase().contains(
+                    workingHours.toLowerCase(),
+                  ),
+            )
+            .toList();
       }
 
       if (additionalRequirements != null && additionalRequirements.isNotEmpty) {
-        jobs = jobs.where((job) => job.additionalRequirements != null && 
-                                   job.additionalRequirements!.toLowerCase().contains(additionalRequirements.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) =>
+                  job.additionalRequirements != null &&
+                  job.additionalRequirements!.toLowerCase().contains(
+                    additionalRequirements.toLowerCase(),
+                  ),
+            )
+            .toList();
       }
 
       // No need to limit here since we already got 1000 from Firebase
@@ -151,36 +231,69 @@ class JobSearchService {
     String? userId, // For matching calculation
   }) async {
     try {
-      // Use the simplest query to get newest 1000 jobs by highest ID
-      Query query = _firestore.collection('job_posts_dentist')
-          .where('isActive', isEqualTo: true)
-          .orderBy('jobId', descending: true)
-          .limit(1000);
+      QuerySnapshot querySnapshot;
 
-      final querySnapshot = await query.get();
+      try {
+        // Use the simplest query to get newest 1000 jobs by creation date
+        Query query = _firestore
+            .collection('job_posts_dentist')
+            .where('isActive', isEqualTo: true)
+            .orderBy('createdAt', descending: true)
+            .limit(1000);
+
+        querySnapshot = await query.get();
+      } catch (e) {
+        debugPrint(
+          'Error with createdAt ordering in alternative search, falling back to simple query: $e',
+        );
+        // Fallback: simple query without ordering
+        Query fallbackQuery = _firestore
+            .collection('job_posts_dentist')
+            .where('isActive', isEqualTo: true)
+            .limit(1000);
+
+        querySnapshot = await fallbackQuery.get();
+      }
 
       List<JobModel> jobs = querySnapshot.docs
-          .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) {
+            try {
+              return JobModel.fromMap(doc.data() as Map<String, dynamic>);
+            } catch (e) {
+              debugPrint('Error parsing job document ${doc.id}: $e');
+              return null;
+            }
+          })
+          .where((job) => job != null)
+          .cast<JobModel>()
           .toList();
 
       // Apply all filters client-side
       if (keyword != null && keyword.isNotEmpty) {
-        jobs = jobs.where((job) =>
-            job.title.toLowerCase().contains(keyword.toLowerCase()) ||
-            job.description.toLowerCase().contains(keyword.toLowerCase()) ||
-            job.clinicName.toLowerCase().contains(keyword.toLowerCase())).toList();
+        jobs = jobs
+            .where(
+              (job) =>
+                  job.title.toLowerCase().contains(keyword.toLowerCase()) ||
+                  job.description.toLowerCase().contains(
+                    keyword.toLowerCase(),
+                  ) ||
+                  job.clinicName.toLowerCase().contains(keyword.toLowerCase()),
+            )
+            .toList();
       }
 
       if (province != null && province.isNotEmpty) {
         jobs = jobs.where((job) => job.province == province).toList();
       }
-      
+
       if (jobCategory != null && jobCategory.isNotEmpty) {
         jobs = jobs.where((job) => job.jobCategory == jobCategory).toList();
       }
-      
+
       if (experienceLevel != null && experienceLevel.isNotEmpty) {
-        jobs = jobs.where((job) => job.experienceLevel == experienceLevel).toList();
+        jobs = jobs
+            .where((job) => job.experienceLevel == experienceLevel)
+            .toList();
       }
 
       if (minSalary != null && minSalary.isNotEmpty) {
@@ -208,13 +321,16 @@ class JobSearchService {
   }
 
   /// Calculate matching scores for jobs based on user profile
-  Future<List<JobModel>> calculateMatchingScores(List<JobModel> jobs, String userId) async {
+  Future<List<JobModel>> calculateMatchingScores(
+    List<JobModel> jobs,
+    String userId,
+  ) async {
     try {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists) return jobs;
 
       final user = UserModel.fromMap(userDoc.data()!);
-      
+
       for (int i = 0; i < jobs.length; i++) {
         final job = jobs[i];
         double score = 0.0;
@@ -227,7 +343,9 @@ class JobSearchService {
         factors++;
 
         // Experience matching (20% weight)
-        if (job.minExperienceYears != null && job.minExperienceYears!.isNotEmpty && user.yearsOfExperience != null) {
+        if (job.minExperienceYears != null &&
+            job.minExperienceYears!.isNotEmpty &&
+            user.yearsOfExperience != null) {
           final userExperience = int.tryParse(user.yearsOfExperience!) ?? 0;
           final jobMinExp = int.tryParse(job.minExperienceYears!) ?? 0;
           if (userExperience >= jobMinExp) {
@@ -238,15 +356,19 @@ class JobSearchService {
         }
         factors++;
 
-        jobs[i] = job.copyWith(matchingScore: factors > 0 ? score / factors : 0);
+        jobs[i] = job.copyWith(
+          matchingScore: factors > 0 ? score / factors : 0,
+        );
       }
 
       // Sort by matching score
-      jobs.sort((a, b) => (b.matchingScore ?? 0).compareTo(a.matchingScore ?? 0));
+      jobs.sort(
+        (a, b) => (b.matchingScore ?? 0).compareTo(a.matchingScore ?? 0),
+      );
       return jobs;
     } catch (e) {
       debugPrint('Error calculating matching scores: $e');
       return jobs;
     }
   }
-} 
+}

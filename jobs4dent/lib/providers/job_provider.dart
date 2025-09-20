@@ -415,6 +415,25 @@ class JobProvider with ChangeNotifier {
     }
   }
 
+  Future<void> getMyDentistApplications(String applicantId) async {
+    try {
+      _setLoading(true);
+      _setError(null);
+
+      _myApplications = await _jobApplicationService.getMyDentistApplications(
+        applicantId,
+      );
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    } catch (e) {
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   Future<void> getApplicantsForMyJobs(String clinicId) async {
     try {
       _setLoading(true);
@@ -615,16 +634,41 @@ class JobProvider with ChangeNotifier {
       _setLoading(true);
       _setError(null);
 
-      // Get newest 1000 active jobs by highest ID
-      Query query = _firestore
-          .collection('job_posts_dentist')
-          .where('isActive', isEqualTo: true)
-          .orderBy('jobId', descending: true)
-          .limit(1000);
+      QuerySnapshot querySnapshot;
 
-      final querySnapshot = await query.get();
+      try {
+        // Get newest 1000 active jobs by creation date
+        Query query = _firestore
+            .collection('job_posts_dentist')
+            .where('isActive', isEqualTo: true)
+            .orderBy('createdAt', descending: true)
+            .limit(1000);
+
+        querySnapshot = await query.get();
+      } catch (e) {
+        debugPrint(
+          'Error with createdAt ordering in loadAllJobs, falling back to simple query: $e',
+        );
+        // Fallback: simple query without ordering
+        Query fallbackQuery = _firestore
+            .collection('job_posts_dentist')
+            .where('isActive', isEqualTo: true)
+            .limit(1000);
+
+        querySnapshot = await fallbackQuery.get();
+      }
+
       final allJobs = querySnapshot.docs
-          .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) {
+            try {
+              return JobModel.fromMap(doc.data() as Map<String, dynamic>);
+            } catch (e) {
+              debugPrint('Error parsing job document ${doc.id}: $e');
+              return null;
+            }
+          })
+          .where((job) => job != null)
+          .cast<JobModel>()
           .toList();
 
       if (allJobs.isEmpty) {

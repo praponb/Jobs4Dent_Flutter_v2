@@ -325,4 +325,32 @@ class JobApplicationService {
       throw Exception('การส่งใบสมัครไม่สำเร็จ: $e');
     }
   }
+
+  /// Get my dentist job applications
+  Future<List<JobApplicationModel>> getMyDentistApplications(
+    String applicantId,
+  ) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('job_applications_dentist')
+          .where('applicantId', isEqualTo: applicantId)
+          .get();
+
+      final applications = querySnapshot.docs
+          .map(
+            (doc) => JobApplicationModel.fromMap({
+              ...doc.data(),
+              'applicationId': doc.id,
+            }),
+          )
+          .toList();
+
+      // Sort by appliedAt in descending order locally
+      applications.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+
+      return applications;
+    } catch (e) {
+      throw Exception('การดึงใบสมัครงานทันตแพทย์ไม่สำเร็จ: $e');
+    }
+  }
 }

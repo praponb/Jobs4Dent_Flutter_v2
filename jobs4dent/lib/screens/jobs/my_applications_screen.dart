@@ -5,6 +5,7 @@ import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_application_model.dart';
 import '../../models/assistant_job_model.dart';
+import '../../models/job_model.dart';
 
 class MyApplicationsScreen extends StatefulWidget {
   final String? initialFilter;
@@ -19,7 +20,8 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  Map<String, AssistantJobModel> _jobDetails = {};
+  Map<String, AssistantJobModel> _assistantJobDetails = {};
+  Map<String, JobModel> _dentistJobDetails = {};
 
   @override
   void initState() {
@@ -47,17 +49,27 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
 
     if (authProvider.userModel != null) {
-      // Load assistant job applications for the current user
-      await jobProvider.getMyAssistantApplications(
-        authProvider.userModel!.userId,
-      );
+      final user = authProvider.userModel!;
 
-      // Load job details for each application
-      await _loadJobDetails(jobProvider.myApplications);
+      if (user.userType == 'dentist') {
+        // Load dentist job applications for the current user
+        await jobProvider.getMyDentistApplications(user.userId);
+
+        // Load dentist job details for each application
+        await _loadDentistJobDetails(jobProvider.myApplications);
+      } else {
+        // Load assistant job applications for the current user
+        await jobProvider.getMyAssistantApplications(user.userId);
+
+        // Load assistant job details for each application
+        await _loadAssistantJobDetails(jobProvider.myApplications);
+      }
     }
   }
 
-  Future<void> _loadJobDetails(List<JobApplicationModel> applications) async {
+  Future<void> _loadAssistantJobDetails(
+    List<JobApplicationModel> applications,
+  ) async {
     final jobDetails = <String, AssistantJobModel>{};
 
     for (final application in applications) {
@@ -74,13 +86,47 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
           jobDetails[application.jobId] = job;
         }
       } catch (e) {
-        debugPrint('Error loading job details for ${application.jobId}: $e');
+        debugPrint(
+          'Error loading assistant job details for ${application.jobId}: $e',
+        );
       }
     }
 
     if (mounted) {
       setState(() {
-        _jobDetails = jobDetails;
+        _assistantJobDetails = jobDetails;
+      });
+    }
+  }
+
+  Future<void> _loadDentistJobDetails(
+    List<JobApplicationModel> applications,
+  ) async {
+    final jobDetails = <String, JobModel>{};
+
+    for (final application in applications) {
+      try {
+        final doc = await _firestore
+            .collection('job_posts_dentist')
+            .doc(application.jobId)
+            .get();
+
+        if (doc.exists) {
+          final jobData = doc.data() as Map<String, dynamic>;
+          jobData['jobId'] = jobData['jobId'] ?? doc.id;
+          final job = JobModel.fromMap(jobData);
+          jobDetails[application.jobId] = job;
+        }
+      } catch (e) {
+        debugPrint(
+          'Error loading dentist job details for ${application.jobId}: $e',
+        );
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _dentistJobDetails = jobDetails;
       });
     }
   }
@@ -192,7 +238,8 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
   }
 
   Widget _buildApplicationCard(JobApplicationModel application) {
-    final job = _jobDetails[application.jobId];
+    final assistantJob = _assistantJobDetails[application.jobId];
+    final dentistJob = _dentistJobDetails[application.jobId];
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -211,13 +258,19 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          job?.titlePost ?? 'งานผู้ช่วยทันตแพทย์',
+                          assistantJob?.titlePost ??
+                              dentistJob?.title ??
+                              application.jobTitle ??
+                              'งานทันตกรรม',
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          job?.clinicNameAndBranch ?? 'คลินิกทันตกรรม',
+                          assistantJob?.clinicNameAndBranch ??
+                              dentistJob?.clinicName ??
+                              application.clinicName ??
+                              'คลินิกทันตกรรม',
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: Colors.blue[700]),
                         ),
@@ -334,20 +387,20 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
               ],
 
               // Job details
-              if (job != null) ...[
+              if (assistantJob != null) ...[
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Icon(Icons.work, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      'ประเภทงาน: ${job.workType}',
+                      'ประเภทงาน: ${assistantJob.workType}',
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                   ],
                 ),
-                if (job.workType == 'Full-time' &&
-                    job.salaryFullTime != null) ...[
+                if (assistantJob.workType == 'Full-time' &&
+                    assistantJob.salaryFullTime != null) ...[
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -358,12 +411,12 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'เงินเดือน: ${job.salaryFullTime} บาท',
+                        'เงินเดือน: ${assistantJob.salaryFullTime} บาท',
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                     ],
                   ),
-                ] else if (job.workType == 'Part-time') ...[
+                ] else if (assistantJob.workType == 'Part-time') ...[
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -374,13 +427,13 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        _formatPartTimeRate(job),
+                        _formatPartTimeRate(assistantJob),
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                     ],
                   ),
                 ],
-                if (job.skillAssistant.isNotEmpty) ...[
+                if (assistantJob.skillAssistant.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,7 +442,52 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          'ทักษะ: ${job.skillAssistant.take(3).join(', ')}${job.skillAssistant.length > 3 ? ' และอีก ${job.skillAssistant.length - 3} รายการ' : ''}',
+                          'ทักษะ: ${assistantJob.skillAssistant.take(3).join(', ')}${assistantJob.skillAssistant.length > 3 ? ' และอีก ${assistantJob.skillAssistant.length - 3} รายการ' : ''}',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ] else if (dentistJob != null) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.work, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      'ประเภทงาน: ${dentistJob.jobCategory}',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                if (dentistJob.minSalary != null) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'เงินเดือน: ${dentistJob.minSalary} บาทขึ้นไป',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ],
+                if (dentistJob.experienceLevel.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.star, size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          'ระดับประสบการณ์: ${dentistJob.experienceLevel}',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                       ),
@@ -520,7 +618,8 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
   }
 
   void _showApplicationDetails(JobApplicationModel application) {
-    final job = _jobDetails[application.jobId];
+    final assistantJob = _assistantJobDetails[application.jobId];
+    final dentistJob = _dentistJobDetails[application.jobId];
 
     showModalBottomSheet(
       context: context,
@@ -589,7 +688,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                       ),
 
                       // Job Information
-                      if (job != null) ...[
+                      if (assistantJob != null) ...[
                         const SizedBox(height: 16),
                         const Divider(),
                         const SizedBox(height: 16),
@@ -599,27 +698,57 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        _buildDetailRow('ตำแหน่งงาน', job.titlePost),
-                        _buildDetailRow('คลินิก', job.clinicNameAndBranch),
-                        _buildDetailRow('ประเภทงาน', job.workType),
-                        if (job.workType == 'Full-time' &&
-                            job.salaryFullTime != null)
+                        _buildDetailRow('ตำแหน่งงาน', assistantJob.titlePost),
+                        _buildDetailRow(
+                          'คลินิก',
+                          assistantJob.clinicNameAndBranch,
+                        ),
+                        _buildDetailRow('ประเภทงาน', assistantJob.workType),
+                        if (assistantJob.workType == 'Full-time' &&
+                            assistantJob.salaryFullTime != null)
                           _buildDetailRow(
                             'เงินเดือน',
-                            '${job.salaryFullTime} บาท',
+                            '${assistantJob.salaryFullTime} บาท',
                           ),
-                        if (job.workType == 'Part-time')
+                        if (assistantJob.workType == 'Part-time')
                           _buildDetailRow(
                             'อัตราค่าจ้าง',
-                            _formatPartTimeRate(job),
+                            _formatPartTimeRate(assistantJob),
                           ),
-                        if (job.skillAssistant.isNotEmpty)
+                        if (assistantJob.skillAssistant.isNotEmpty)
                           _buildDetailRow(
                             'ทักษะที่ต้องการ',
-                            job.skillAssistant.join(', '),
+                            assistantJob.skillAssistant.join(', '),
                           ),
-                        if (job.perk != null && job.perk!.isNotEmpty)
-                          _buildDetailRow('สวัสดิการ', job.perk!),
+                        if (assistantJob.perk != null &&
+                            assistantJob.perk!.isNotEmpty)
+                          _buildDetailRow('สวัสดิการ', assistantJob.perk!),
+                      ] else if (dentistJob != null) ...[
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 16),
+                        Text(
+                          'ข้อมูลงาน',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildDetailRow('ตำแหน่งงาน', dentistJob.title),
+                        _buildDetailRow('คลินิก', dentistJob.clinicName),
+                        _buildDetailRow('ประเภทงาน', dentistJob.jobCategory),
+                        if (dentistJob.minSalary != null)
+                          _buildDetailRow(
+                            'เงินเดือน',
+                            '${dentistJob.minSalary} บาทขึ้นไป',
+                          ),
+                        if (dentistJob.experienceLevel.isNotEmpty)
+                          _buildDetailRow(
+                            'ระดับประสบการณ์',
+                            dentistJob.experienceLevel,
+                          ),
+                        if (dentistJob.perks != null &&
+                            dentistJob.perks!.isNotEmpty)
+                          _buildDetailRow('สวัสดิการ', dentistJob.perks!),
                       ],
 
                       if (application.interviewDate != null) ...[
