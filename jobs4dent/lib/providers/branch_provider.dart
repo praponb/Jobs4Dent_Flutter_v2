@@ -24,7 +24,10 @@ class BranchProvider with ChangeNotifier {
     try {
       _isLoading = true;
       _error = null;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
 
       // Simplified query to avoid composite index requirement during development
       // The composite index has been added to firestore.indexes.json and deployed
@@ -35,18 +38,27 @@ class BranchProvider with ChangeNotifier {
           .get();
 
       // Client-side filtering and sorting to avoid Firestore composite index
-      _branches = snapshot.docs
-          .map((doc) => BranchModel.fromFirestore(doc))
-          .where((branch) => branch.isActive) // Filter active branches
-          .toList()
-        ..sort((a, b) => a.createdAt.compareTo(b.createdAt)); // Sort by creation date
+      _branches =
+          snapshot.docs
+              .map((doc) => BranchModel.fromFirestore(doc))
+              .where((branch) => branch.isActive) // Filter active branches
+              .toList()
+            ..sort(
+              (a, b) => a.createdAt.compareTo(b.createdAt),
+            ); // Sort by creation date
 
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการโหลดข้อมูลสาขา: ${e.toString()}';
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     }
   }
 
@@ -58,11 +70,14 @@ class BranchProvider with ChangeNotifier {
         .snapshots()
         .map((snapshot) {
           // Client-side filtering and sorting to avoid Firestore composite index
-          final branches = snapshot.docs
-              .map((doc) => BranchModel.fromFirestore(doc))
-              .where((branch) => branch.isActive) // Filter active branches
-              .toList()
-            ..sort((a, b) => a.createdAt.compareTo(b.createdAt)); // Sort by creation date
+          final branches =
+              snapshot.docs
+                  .map((doc) => BranchModel.fromFirestore(doc))
+                  .where((branch) => branch.isActive) // Filter active branches
+                  .toList()
+                ..sort(
+                  (a, b) => a.createdAt.compareTo(b.createdAt),
+                ); // Sort by creation date
           return branches;
         });
   }
@@ -72,7 +87,10 @@ class BranchProvider with ChangeNotifier {
     try {
       _isLoading = true;
       _error = null;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
 
       final docRef = await _firestore
           .collection('branches')
@@ -82,11 +100,17 @@ class BranchProvider with ChangeNotifier {
       _branches.add(newBranch);
 
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการสร้างสาขา: ${e.toString()}';
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
       rethrow;
     }
   }
@@ -96,7 +120,10 @@ class BranchProvider with ChangeNotifier {
     try {
       _isLoading = true;
       _error = null;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
 
       await _firestore
           .collection('branches')
@@ -113,11 +140,17 @@ class BranchProvider with ChangeNotifier {
       }
 
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการอัปเดตสาขา: ${e.toString()}';
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
       rethrow;
     }
   }
@@ -127,15 +160,15 @@ class BranchProvider with ChangeNotifier {
     try {
       _isLoading = true;
       _error = null;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
 
-      await _firestore
-          .collection('branches')
-          .doc(branchId)
-          .update({
-            'isActive': false,
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
+      await _firestore.collection('branches').doc(branchId).update({
+        'isActive': false,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
 
       _branches.removeWhere((branch) => branch.branchId == branchId);
 
@@ -144,29 +177,39 @@ class BranchProvider with ChangeNotifier {
       }
 
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการลบสาขา: ${e.toString()}';
       _isLoading = false;
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
       rethrow;
     }
   }
 
   // Upload branch photos
-  Future<List<String>> uploadBranchPhotos(String branchId, List<File> photos) async {
+  Future<List<String>> uploadBranchPhotos(
+    String branchId,
+    List<File> photos,
+  ) async {
     try {
       List<String> photoUrls = [];
 
       for (int i = 0; i < photos.length; i++) {
         final file = photos[i];
-        final fileName = 'branch_${branchId}_photo_$i.${file.path.split('.').last}';
+        final fileName =
+            'branch_${branchId}_photo_$i.${file.path.split('.').last}';
         final ref = _storage.ref().child('branch_photos').child(fileName);
-        
+
         final uploadTask = ref.putFile(file);
         final snapshot = await uploadTask;
         final downloadUrl = await snapshot.ref.getDownloadURL();
-        
+
         photoUrls.add(downloadUrl);
       }
 
@@ -179,10 +222,7 @@ class BranchProvider with ChangeNotifier {
   // Get branch by ID
   Future<BranchModel?> getBranchById(String branchId) async {
     try {
-      final doc = await _firestore
-          .collection('branches')
-          .doc(branchId)
-          .get();
+      final doc = await _firestore.collection('branches').doc(branchId).get();
 
       if (doc.exists) {
         return BranchModel.fromFirestore(doc);
@@ -190,7 +230,10 @@ class BranchProvider with ChangeNotifier {
       return null;
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการโหลดข้อมูลสาขา: ${e.toString()}';
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
       return null;
     }
   }
@@ -198,7 +241,10 @@ class BranchProvider with ChangeNotifier {
   // Set selected branch
   void setSelectedBranch(BranchModel? branch) {
     _selectedBranch = branch;
-    notifyListeners();
+    // Defer notifyListeners to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   // Get branches near a location (requires coordinates)
@@ -221,37 +267,48 @@ class BranchProvider with ChangeNotifier {
       // Filter branches within radius
       final nearbyBranches = allBranches.where((branch) {
         if (branch.coordinates == null) return false;
-        
+
         final distance = _calculateDistance(
           userLocation.latitude,
           userLocation.longitude,
           branch.coordinates!.latitude,
           branch.coordinates!.longitude,
         );
-        
+
         return distance <= radiusInKm;
       }).toList();
 
       return nearbyBranches;
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการค้นหาสาขาใกล้เคียง: ${e.toString()}';
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
       return [];
     }
   }
 
   // Calculate distance between two coordinates (Haversine formula)
-  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  double _calculateDistance(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     const double earthRadius = 6371; // Earth's radius in kilometers
-    
+
     final double lat1Rad = lat1 * (pi / 180);
     final double lat2Rad = lat2 * (pi / 180);
     final double deltaLatRad = (lat2 - lat1) * (pi / 180);
     final double deltaLonRad = (lon2 - lon1) * (pi / 180);
 
-    final double a = sin(deltaLatRad / 2) * sin(deltaLatRad / 2) +
-        cos(lat1Rad) * cos(lat2Rad) *
-        sin(deltaLonRad / 2) * sin(deltaLonRad / 2);
+    final double a =
+        sin(deltaLatRad / 2) * sin(deltaLatRad / 2) +
+        cos(lat1Rad) *
+            cos(lat2Rad) *
+            sin(deltaLonRad / 2) *
+            sin(deltaLonRad / 2);
     final double c = 2 * asin(sqrt(a));
 
     return earthRadius * c;
@@ -263,14 +320,17 @@ class BranchProvider with ChangeNotifier {
       if (query.isEmpty) return _branches;
 
       final lowercaseQuery = query.toLowerCase();
-      
+
       return _branches.where((branch) {
         return branch.branchName.toLowerCase().contains(lowercaseQuery) ||
-               branch.address.toLowerCase().contains(lowercaseQuery);
+            branch.address.toLowerCase().contains(lowercaseQuery);
       }).toList();
     } catch (e) {
       _error = 'เกิดข้อผิดพลาดในการค้นหา: ${e.toString()}';
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
       return [];
     }
   }
@@ -278,7 +338,10 @@ class BranchProvider with ChangeNotifier {
   // Clear error
   void clearError() {
     _error = null;
-    notifyListeners();
+    // Defer notifyListeners to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   // Reset state
@@ -287,6 +350,9 @@ class BranchProvider with ChangeNotifier {
     _selectedBranch = null;
     _isLoading = false;
     _error = null;
-    notifyListeners();
+    // Defer notifyListeners to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
-} 
+}

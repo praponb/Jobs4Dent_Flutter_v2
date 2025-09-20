@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/job_provider.dart';
+import '../../models/job_application_model.dart';
+import '../../models/job_model.dart';
 import '../profile/profile_screen.dart';
 import 'dentist_data_processor.dart';
 import 'widgets/dentist_welcome_card.dart';
@@ -19,6 +22,9 @@ class DentistDashboard extends StatefulWidget {
 }
 
 class _DentistDashboardState extends State<DentistDashboard> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Map<String, JobModel> _jobDetails = {};
+
   @override
   void initState() {
     super.initState();
@@ -33,11 +39,42 @@ class _DentistDashboardState extends State<DentistDashboard> {
   Future<void> _loadData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.userModel != null) {
-      // Load user's applications and related data
-      await Provider.of<JobProvider>(
-        context,
-        listen: false,
-      ).loadUserApplications(authProvider.userModel!.userId);
+      // Load user's dentist applications and related data
+      final jobProvider = Provider.of<JobProvider>(context, listen: false);
+      await jobProvider.getMyDentistApplications(
+        authProvider.userModel!.userId,
+      );
+
+      // Load job details for applications
+      await _loadJobDetails(jobProvider.myApplications);
+    }
+  }
+
+  Future<void> _loadJobDetails(List<JobApplicationModel> applications) async {
+    final jobDetails = <String, JobModel>{};
+
+    for (final application in applications) {
+      try {
+        final doc = await _firestore
+            .collection('job_posts_dentist')
+            .doc(application.jobId)
+            .get();
+
+        if (doc.exists) {
+          final jobData = doc.data() as Map<String, dynamic>;
+          jobData['jobId'] = jobData['jobId'] ?? doc.id;
+          final job = JobModel.fromMap(jobData);
+          jobDetails[application.jobId] = job;
+        }
+      } catch (e) {
+        debugPrint('Error loading job details for ${application.jobId}: $e');
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _jobDetails = jobDetails;
+      });
     }
   }
 
@@ -114,6 +151,7 @@ class _DentistDashboardState extends State<DentistDashboard> {
                   // Recent Applications
                   DentistRecentApplications(
                     recentApplications: recentApplications,
+                    jobDetails: _jobDetails,
                   ),
                   const SizedBox(height: 24),
                 ],

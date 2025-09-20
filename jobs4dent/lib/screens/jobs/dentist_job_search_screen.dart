@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_model.dart';
-import 'job_application_screen.dart';
+import '../../models/job_application_model.dart';
 
 class DentistJobSearchScreen extends StatefulWidget {
   const DentistJobSearchScreen({super.key});
@@ -13,6 +14,7 @@ class DentistJobSearchScreen extends StatefulWidget {
 }
 
 class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _keywordController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _minSalaryController = TextEditingController();
@@ -686,19 +688,308 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
     }
   }
 
-  void _applyForJob(JobModel job) {
+  Future<void> _applyForJob(JobModel job) async {
+    debugPrint('=== STARTING JOB APPLICATION PROCESS ===');
+    debugPrint('Job ID: ${job.jobId}');
+    debugPrint('Job Title: ${job.title}');
+    debugPrint('Job Clinic: ${job.clinicName}');
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (authProvider.userModel == null) {
+      debugPrint('ERROR: User not authenticated');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('กรุณาเข้าสู่ระบบก่อนสมัครงาน')),
       );
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => JobApplicationScreen(job: job)),
+    debugPrint('User authenticated: ${authProvider.userModel!.userId}');
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
+
+    try {
+      // Add timeout to prevent hanging
+      await Future.any([
+        _processJobApplication(job, authProvider.userModel!),
+        Future.delayed(const Duration(seconds: 30), () {
+          throw Exception('timeout');
+        }),
+      ]);
+    } catch (e) {
+      debugPrint('=== ERROR IN JOB APPLICATION ===');
+      debugPrint('Error type: ${e.runtimeType}');
+      debugPrint('Error message: ${e.toString()}');
+      debugPrint('Stack trace: ${StackTrace.current}');
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+
+        String errorMessage = 'เกิดข้อผิดพลาดในการสมัครงาน';
+
+        // Provide more specific error messages based on the error type
+        if (e.toString().contains('not-found')) {
+          errorMessage = 'ไม่พบข้อมูลงานหรือผู้ใช้ กรุณาลองใหม่อีกครั้ง';
+        } else if (e.toString().contains('permission-denied')) {
+          errorMessage = 'ไม่มีสิทธิ์ในการสมัครงาน กรุณาติดต่อผู้ดูแลระบบ';
+        } else if (e.toString().contains('network')) {
+          errorMessage = 'เกิดปัญหาการเชื่อมต่อ กรุณาตรวจสอบอินเทอร์เน็ต';
+        } else if (e.toString().contains('timeout')) {
+          errorMessage = 'การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองใหม่อีกครั้ง';
+        } else {
+          // Show the actual error message for debugging
+          errorMessage = 'เกิดข้อผิดพลาด: ${e.toString()}';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'ลองใหม่',
+              textColor: Colors.white,
+              onPressed: () => _applyForJob(job),
+            ),
+          ),
+        );
+      }
+      debugPrint('=== END ERROR HANDLING ===');
+    }
+  }
+
+  Future<void> _processJobApplication(JobModel job, user) async {
+    try {
+      final now = DateTime.now();
+
+      debugPrint('Processing job application for jobId: ${job.jobId}');
+      debugPrint('Job title: ${job.title}');
+      debugPrint('Job clinic: ${job.clinicName}');
+
+      // Skip job validation for now - trust the job data we already have
+      // The job was loaded successfully from the search results, so it should exist
+      debugPrint(
+        'Skipping job validation - using job data from search results',
+      );
+      debugPrint('Job isActive from search results: ${job.isActive}');
+
+      // Only check if job is active from the loaded data
+      if (!job.isActive) {
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('งานนี้ไม่เปิดรับสมัครแล้ว'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Check if already applied
+      final existingApplication = await _firestore
+          .collection('job_applications_dentist')
+          .where('jobId', isEqualTo: job.jobId)
+          .where('applicantId', isEqualTo: user.userId)
+          .limit(1)
+          .get();
+
+      if (existingApplication.docs.isNotEmpty) {
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('คุณได้สมัครงานนี้แล้ว'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Fetch additional user data from 'users' collection with proper error handling
+      Map<String, dynamic> userData = {};
+      try {
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(user.userId)
+            .get();
+
+        if (userDoc.exists) {
+          userData = userDoc.data() as Map<String, dynamic>;
+          debugPrint(
+            'Fetched user data from users collection: ${userData.keys.toList()}',
+          );
+        } else {
+          debugPrint(
+            'User document not found in users collection, using auth data only',
+          );
+          // Use basic user data from auth provider if user document doesn't exist
+          userData = {
+            'fullName': user.userName,
+            'nickName': '',
+            'age': null,
+            'educationInstitute': '',
+            'experienceYears': 0,
+            'educationSpecialist': '',
+            'coreCompetencies': [],
+            'workLimitations': [],
+            'verificationStatus': 'unverified',
+            'isProfileComplete': false,
+          };
+        }
+      } catch (e) {
+        debugPrint('Error fetching user data: $e');
+        // Fallback to basic user data from auth provider
+        userData = {
+          'fullName': user.userName,
+          'nickName': '',
+          'age': null,
+          'educationInstitute': '',
+          'experienceYears': 0,
+          'educationSpecialist': '',
+          'coreCompetencies': [],
+          'workLimitations': [],
+          'verificationStatus': 'unverified',
+          'isProfileComplete': false,
+        };
+      }
+
+      // Create application ID
+      final applicationId = _firestore
+          .collection('job_applications_dentist')
+          .doc()
+          .id;
+
+      // Create comprehensive applicant profile with data from DentistMiniResumeScreen
+      final applicantProfile = {
+        // Basic user information
+        'userName': user.userName,
+        'email': user.email,
+        'phoneNumber': user.phoneNumber,
+        'profilePhotoUrl': user.profilePhotoUrl,
+        'userType': user.userType,
+
+        // Personal Information from DentistMiniResumeScreen
+        'fullName': userData['fullName'] ?? '',
+        'nickName': userData['nickName'] ?? '',
+        'age': userData['age'],
+
+        // Education and Experience from DentistMiniResumeScreen
+        'educationInstitute': userData['educationInstitute'] ?? '',
+        'experienceYears': userData['experienceYears'] ?? 0,
+        'educationSpecialist': userData['educationSpecialist'] ?? '',
+
+        // Skills from DentistMiniResumeScreen
+        'coreCompetencies': userData['coreCompetencies'] ?? [],
+        'workLimitations': userData['workLimitations'] ?? [],
+
+        // Additional profile information
+        'verificationStatus': userData['verificationStatus'] ?? 'unverified',
+        'isProfileComplete': userData['isProfileComplete'] ?? false,
+      };
+
+      // Create job application
+      final application = JobApplicationModel(
+        applicationId: applicationId,
+        jobId: job.jobId,
+        applicantId: user.userId,
+        clinicId: job.clinicId,
+        applicantName: userData['fullName']?.toString() ?? user.userName,
+        applicantEmail: user.email,
+        applicantPhone: user.phoneNumber,
+        applicantProfilePhoto: user.profilePhotoUrl,
+        coverLetter: 'สมัครงานตำแหน่ง ${job.title} ที่ ${job.clinicName}',
+        additionalDocuments: const [],
+        status: 'submitted',
+        appliedAt: now,
+        updatedAt: now,
+        notes: null,
+        interviewDate: null,
+        interviewLocation: null,
+        interviewNotes: null,
+        matchingScore: null,
+        applicantProfile: applicantProfile,
+        jobTitle: job.title,
+        clinicName: job.clinicName,
+      );
+
+      // Save to Firestore
+      await _firestore
+          .collection('job_applications_dentist')
+          .doc(applicationId)
+          .set(application.toMap());
+
+      // Update job's application count - try direct update first, then fallback
+      try {
+        await _firestore.collection('job_posts_dentist').doc(job.jobId).update({
+          'applicationCount': FieldValue.increment(1),
+          'applicationIds': FieldValue.arrayUnion([applicationId]),
+          'updatedAt': now.millisecondsSinceEpoch,
+        });
+        debugPrint('Successfully updated job application count by document ID');
+      } catch (e) {
+        debugPrint('Error updating job by document ID, trying by query: $e');
+        try {
+          // Fallback: find the job document and update it
+          final querySnapshot = await _firestore
+              .collection('job_posts_dentist')
+              .where('jobId', isEqualTo: job.jobId)
+              .limit(1)
+              .get();
+
+          if (querySnapshot.docs.isNotEmpty) {
+            await querySnapshot.docs.first.reference.update({
+              'applicationCount': FieldValue.increment(1),
+              'applicationIds': FieldValue.arrayUnion([applicationId]),
+              'updatedAt': now.millisecondsSinceEpoch,
+            });
+            debugPrint('Successfully updated job application count by query');
+          } else {
+            debugPrint(
+              'Warning: Could not find job to update application count',
+            );
+          }
+        } catch (fallbackError) {
+          debugPrint('Error in fallback job update: $fallbackError');
+          // Don't fail the application if we can't update the count
+        }
+      }
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('สมัครงาน ${job.title} สำเร็จแล้ว!'),
+            backgroundColor: Colors.green,
+            action: SnackBarAction(label: 'ปิด', onPressed: () {}),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error in _processJobApplication: $e');
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('เกิดข้อผิดพลาด: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'ลองใหม่',
+              textColor: Colors.white,
+              onPressed: () => _applyForJob(job),
+            ),
+          ),
+        );
+      }
+      rethrow; // Re-throw to be caught by the outer try-catch
+    }
   }
 }
