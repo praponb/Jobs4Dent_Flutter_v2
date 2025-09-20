@@ -5,13 +5,13 @@ class AssistantJobModel {
   final String titlePost;
   final List<String> skillAssistant;
   final String workType; // Part-time or Full-time
-  
+
   // Part-time specific fields
   final List<DateTime>? workDayPartTime;
   final String? paymentTermPartTime;
   final String? payPerDayPartTime;
   final String? payPerHourPartTime;
-  
+
   // Full-time specific fields
   final String? salaryFullTime;
   final String? totalIncomeFullTime;
@@ -19,7 +19,13 @@ class AssistantJobModel {
   final String? workTimeStart;
   final String? workTimeEnd;
   final String? perk;
-  
+
+  // Location fields
+  final String? selectedProvinceZones;
+  final String? selectedLocationZones;
+  final String? selectedTrainLine;
+  final String? selectedTrainStation;
+
   // System fields
   final bool isActive;
   final bool reported;
@@ -45,6 +51,10 @@ class AssistantJobModel {
     this.workTimeStart,
     this.workTimeEnd,
     this.perk,
+    this.selectedProvinceZones,
+    this.selectedLocationZones,
+    this.selectedTrainLine,
+    this.selectedTrainStation,
     this.isActive = true,
     this.reported = false,
     required this.createdAt,
@@ -61,21 +71,19 @@ class AssistantJobModel {
       titlePost: map['titlePost'] ?? '',
       skillAssistant: List<String>.from(map['skillAssistant'] ?? []),
       workType: map['workType'] ?? '',
-      workDayPartTime: map['workDayPartTime'] != null 
-          ? (map['workDayPartTime'] as List)
-              .map<DateTime>((timestamp) {
-                try {
-                  if (timestamp is int) {
-                    return DateTime.fromMillisecondsSinceEpoch(timestamp);
-                  } else if (timestamp.toString().contains('Timestamp')) {
-                    return timestamp.toDate();
-                  }
-                  return DateTime.now();
-                } catch (e) {
-                  return DateTime.now();
+      workDayPartTime: map['workDayPartTime'] != null
+          ? (map['workDayPartTime'] as List).map<DateTime>((timestamp) {
+              try {
+                if (timestamp is int) {
+                  return DateTime.fromMillisecondsSinceEpoch(timestamp);
+                } else if (timestamp.toString().contains('Timestamp')) {
+                  return timestamp.toDate();
                 }
-              })
-              .toList()
+                return DateTime.now();
+              } catch (e) {
+                return DateTime.now();
+              }
+            }).toList()
           : null,
       paymentTermPartTime: map['paymentTermPartTime'],
       payPerDayPartTime: map['payPerDayPartTime'],
@@ -86,6 +94,10 @@ class AssistantJobModel {
       workTimeStart: map['workTimeStart'],
       workTimeEnd: map['workTimeEnd'],
       perk: map['perk'],
+      selectedProvinceZones: map['selectedProvinceZones'],
+      selectedLocationZones: map['selectedLocationZones'],
+      selectedTrainLine: map['selectedTrainLine'],
+      selectedTrainStation: map['selectedTrainStation'],
       isActive: map['isActive'] ?? true,
       reported: map['reported'] ?? false,
       createdAt: _parseTimestamp(map['createdAt']) ?? DateTime.now(),
@@ -122,7 +134,9 @@ class AssistantJobModel {
       'titlePost': titlePost,
       'skillAssistant': skillAssistant,
       'workType': workType,
-      'workDayPartTime': workDayPartTime?.map((date) => date.millisecondsSinceEpoch).toList(),
+      'workDayPartTime': workDayPartTime
+          ?.map((date) => date.millisecondsSinceEpoch)
+          .toList(),
       'paymentTermPartTime': paymentTermPartTime,
       'payPerDayPartTime': payPerDayPartTime,
       'payPerHourPartTime': payPerHourPartTime,
@@ -132,6 +146,10 @@ class AssistantJobModel {
       'workTimeStart': workTimeStart,
       'workTimeEnd': workTimeEnd,
       'perk': perk,
+      'selectedProvinceZones': selectedProvinceZones,
+      'selectedLocationZones': selectedLocationZones,
+      'selectedTrainLine': selectedTrainLine,
+      'selectedTrainStation': selectedTrainStation,
       'isActive': isActive,
       'reported': reported,
       'createdAt': createdAt,
@@ -158,6 +176,10 @@ class AssistantJobModel {
     String? workTimeStart,
     String? workTimeEnd,
     String? perk,
+    String? selectedProvinceZones,
+    String? selectedLocationZones,
+    String? selectedTrainLine,
+    String? selectedTrainStation,
     bool? isActive,
     bool? reported,
     DateTime? createdAt,
@@ -182,6 +204,12 @@ class AssistantJobModel {
       workTimeStart: workTimeStart ?? this.workTimeStart,
       workTimeEnd: workTimeEnd ?? this.workTimeEnd,
       perk: perk ?? this.perk,
+      selectedProvinceZones:
+          selectedProvinceZones ?? this.selectedProvinceZones,
+      selectedLocationZones:
+          selectedLocationZones ?? this.selectedLocationZones,
+      selectedTrainLine: selectedTrainLine ?? this.selectedTrainLine,
+      selectedTrainStation: selectedTrainStation ?? this.selectedTrainStation,
       isActive: isActive ?? this.isActive,
       reported: reported ?? this.reported,
       createdAt: createdAt ?? this.createdAt,
@@ -190,4 +218,4 @@ class AssistantJobModel {
       applicationIds: applicationIds ?? this.applicationIds,
     );
   }
-} 
+}

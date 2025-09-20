@@ -95,6 +95,19 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
       _workTimeEndController.text = job.workTimeEnd ?? '';
       _perkController.text = job.perk ?? '';
       _perkPostController.text = job.perk ?? '';
+
+      // Initialize location fields
+      _selectedProvinceZones =
+          job.selectedProvinceZones ??
+          JobPostingConstants.thaiProvinceZones.first;
+      _selectedLocationZones =
+          job.selectedLocationZones ??
+          JobPostingConstants.thaiLocationZones.first.first;
+      _selectedTrainLine =
+          job.selectedTrainLine ?? JobPostingConstants.thaiTrainLines.last;
+      _selectedTrainStation =
+          job.selectedTrainStation ??
+          JobPostingConstants.thaiTrainStations.last.first;
     }
   }
 
@@ -731,6 +744,10 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
             : (_perkPostController.text.trim().isNotEmpty
                   ? _perkPostController.text.trim()
                   : null),
+        selectedProvinceZones: _selectedProvinceZones,
+        selectedLocationZones: _selectedLocationZones,
+        selectedTrainLine: _selectedTrainLine,
+        selectedTrainStation: _selectedTrainStation,
         createdAt: widget.jobToEdit?.createdAt ?? now,
         updatedAt: now,
       );

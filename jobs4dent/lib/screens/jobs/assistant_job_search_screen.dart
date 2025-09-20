@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/assistant_job_model.dart';
+import '../../models/job_application_model.dart';
 import 'assistant_job_constants.dart';
 
 class AssistantJobSearchScreen extends StatefulWidget {
@@ -853,6 +854,41 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                         ),
                         const SizedBox(height: 16),
 
+                        // Location Information
+                        if (job.selectedProvinceZones != null ||
+                            job.selectedLocationZones != null ||
+                            job.selectedTrainLine != null ||
+                            job.selectedTrainStation != null) ...[
+                          const Text(
+                            'ข้อมูลสถานที่:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          if (job.selectedProvinceZones != null)
+                            _buildDetailRow(
+                              'โซนที่ตั้ง',
+                              job.selectedProvinceZones!,
+                            ),
+                          if (job.selectedLocationZones != null)
+                            _buildDetailRow(
+                              'จังหวัด/โซนในจังหวัด',
+                              job.selectedLocationZones!,
+                            ),
+                          if (job.selectedTrainLine != null)
+                            _buildDetailRow('รถไฟฟ้า', job.selectedTrainLine!),
+                          if (job.selectedTrainStation != null)
+                            _buildDetailRow(
+                              'สถานีรถไฟฟ้า',
+                              job.selectedTrainStation!,
+                            ),
+                          const SizedBox(height: 8),
+                        ],
+
+                        const SizedBox(height: 16),
+
                         _buildDetailRow('ประเภทงาน', job.workType),
 
                         // Skills
@@ -1100,7 +1136,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
     }
   }
 
-  void _applyForJob(AssistantJobModel job) {
+  Future<void> _applyForJob(AssistantJobModel job) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (authProvider.userModel == null) {
@@ -1110,12 +1146,157 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       return;
     }
 
-    // For now, show a simple message since there's no specific assistant job application screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('สมัครงาน: ${job.titlePost}'),
-        action: SnackBarAction(label: 'ปิด', onPressed: () {}),
-      ),
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
+
+    try {
+      final user = authProvider.userModel!;
+      final now = DateTime.now();
+
+      // Check if already applied
+      final existingApplication = await _firestore
+          .collection('job_applications_assistant')
+          .where('jobId', isEqualTo: job.jobId)
+          .where('applicantId', isEqualTo: user.userId)
+          .limit(1)
+          .get();
+
+      if (existingApplication.docs.isNotEmpty) {
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('คุณได้สมัครงานนี้แล้ว'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Fetch additional user data from 'users' collection
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(user.userId)
+          .get();
+
+      Map<String, dynamic> userData = {};
+      if (userDoc.exists) {
+        userData = userDoc.data() as Map<String, dynamic>;
+        debugPrint(
+          'Fetched user data from users collection: ${userData.keys.toList()}',
+        );
+      }
+
+      // Create application ID
+      final applicationId = _firestore
+          .collection('job_applications_assistant')
+          .doc()
+          .id;
+
+      // Create comprehensive applicant profile with data from AssistantMiniResumeScreen
+      final applicantProfile = {
+        // Basic user information
+        'userName': user.userName,
+        'email': user.email,
+        'phoneNumber': user.phoneNumber,
+        'profilePhotoUrl': user.profilePhotoUrl,
+        'userType': user.userType,
+
+        // Personal Information from AssistantMiniResumeScreen
+        'fullName': userData['fullName'] ?? '',
+        'nickName': userData['nickName'] ?? '',
+        'age': userData['age'],
+
+        // Job Application Information from AssistantMiniResumeScreen
+        'educationLevel': userData['educationLevel'],
+        'jobType': userData['jobType'],
+        'minSalary': userData['minSalary'],
+        'maxSalary': userData['maxSalary'],
+        'jobReadiness': userData['jobReadiness'],
+
+        // Education and Experience from AssistantMiniResumeScreen
+        'educationInstitute': userData['educationInstitute'] ?? '',
+        'experienceYears': userData['experienceYears'] ?? 0,
+        'educationSpecialist': userData['educationSpecialist'] ?? '',
+
+        // Skills from AssistantMiniResumeScreen
+        'coreCompetencies': userData['coreCompetencies'] ?? [],
+        'counterSkills': userData['counterSkills'] ?? [],
+        'softwareSkills': userData['softwareSkills'] ?? [],
+        'eqSkills': userData['eqSkills'] ?? [],
+        'workLimitations': userData['workLimitations'] ?? [],
+
+        // Additional profile information
+        'address': userData['address'],
+        'verificationStatus': userData['verificationStatus'] ?? 'unverified',
+        'isProfileComplete': userData['isProfileComplete'] ?? false,
+      };
+
+      // Create job application
+      final application = JobApplicationModel(
+        applicationId: applicationId,
+        jobId: job.jobId,
+        applicantId: user.userId,
+        clinicId: job.clinicId,
+        applicantName: userData['fullName']?.toString() ?? user.userName,
+        applicantEmail: user.email,
+        applicantPhone: user.phoneNumber,
+        applicantProfilePhoto: user.profilePhotoUrl,
+        coverLetter:
+            'สมัครงานตำแหน่ง ${job.titlePost} ที่ ${job.clinicNameAndBranch}',
+        additionalDocuments: const [],
+        status: 'submitted',
+        appliedAt: now,
+        updatedAt: now,
+        notes: null,
+        interviewDate: null,
+        interviewLocation: null,
+        interviewNotes: null,
+        matchingScore: null,
+        applicantProfile: applicantProfile,
+        jobTitle: job.titlePost,
+        clinicName: job.clinicNameAndBranch,
+      );
+
+      // Save to Firestore
+      await _firestore
+          .collection('job_applications_assistant')
+          .doc(applicationId)
+          .set(application.toMap());
+
+      // Update job's application count
+      await _firestore.collection('job_posts_assistant').doc(job.jobId).update({
+        'applicationCount': FieldValue.increment(1),
+        'applicationIds': FieldValue.arrayUnion([applicationId]),
+        'updatedAt': now.millisecondsSinceEpoch,
+      });
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('สมัครงาน ${job.titlePost} สำเร็จแล้ว!'),
+            backgroundColor: Colors.green,
+            action: SnackBarAction(label: 'ปิด', onPressed: () {}),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('เกิดข้อผิดพลาด: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      debugPrint('Error applying for job: $e');
+    }
   }
 }

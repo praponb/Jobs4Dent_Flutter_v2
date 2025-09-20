@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/job_model.dart';
 import '../models/assistant_job_model.dart';
@@ -51,12 +51,18 @@ class JobProvider with ChangeNotifier {
 
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+    // Defer notifyListeners to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   void _setError(String? error) {
     _error = error;
-    notifyListeners();
+    // Defer notifyListeners to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   // Job Management Methods
@@ -209,7 +215,10 @@ class JobProvider with ChangeNotifier {
           'Assistant Job: ${job.jobId}, Title: ${job.titlePost}, Active: ${job.isActive}',
         );
       }
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
       debugPrint('Error in getMyPostedAssistantJobs: $e');
       _setError(e.toString());
@@ -376,7 +385,29 @@ class JobProvider with ChangeNotifier {
       _myApplications = await _jobApplicationService.getMyApplications(
         applicantId,
       );
-      notifyListeners();
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    } catch (e) {
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> getMyAssistantApplications(String applicantId) async {
+    try {
+      _setLoading(true);
+      _setError(null);
+
+      _myApplications = await _jobApplicationService.getMyAssistantApplications(
+        applicantId,
+      );
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
       _setError(e.toString());
     } finally {

@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_application_model.dart';
+import '../../models/assistant_job_model.dart';
 
 class MyApplicationsScreen extends StatefulWidget {
   final String? initialFilter;
-  
+
   const MyApplicationsScreen({super.key, this.initialFilter});
 
   @override
   State<MyApplicationsScreen> createState() => _MyApplicationsScreenState();
 }
 
-class _MyApplicationsScreenState extends State<MyApplicationsScreen> with SingleTickerProviderStateMixin {
+class _MyApplicationsScreenState extends State<MyApplicationsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Map<String, AssistantJobModel> _jobDetails = {};
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     // Set initial tab based on filter
     if (widget.initialFilter == 'interview_scheduled') {
       _tabController.index = 1; // Active tab
     }
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadApplications();
     });
@@ -37,12 +42,46 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
     super.dispose();
   }
 
-  void _loadApplications() {
+  void _loadApplications() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
-    
-    if (authProvider.user != null) {
-      jobProvider.getMyApplications(authProvider.user!.uid);
+
+    if (authProvider.userModel != null) {
+      // Load assistant job applications for the current user
+      await jobProvider.getMyAssistantApplications(
+        authProvider.userModel!.userId,
+      );
+
+      // Load job details for each application
+      await _loadJobDetails(jobProvider.myApplications);
+    }
+  }
+
+  Future<void> _loadJobDetails(List<JobApplicationModel> applications) async {
+    final jobDetails = <String, AssistantJobModel>{};
+
+    for (final application in applications) {
+      try {
+        final doc = await _firestore
+            .collection('job_posts_assistant')
+            .doc(application.jobId)
+            .get();
+
+        if (doc.exists) {
+          final jobData = doc.data() as Map<String, dynamic>;
+          jobData['jobId'] = jobData['jobId'] ?? doc.id;
+          final job = AssistantJobModel.fromMap(jobData);
+          jobDetails[application.jobId] = job;
+        }
+      } catch (e) {
+        debugPrint('Error loading job details for ${application.jobId}: $e');
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _jobDetails = jobDetails;
+      });
     }
   }
 
@@ -118,7 +157,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                 Icon(Icons.inbox, size: 64, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
-                  statusFilter == null 
+                  statusFilter == null
                       ? 'ยังไม่มีการสมัคร'
                       : 'ไม่มีการสมัคร$statusFilter',
                   style: Theme.of(context).textTheme.headlineSmall,
@@ -153,6 +192,8 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
   }
 
   Widget _buildApplicationCard(JobApplicationModel application) {
+    final job = _jobDetails[application.jobId];
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
@@ -169,19 +210,16 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Note: In a real app, you'd fetch job details by jobId
                         Text(
-                          'การสมัครงาน', // Placeholder - would be actual job title
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          job?.titlePost ?? 'งานผู้ช่วยทันตแพทย์',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'สมัครไปที่ ${application.clinicId}', // Placeholder - would be clinic name
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.blue[700],
-                          ),
+                          job?.clinicNameAndBranch ?? 'คลินิกทันตกรรม',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.blue[700]),
                         ),
                       ],
                     ),
@@ -257,7 +295,8 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
               ],
 
               // Notes (if any)
-              if (application.notes != null && application.notes!.isNotEmpty) ...[
+              if (application.notes != null &&
+                  application.notes!.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -294,7 +333,70 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                 ),
               ],
 
-              // Salary
+              // Job details
+              if (job != null) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.work, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      'ประเภทงาน: ${job.workType}',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                if (job.workType == 'Full-time' &&
+                    job.salaryFullTime != null) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'เงินเดือน: ${job.salaryFullTime} บาท',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ] else if (job.workType == 'Part-time') ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatPartTimeRate(job),
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ],
+                if (job.skillAssistant.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.star, size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          'ทักษะ: ${job.skillAssistant.take(3).join(', ')}${job.skillAssistant.length > 3 ? ' และอีก ${job.skillAssistant.length - 3} รายการ' : ''}',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
               const SizedBox(height: 8),
             ],
           ),
@@ -406,7 +508,20 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
     return '${date.day}/${date.month}/${date.year}';
   }
 
+  String _formatPartTimeRate(AssistantJobModel job) {
+    List<String> rates = [];
+    if (job.payPerDayPartTime != null && job.payPerDayPartTime!.isNotEmpty) {
+      rates.add('${job.payPerDayPartTime}/วัน');
+    }
+    if (job.payPerHourPartTime != null && job.payPerHourPartTime!.isNotEmpty) {
+      rates.add('${job.payPerHourPartTime}/ชม.');
+    }
+    return rates.isEmpty ? 'ตามตกลง' : rates.join(', ');
+  }
+
   void _showApplicationDetails(JobApplicationModel application) {
+    final job = _jobDetails[application.jobId];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -460,26 +575,77 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Basic Info
-                      _buildDetailRow('วันที่สมัคร', _formatDate(application.appliedAt)),
-                      _buildDetailRow('อัปเดตล่าสุด', _formatDate(application.updatedAt)),
-                      _buildDetailRow('หมายเลขใบสมัคร', application.applicationId),
-                      
+                      _buildDetailRow(
+                        'วันที่สมัคร',
+                        _formatDate(application.appliedAt),
+                      ),
+                      _buildDetailRow(
+                        'อัปเดตล่าสุด',
+                        _formatDate(application.updatedAt),
+                      ),
+                      _buildDetailRow(
+                        'หมายเลขใบสมัคร',
+                        application.applicationId,
+                      ),
+
+                      // Job Information
+                      if (job != null) ...[
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 16),
+                        Text(
+                          'ข้อมูลงาน',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildDetailRow('ตำแหน่งงาน', job.titlePost),
+                        _buildDetailRow('คลินิก', job.clinicNameAndBranch),
+                        _buildDetailRow('ประเภทงาน', job.workType),
+                        if (job.workType == 'Full-time' &&
+                            job.salaryFullTime != null)
+                          _buildDetailRow(
+                            'เงินเดือน',
+                            '${job.salaryFullTime} บาท',
+                          ),
+                        if (job.workType == 'Part-time')
+                          _buildDetailRow(
+                            'อัตราค่าจ้าง',
+                            _formatPartTimeRate(job),
+                          ),
+                        if (job.skillAssistant.isNotEmpty)
+                          _buildDetailRow(
+                            'ทักษะที่ต้องการ',
+                            job.skillAssistant.join(', '),
+                          ),
+                        if (job.perk != null && job.perk!.isNotEmpty)
+                          _buildDetailRow('สวัสดิการ', job.perk!),
+                      ],
+
                       if (application.interviewDate != null) ...[
                         const SizedBox(height: 16),
                         const Divider(),
                         const SizedBox(height: 16),
                         Text(
                           'ข้อมูลการสัมภาษณ์',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        _buildDetailRow('วันที่สัมภาษณ์', _formatDate(application.interviewDate!)),
+                        _buildDetailRow(
+                          'วันที่สัมภาษณ์',
+                          _formatDate(application.interviewDate!),
+                        ),
                         if (application.interviewLocation != null)
-                          _buildDetailRow('สถานที่', application.interviewLocation!),
+                          _buildDetailRow(
+                            'สถานที่',
+                            application.interviewLocation!,
+                          ),
                         if (application.interviewNotes != null)
-                          _buildDetailRow('หมายเหตุ', application.interviewNotes!),
+                          _buildDetailRow(
+                            'หมายเหตุ',
+                            application.interviewNotes!,
+                          ),
                       ],
 
                       const SizedBox(height: 16),
@@ -489,9 +655,8 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                       // Cover Letter
                       Text(
                         'จดหมายนำ',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       Container(
@@ -510,31 +675,32 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
                         const SizedBox(height: 16),
                         Text(
                           'เอกสารเพิ่มเติม',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        ...application.additionalDocuments.map((doc) => Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.description, size: 16),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(doc)),
-                            ],
+                        ...application.additionalDocuments.map(
+                          (doc) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.description, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(doc)),
+                              ],
+                            ),
                           ),
-                        )),
+                        ),
                       ],
 
                       // Notes from clinic
-                      if (application.notes != null && application.notes!.isNotEmpty) ...[
+                      if (application.notes != null &&
+                          application.notes!.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text(
                           'หมายเหตุจากคลินิก',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Container(
@@ -577,4 +743,4 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> with Single
       ),
     );
   }
-} 
+}

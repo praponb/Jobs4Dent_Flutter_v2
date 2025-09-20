@@ -9,7 +9,8 @@ class JobApplicationModel {
   final String? applicantProfilePhoto;
   final String coverLetter;
   final List<String> additionalDocuments; // URLs of uploaded documents
-  final String status; // 'submitted', 'under_review', 'shortlisted', 'interview_scheduled', 'interview_completed', 'offered', 'hired', 'rejected'
+  final String
+  status; // 'submitted', 'under_review', 'shortlisted', 'interview_scheduled', 'interview_completed', 'offered', 'hired', 'rejected'
   final DateTime appliedAt;
   final DateTime updatedAt;
   final String? notes; // Notes from clinic/HR
@@ -17,7 +18,10 @@ class JobApplicationModel {
   final String? interviewLocation;
   final String? interviewNotes;
   final double? matchingScore;
-  final Map<String, dynamic>? applicantProfile; // Snapshot of applicant's profile at time of application
+  final Map<String, dynamic>?
+  applicantProfile; // Snapshot of applicant's profile at time of application
+  final String? jobTitle; // Job title for display purposes
+  final String? clinicName; // Clinic name for display purposes
 
   JobApplicationModel({
     required this.applicationId,
@@ -39,6 +43,8 @@ class JobApplicationModel {
     this.interviewNotes,
     this.matchingScore,
     this.applicantProfile,
+    this.jobTitle,
+    this.clinicName,
   });
 
   factory JobApplicationModel.fromMap(Map<String, dynamic> map) {
@@ -57,13 +63,15 @@ class JobApplicationModel {
       appliedAt: DateTime.fromMillisecondsSinceEpoch(map['appliedAt'] ?? 0),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] ?? 0),
       notes: map['notes'],
-      interviewDate: map['interviewDate'] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(map['interviewDate']) 
+      interviewDate: map['interviewDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['interviewDate'])
           : null,
       interviewLocation: map['interviewLocation'],
       interviewNotes: map['interviewNotes'],
       matchingScore: map['matchingScore']?.toDouble(),
       applicantProfile: map['applicantProfile'],
+      jobTitle: map['jobTitle'],
+      clinicName: map['clinicName'],
     );
   }
 
@@ -88,6 +96,8 @@ class JobApplicationModel {
       'interviewNotes': interviewNotes,
       'matchingScore': matchingScore,
       'applicantProfile': applicantProfile,
+      'jobTitle': jobTitle,
+      'clinicName': clinicName,
     };
   }
 
@@ -111,6 +121,8 @@ class JobApplicationModel {
     String? interviewNotes,
     double? matchingScore,
     Map<String, dynamic>? applicantProfile,
+    String? jobTitle,
+    String? clinicName,
   }) {
     return JobApplicationModel(
       applicationId: applicationId ?? this.applicationId,
@@ -120,7 +132,8 @@ class JobApplicationModel {
       applicantName: applicantName ?? this.applicantName,
       applicantEmail: applicantEmail ?? this.applicantEmail,
       applicantPhone: applicantPhone ?? this.applicantPhone,
-      applicantProfilePhoto: applicantProfilePhoto ?? this.applicantProfilePhoto,
+      applicantProfilePhoto:
+          applicantProfilePhoto ?? this.applicantProfilePhoto,
       coverLetter: coverLetter ?? this.coverLetter,
       additionalDocuments: additionalDocuments ?? this.additionalDocuments,
       status: status ?? this.status,
@@ -132,6 +145,8 @@ class JobApplicationModel {
       interviewNotes: interviewNotes ?? this.interviewNotes,
       matchingScore: matchingScore ?? this.matchingScore,
       applicantProfile: applicantProfile ?? this.applicantProfile,
+      jobTitle: jobTitle ?? this.jobTitle,
+      clinicName: clinicName ?? this.clinicName,
     );
   }
 
@@ -167,10 +182,15 @@ class JobApplicationModel {
   }
 
   bool get isInProgress {
-    return ['shortlisted', 'interview_scheduled', 'interview_completed', 'offered'].contains(status);
+    return [
+      'shortlisted',
+      'interview_scheduled',
+      'interview_completed',
+      'offered',
+    ].contains(status);
   }
 
   bool get isCompleted {
     return ['hired', 'rejected'].contains(status);
   }
-} 
+}
