@@ -31,19 +31,25 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.userModel != null) {
       final jobProvider = Provider.of<JobProvider>(context, listen: false);
-      
-      debugPrint('Clinic Dashboard: Loading data for user ${authProvider.userModel!.userId}');
-      debugPrint('Clinic Dashboard: User type: ${authProvider.userModel!.userType}');
-      
+
+      debugPrint(
+        'Clinic Dashboard: Loading data for user ${authProvider.userModel!.userId}',
+      );
+      debugPrint(
+        'Clinic Dashboard: User type: ${authProvider.userModel!.userType}',
+      );
+
       // Load clinic's posted jobs (both dentist and assistant) and their applicants
       await Future.wait([
         jobProvider.loadMyPostedJobs(authProvider.userModel!.userId),
         jobProvider.loadMyPostedAssistantJobs(authProvider.userModel!.userId),
         jobProvider.loadApplicantsForMyJobs(authProvider.userModel!.userId),
       ]);
-      
+
       debugPrint('Clinic Dashboard: Data loading completed');
-      debugPrint('Clinic Dashboard: Assistant jobs count: ${jobProvider.myPostedAssistantJobs.length}');
+      debugPrint(
+        'Clinic Dashboard: Assistant jobs count: ${jobProvider.myPostedAssistantJobs.length}',
+      );
     }
   }
 
@@ -134,23 +140,14 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           );
         },
       ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //                     MaterialPageRoute(builder: (context) => const DentistJobPostingScreen()),
-      //     );
-      //   },
-      //   icon: const Icon(Icons.add),
-      //   label: const Text('ประกาศงาน'),
-      //   backgroundColor: const Color(0xFF2196F3),
-      // ),
     );
   }
 
   Widget _buildBranchManagement(user) {
-    final branches = DashboardDataProcessor.getBranchesForOverview(user.branches);
-    
+    final branches = DashboardDataProcessor.getBranchesForOverview(
+      user.branches,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -207,7 +204,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           ),
                         ),
                         Text(
-                          branches.isEmpty 
+                          branches.isEmpty
                               ? 'ยังไม่ได้ตั้งค่าสาขา'
                               : '${branches.length} สาขาเปิดใช้งาน',
                           style: const TextStyle(color: Colors.grey),
@@ -220,7 +217,8 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SubBranchManagementScreen(),
+                          builder: (context) =>
+                              const SubBranchManagementScreen(),
                         ),
                       );
                     },
@@ -236,10 +234,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       '+${(user.branches?.length ?? 0) - 3} สาขาอื่นๆ',
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontSize: 12,
-                      ),
+                      style: const TextStyle(color: Colors.blue, fontSize: 12),
                     ),
                   ),
               ],
@@ -271,14 +266,11 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
             ),
             child: Text(
               'เปิดใช้งาน',
-              style: TextStyle(
-                fontSize: 10,
-                color: Colors.green[700],
-              ),
+              style: TextStyle(fontSize: 10, color: Colors.green[700]),
             ),
           ),
         ],
       ),
     );
   }
-} 
+}

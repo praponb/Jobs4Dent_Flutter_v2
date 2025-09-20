@@ -1,12 +1,7 @@
-// import '../profile/assistant_skills_data.dart';
-
 /// Constants for Assistant Job Posting functionality
 class AssistantJobConstants {
   // Work type options
-  static const List<String> workTypes = [
-    'Part-time',
-    'Full-time',
-  ];
+  static const List<String> workTypes = ['Part-time', 'Full-time'];
 
   // Payment terms for Part-time work
   static const List<String> paymentTermsPartTime = [
@@ -41,14 +36,4 @@ class AssistantJobConstants {
     'เคาน์เตอร์',
     'ผู้จัดการคลินิก',
   ];
-
-  // Get categorized skills for better organization
-  // static Map<String, List<String>> get categorizedSkills {
-  //   return {
-  //     'ทักษะการช่วยงานทันตกรรม': AssistantSkillsData.availableCompetencies,
-  //     'ทักษะงานเคาน์เตอร์': AssistantSkillsData.availableCounterSkills,
-  //     'ทักษะซอฟต์แวร์': AssistantSkillsData.availableSoftwareSkills,
-  //     'คุณสมบัติส่วนบุคคล': AssistantSkillsData.availableEqSkills,
-  //   };
-  // }
-} 
+}

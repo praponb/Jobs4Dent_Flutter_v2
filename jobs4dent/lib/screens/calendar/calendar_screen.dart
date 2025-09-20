@@ -8,7 +8,6 @@ import '../../models/user_model.dart';
 import '../../providers/appointment_provider.dart';
 import '../../providers/auth_provider.dart';
 import 'appointment_detail_screen.dart';
-// import 'availability_setup_screen.dart'; // Note: Availability setup screen implementation pending
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -31,19 +30,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final appointmentProvider = Provider.of<AppointmentProvider>(context, listen: false);
-    
+    final appointmentProvider = Provider.of<AppointmentProvider>(
+      context,
+      listen: false,
+    );
+
     if (authProvider.userModel != null) {
-      await appointmentProvider.loadAppointments(authProvider.userModel!.userId);
+      await appointmentProvider.loadAppointments(
+        authProvider.userModel!.userId,
+      );
       await appointmentProvider.loadAvailability(
         authProvider.userModel!.userId,
         DateTime.now().subtract(const Duration(days: 30)),
         DateTime.now().add(const Duration(days: 90)),
       );
     }
-    
+
     setState(() => _isLoading = false);
   }
 
@@ -189,11 +193,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildSelectedDayInfo(AppointmentProvider appointmentProvider, UserModel user) {
-    final appointments = appointmentProvider.getAppointmentsForDate(_selectedDay);
+  Widget _buildSelectedDayInfo(
+    AppointmentProvider appointmentProvider,
+    UserModel user,
+  ) {
+    final appointments = appointmentProvider.getAppointmentsForDate(
+      _selectedDay,
+    );
     final availability = appointmentProvider.availability
-        .where((avail) => avail.userId == user.userId && 
-                         isSameDay(avail.date, _selectedDay))
+        .where(
+          (avail) =>
+              avail.userId == user.userId &&
+              isSameDay(avail.date, _selectedDay),
+        )
         .toList();
 
     return Expanded(
@@ -232,15 +244,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           if (appointments.isNotEmpty) ...[
                             _buildSectionHeader('นัดหมาย', Icons.event),
                             const SizedBox(height: 8),
-                            ...appointments.map((appointment) => 
-                                _buildAppointmentCard(appointment)),
+                            ...appointments.map(
+                              (appointment) =>
+                                  _buildAppointmentCard(appointment),
+                            ),
                             const SizedBox(height: 16),
                           ],
                           if (availability.isNotEmpty) ...[
                             _buildSectionHeader('ความพร้อม', Icons.schedule),
                             const SizedBox(height: 8),
-                            ...availability.map((avail) => 
-                                _buildAvailabilityCard(avail)),
+                            ...availability.map(
+                              (avail) => _buildAvailabilityCard(avail),
+                            ),
                           ],
                         ],
                       ),
@@ -265,18 +280,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
           const SizedBox(height: 16),
           Text(
             'ไม่มีกิจกรรมในวันนี้',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
           const SizedBox(height: 8),
           Text(
             'แตะปุ่ม + เพื่อเพิ่มช่วงเวลาว่าง',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
           ),
         ],
       ),
@@ -334,12 +343,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
             appointment.statusDisplayName,
             style: const TextStyle(fontSize: 12),
           ),
-          backgroundColor: _getStatusColor(appointment.status).withValues(alpha: 0.2),
+          backgroundColor: _getStatusColor(
+            appointment.status,
+          ).withValues(alpha: 0.2),
         ),
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => AppointmentDetailScreen(appointment: appointment),
+              builder: (context) =>
+                  AppointmentDetailScreen(appointment: appointment),
             ),
           );
         },
@@ -356,11 +368,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Icon(Icons.schedule, color: Colors.white, size: 20),
         ),
         title: Text(
-                      'ช่วงเวลาที่ว่าง (${availability.timeSlots.length})',
+          'ช่วงเวลาที่ว่าง (${availability.timeSlots.length})',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-                          'รวม: ${_formatDuration(availability.getTotalAvailableTime())}',
+          'รวม: ${_formatDuration(availability.getTotalAvailableTime())}',
           style: TextStyle(color: Colors.grey[600]),
         ),
         children: availability.timeSlots.map((slot) {
@@ -381,7 +393,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 _getAvailabilityTypeName(slot.type),
                 style: const TextStyle(fontSize: 10),
               ),
-              backgroundColor: _getAvailabilityColor(slot.type).withValues(alpha: 0.2),
+              backgroundColor: _getAvailabilityColor(
+                slot.type,
+              ).withValues(alpha: 0.2),
             ),
           );
         }).toList(),
@@ -394,7 +408,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       onPressed: () => _showAddOptionsDialog(),
       backgroundColor: const Color(0xFF1976D2),
       icon: const Icon(Icons.add),
-                          label: const Text('เพิ่ม'),
+      label: const Text('เพิ่ม'),
     );
   }
 
@@ -402,7 +416,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-                      title: const Text('เพิ่มลงในปฏิทิน'),
+        title: const Text('เพิ่มลงในปฏิทิน'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -413,7 +427,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               onTap: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('การตั้งค่าความพร้อม เร็วๆ นี้!')),
+                  const SnackBar(
+                    content: Text('การตั้งค่าความพร้อม เร็วๆ นี้!'),
+                  ),
                 );
               },
             ),
@@ -439,12 +455,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-                    title: const Text('สร้างนัดหมาย'),
-            content: const Text('ฟีเจอร์นี้จะพร้อมใช้งานเมื่อรวมกับการสมัครงาน'),
+        title: const Text('สร้างนัดหมาย'),
+        content: const Text('ฟีเจอร์นี้จะพร้อมใช้งานเมื่อรวมกับการสมัครงาน'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('ตกลง'),
+            child: const Text('ตกลง'),
           ),
         ],
       ),
@@ -455,7 +471,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-                    title: const Text('การตั้งค่าปฏิทิน'),
+        title: const Text('การตั้งค่าปฏิทิน'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -485,7 +501,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('ปิด'),
+            child: const Text('ปิด'),
           ),
         ],
       ),
@@ -553,22 +569,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
       case AvailabilityType.available:
         return 'ว่าง';
       case AvailabilityType.busy:
-                  return 'ไม่ว่าง';
+        return 'ไม่ว่าง';
       case AvailabilityType.unavailable:
         return 'ไม่ว่าง';
       case AvailabilityType.preferred:
-                  return 'ต้องการ';
+        return 'ต้องการ';
     }
   }
 
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
-    
+
     if (hours > 0) {
       return '$hours ชม. $minutes นาที';
     } else {
       return '$minutes นาที';
     }
   }
-} 
+}

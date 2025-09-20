@@ -4,8 +4,6 @@ import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_model.dart';
 import 'job_application_screen.dart';
-// import 'advanced_job_search_screen.dart';
-// import 'day_hour_job_search_screen.dart';
 
 class DentistJobSearchScreen extends StatefulWidget {
   const DentistJobSearchScreen({super.key});
@@ -21,16 +19,18 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
   final TextEditingController _maxSalaryController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _minExperienceYearsController = TextEditingController();
+  final TextEditingController _minExperienceYearsController =
+      TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _trainLineController = TextEditingController();
   final TextEditingController _trainStationController = TextEditingController();
   final TextEditingController _workingDaysController = TextEditingController();
   final TextEditingController _workingHoursController = TextEditingController();
-  final TextEditingController _additionalRequirementsController = TextEditingController();
+  final TextEditingController _additionalRequirementsController =
+      TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
-  
+
   String? _selectedCategory;
   String? _selectedExperienceLevel;
   String? _selectedSalaryType;
@@ -65,51 +65,74 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
   void _loadJobs() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      Provider.of<JobProvider>(context, listen: false).searchJobs(
-        userId: authProvider.userModel?.userId,
-      );
+      Provider.of<JobProvider>(
+        context,
+        listen: false,
+      ).searchJobs(userId: authProvider.userModel?.userId);
     });
   }
 
   void _searchJobs() {
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     jobProvider.searchJobs(
-      keyword: _keywordController.text.trim().isEmpty ? null : _keywordController.text.trim(),
+      keyword: _keywordController.text.trim().isEmpty
+          ? null
+          : _keywordController.text.trim(),
       jobCategory: _selectedCategory,
       experienceLevel: _selectedExperienceLevel,
-      province: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
-      minSalary: _minSalaryController.text.trim().isEmpty ? null : _minSalaryController.text.trim(),
+      province: _locationController.text.trim().isEmpty
+          ? null
+          : _locationController.text.trim(),
+      minSalary: _minSalaryController.text.trim().isEmpty
+          ? null
+          : _minSalaryController.text.trim(),
       userId: authProvider.userModel?.userId,
-      title: _titleController.text.trim().isEmpty ? null : _titleController.text.trim(),
-      description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
-      minExperienceYears: _minExperienceYearsController.text.trim().isEmpty ? null : _minExperienceYearsController.text.trim(),
+      title: _titleController.text.trim().isEmpty
+          ? null
+          : _titleController.text.trim(),
+      description: _descriptionController.text.trim().isEmpty
+          ? null
+          : _descriptionController.text.trim(),
+      minExperienceYears: _minExperienceYearsController.text.trim().isEmpty
+          ? null
+          : _minExperienceYearsController.text.trim(),
       salaryType: _selectedSalaryType,
       perks: _selectedPerks,
-      city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
-      trainLine: _trainLineController.text.trim().isEmpty ? null : _trainLineController.text.trim(),
-      trainStation: _trainStationController.text.trim().isEmpty ? null : _trainStationController.text.trim(),
-      workingDays: _workingDaysController.text.trim().isEmpty ? null : _workingDaysController.text.trim(),
-      workingHours: _workingHoursController.text.trim().isEmpty ? null : _workingHoursController.text.trim(),
-      additionalRequirements: _additionalRequirementsController.text.trim().isEmpty ? null : _additionalRequirementsController.text.trim(),
-      // isActive: _isActiveController.text.trim().isEmpty ? null : _isActiveController.text.trim(),
-      // createdAt: _createdAtController.text.trim().isEmpty ? null : _createdAtController.text.trim(),
-      startDate: _startDateController.text.trim().isEmpty ? null : _startDateController.text.trim(),
-      endDate: _endDateController.text.trim().isEmpty ? null : _endDateController.text.trim(),
+      city: _cityController.text.trim().isEmpty
+          ? null
+          : _cityController.text.trim(),
+      trainLine: _trainLineController.text.trim().isEmpty
+          ? null
+          : _trainLineController.text.trim(),
+      trainStation: _trainStationController.text.trim().isEmpty
+          ? null
+          : _trainStationController.text.trim(),
+      workingDays: _workingDaysController.text.trim().isEmpty
+          ? null
+          : _workingDaysController.text.trim(),
+      workingHours: _workingHoursController.text.trim().isEmpty
+          ? null
+          : _workingHoursController.text.trim(),
+      additionalRequirements:
+          _additionalRequirementsController.text.trim().isEmpty
+          ? null
+          : _additionalRequirementsController.text.trim(),
+      startDate: _startDateController.text.trim().isEmpty
+          ? null
+          : _startDateController.text.trim(),
+      endDate: _endDateController.text.trim().isEmpty
+          ? null
+          : _endDateController.text.trim(),
       //isActive: true,
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ค้นหางานทันตแพทย์'),
-        actions: [],
-      ),
+      appBar: AppBar(title: const Text('ค้นหางานทันตแพทย์'), actions: []),
       body: Column(
         children: [
           // Search Bar
@@ -138,46 +161,10 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                // SizedBox(
-                //   width: double.infinity,
-                //   child: Row(
-                //     children: [
-                //       Expanded(
-                //         child: OutlinedButton.icon(
-                //           onPressed: () {
-                //             Navigator.push(
-                //               context,
-                //               MaterialPageRoute(
-                //                 builder: (context) => const DayHourJobSearchScreen(),
-                //               ),
-                //             );
-                //           },
-                //           icon: const Icon(Icons.tune),
-                //           label: const Text('เลือกวัน/เวลาทำงาน'),
-                //         ),
-                //       ),
-                //       const SizedBox(width: 8),
-                //       Expanded(
-                //         child: OutlinedButton.icon(
-                //           onPressed: () {
-                //             Navigator.push(
-                //               context,
-                //               MaterialPageRoute(
-                //                 builder: (context) => const AdvancedJobSearchScreen(),
-                //               ),
-                //             );
-                //           },
-                //           icon: const Icon(Icons.tune),
-                //           label: const Text('ค้นหาขั้นสูง'),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
               ],
             ),
           ),
-          
+
           // Search Criteria Display
           Consumer<JobProvider>(
             builder: (context, jobProvider, child) {
@@ -185,7 +172,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
               if (searchCriteria.isEmpty) {
                 return const SizedBox.shrink();
               }
-              
+
               return Container(
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(12),
@@ -199,7 +186,11 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.search, size: 16, color: Colors.blue.shade700),
+                        Icon(
+                          Icons.search,
+                          size: 16,
+                          color: Colors.blue.shade700,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'เงื่อนไขการค้นหา',
@@ -217,7 +208,10 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                       runSpacing: 4,
                       children: searchCriteria.map((criteria) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -239,7 +233,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
               );
             },
           ),
-          
+
           // Results
           Expanded(
             child: Consumer<JobProvider>(
@@ -247,7 +241,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                 if (jobProvider.isLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                
+
                 if (jobProvider.error != null) {
                   return Center(
                     child: Column(
@@ -267,13 +261,11 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                     ),
                   );
                 }
-                
+
                 if (jobProvider.jobs.isEmpty) {
-                  return const Center(
-                    child: Text('ไม่พบงานที่ค้นหา'),
-                  );
+                  return const Center(child: Text('ไม่พบงานที่ค้นหา'));
                 }
-                
+
                 return ListView.builder(
                   itemCount: jobProvider.jobs.length,
                   itemBuilder: (context, index) {
@@ -288,8 +280,6 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
       ),
     );
   }
-
-
 
   Widget _buildJobCard(JobModel job) {
     return Card(
@@ -334,10 +324,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
               const SizedBox(height: 4),
               Text(
                 job.jobCategory,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 8),
               Row(
@@ -356,7 +343,11 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
               if (job.minSalary != null)
                 Row(
                   children: [
-                    const Icon(Icons.monetization_on, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.monetization_on,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       _formatSalary(job),
@@ -368,7 +359,10 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(4),
@@ -383,7 +377,10 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.green.shade50,
                       borderRadius: BorderRadius.circular(4),
@@ -419,7 +416,10 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                       const SizedBox(width: 4),
                       Text(
                         '${job.applicationCount} ใบสมัคร',
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -455,7 +455,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays} วันที่แล้ว';
     } else if (difference.inHours > 0) {
@@ -516,38 +516,52 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         _buildDetailRow('หมวดหมู่', job.jobCategory),
                         _buildDetailRow('ประสบการณ์', job.experienceLevel),
                         _buildDetailRow('ประเภทเงินเดือน', job.salaryType),
                         if (job.minSalary != null)
                           _buildDetailRow('เงินเดือน', _formatSalary(job)),
-                        _buildDetailRow('สถานที่', '${job.city}, ${job.province}'),
+                        _buildDetailRow(
+                          'สถานที่',
+                          '${job.city}, ${job.province}',
+                        ),
                         if (job.trainLine != null && job.trainStation != null)
-                          _buildDetailRow('รถไฟฟ้า', '${job.trainLine} - ${job.trainStation}'),
-                        if (job.workingDays != null && job.workingDays!.isNotEmpty)
+                          _buildDetailRow(
+                            'รถไฟฟ้า',
+                            '${job.trainLine} - ${job.trainStation}',
+                          ),
+                        if (job.workingDays != null &&
+                            job.workingDays!.isNotEmpty)
                           _buildDetailRow('วันทำงาน', job.workingDays!),
                         if (job.workingHours != null)
                           _buildDetailRow('เวลาทำงาน', job.workingHours!),
                         if (job.perks != null && job.perks!.isNotEmpty)
                           _buildDetailRow('สิทธิพิเศษ', job.perks!),
-                        
+
                         const SizedBox(height: 16),
                         const Text(
                           'รายละเอียดงาน',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           job.description,
                           style: const TextStyle(fontSize: 14),
                         ),
-                        
-                        if (job.additionalRequirements != null && job.additionalRequirements!.isNotEmpty) ...[
+
+                        if (job.additionalRequirements != null &&
+                            job.additionalRequirements!.isNotEmpty) ...[
                           const SizedBox(height: 16),
                           const Text(
                             'ข้อกำหนดเพิ่มเติม',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -555,17 +569,19 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
                             style: const TextStyle(fontSize: 14),
                           ),
                         ],
-                        
+
                         const SizedBox(height: 16),
-                        Row(
-                          children: [
+                        Row(children: [
                           ],
                         ),
-                        
+
                         const SizedBox(height: 16),
                         Text(
                           'โพสต์เมื่อ ${_formatDate(job.createdAt)}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -607,9 +623,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
-          Expanded(
-            child: Text(value),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );
@@ -621,7 +635,9 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('รายงานโพสต์งาน'),
-          content: const Text('คุณต้องการรายงานโพสต์งานนี้ว่าไม่เหมาะสมหรือไม่?'),
+          content: const Text(
+            'คุณต้องการรายงานโพสต์งานนี้ว่าไม่เหมาะสมหรือไม่?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -672,7 +688,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
 
   void _applyForJob(JobModel job) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.userModel == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('กรุณาเข้าสู่ระบบก่อนสมัครงาน')),
@@ -682,9 +698,7 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => JobApplicationScreen(job: job),
-      ),
+      MaterialPageRoute(builder: (context) => JobApplicationScreen(job: job)),
     );
   }
-} 
+}

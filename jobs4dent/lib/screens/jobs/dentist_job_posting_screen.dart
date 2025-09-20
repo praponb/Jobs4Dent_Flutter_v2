@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// import 'package:multi_select_flutter/multi_select_flutter.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/job_constants.dart';
 import '../../providers/auth_provider.dart';
@@ -15,7 +14,8 @@ class DentistJobPostingScreen extends StatefulWidget {
   const DentistJobPostingScreen({super.key, this.jobToEdit});
 
   @override
-  State<DentistJobPostingScreen> createState() => _DentistJobPostingScreenState();
+  State<DentistJobPostingScreen> createState() =>
+      _DentistJobPostingScreenState();
 }
 
 class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
@@ -33,9 +33,11 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
   String _selectedExperienceLevel = 'ไม่มีประสบการณ์';
   String _selectedSalaryType = '50:50';
   String _selectedProvinceZones = JobPostingConstants.thaiProvinceZones.first;
-  String _selectedLocationZones = JobPostingConstants.thaiLocationZones.first.first;
+  String _selectedLocationZones =
+      JobPostingConstants.thaiLocationZones.first.first;
   String _selectedTrainLine = JobPostingConstants.thaiTrainLines.last;
-  String _selectedTrainStation = JobPostingConstants.thaiTrainStations.last.first;
+  String _selectedTrainStation =
+      JobPostingConstants.thaiTrainStations.last.first;
   String _selectedWorkingType = JobPostingConstants.workingTypes.first;
 
   @override
@@ -60,28 +62,29 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
     if (widget.jobToEdit != null) {
       final job = widget.jobToEdit!;
       final formData = JobPostingUtils.initializeFormFromJob(job);
-      
+
       _titleController.text = formData['title'];
       _descriptionController.text = formData['description'];
       _selectedJobCategory = formData['jobCategory'];
       _selectedExperienceLevel = formData['experienceLevel'];
       _selectedSalaryType = formData['salaryType'];
-      
+
       // Validate and set location
       final locationData = JobPostingUtils.validateLocationForEditing(job);
       _selectedProvinceZones = locationData['province']!;
       _selectedLocationZones = locationData['city']!;
-      
+
       // Validate and set train info
       final trainData = JobPostingUtils.validateTrainForEditing(job);
       _selectedTrainLine = trainData['trainLine']!;
       _selectedTrainStation = trainData['trainStation']!;
-      
+
       _minSalaryController.text = formData['minSalary'];
       _perksController.text = formData['perks'];
       _workingDaysController.text = formData['workingDays'];
       _workingHoursController.text = formData['workingHours'];
-      _additionalRequirementsController.text = formData['additionalRequirements'];
+      _additionalRequirementsController.text =
+          formData['additionalRequirements'];
       _selectedWorkingType = formData['workingType'];
     }
   }
@@ -90,13 +93,15 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.jobToEdit != null ? 'แก้ไขประกาศงาน' : 'ประกาศงานใหม่'),
+        title: Text(
+          widget.jobToEdit != null ? 'แก้ไขประกาศงาน' : 'ประกาศงานใหม่',
+        ),
         actions: [
           Consumer<JobProvider>(
             builder: (context, jobProvider, child) {
               return TextButton(
                 onPressed: jobProvider.isLoading ? null : _postJob,
-                child: jobProvider.isLoading 
+                child: jobProvider.isLoading
                     ? const SizedBox(
                         width: 20,
                         height: 20,
@@ -119,16 +124,21 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Basic Information Section
-              JobPostingFormWidgets.buildSectionHeader(context, 'ข้อมูลพื้นฐาน'),
+              JobPostingFormWidgets.buildSectionHeader(
+                context,
+                'ข้อมูลพื้นฐาน',
+              ),
               const SizedBox(height: 16),
 
               // Job Title
               JobPostingFormWidgets.buildTextFormField(
                 _titleController,
                 'หัวข้อ',
-                hintText: 'เช่น รับสมัครทันตแพทย์ประจำ(สามารถเลือกวันลงตรวจได้)',
+                hintText:
+                    'เช่น รับสมัครทันตแพทย์ประจำ(สามารถเลือกวันลงตรวจได้)',
                 isRequired: true,
-                validator: (value) => JobPostingFormWidgets.requiredValidator(value, 'หัวข้อ'),
+                validator: (value) =>
+                    JobPostingFormWidgets.requiredValidator(value, 'หัวข้อ'),
               ),
               const SizedBox(height: 16),
 
@@ -146,12 +156,18 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
                 hintText: 'อธิบายลักษณะงาน และข้อมูลการติดต่อ...',
                 maxLines: 5,
                 isRequired: true,
-                validator: (value) => JobPostingFormWidgets.requiredValidator(value, 'รายละเอียดงาน'),
+                validator: (value) => JobPostingFormWidgets.requiredValidator(
+                  value,
+                  'รายละเอียดงาน',
+                ),
               ),
               const SizedBox(height: 24),
 
               // Location Information Section
-              JobPostingFormWidgets.buildSectionHeader(context, 'ข้อมูลสถานที่'),
+              JobPostingFormWidgets.buildSectionHeader(
+                context,
+                'ข้อมูลสถานที่',
+              ),
               const SizedBox(height: 16),
 
               // Province
@@ -167,7 +183,10 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
               // City/Location Zone
               JobPostingFormWidgets.buildDropdownField<String>(
                 'จังหวัด/โซนในจังหวัด',
-                JobPostingUtils.getValidLocationZone(_selectedProvinceZones, _selectedLocationZones),
+                JobPostingUtils.getValidLocationZone(
+                  _selectedProvinceZones,
+                  _selectedLocationZones,
+                ),
                 JobPostingUtils.getCurrentLocationZones(_selectedProvinceZones),
                 (value) => setState(() => _selectedLocationZones = value!),
                 isRequired: true,
@@ -187,7 +206,10 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
               // Train Station
               JobPostingFormWidgets.buildDropdownField<String>(
                 'สถานีรถไฟฟ้า',
-                JobPostingUtils.getValidTrainStation(_selectedTrainLine, _selectedTrainStation),
+                JobPostingUtils.getValidTrainStation(
+                  _selectedTrainLine,
+                  _selectedTrainStation,
+                ),
                 JobPostingUtils.getCurrentTrainStations(_selectedTrainLine),
                 (value) => setState(() => _selectedTrainStation = value!),
                 isRequired: true,
@@ -195,7 +217,10 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
               const SizedBox(height: 24),
 
               // Experience Section
-              JobPostingFormWidgets.buildSectionHeader(context, 'ข้อกำหนดประสบการณ์'),
+              JobPostingFormWidgets.buildSectionHeader(
+                context,
+                'ข้อกำหนดประสบการณ์',
+              ),
               const SizedBox(height: 16),
 
               // Experience Level
@@ -236,7 +261,10 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
               const SizedBox(height: 24),
 
               // Schedule Information Section
-              JobPostingFormWidgets.buildSectionHeader(context, 'ข้อมูลตารางงาน'),
+              JobPostingFormWidgets.buildSectionHeader(
+                context,
+                'ข้อมูลตารางงาน',
+              ),
               const SizedBox(height: 16),
 
               // Working Type
@@ -266,7 +294,10 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
               const SizedBox(height: 24),
 
               // Additional Information Section
-              JobPostingFormWidgets.buildSectionHeader(context, 'ข้อมูลเพิ่มเติม'),
+              JobPostingFormWidgets.buildSectionHeader(
+                context,
+                'ข้อมูลเพิ่มเติม',
+              ),
               const SizedBox(height: 16),
 
               // Additional Requirements
@@ -284,7 +315,9 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
                   return JobPostingFormWidgets.buildLoadingButton(
                     onPressed: _postJob,
                     isLoading: jobProvider.isLoading,
-                    text: widget.jobToEdit != null ? 'อัปเดตโพสต์งาน' : 'โพสต์งาน',
+                    text: widget.jobToEdit != null
+                        ? 'อัปเดตโพสต์งาน'
+                        : 'โพสต์งาน',
                   );
                 },
               ),
@@ -300,7 +333,9 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _selectedProvinceZones = newProvince;
-        final newLocations = JobPostingUtils.getCurrentLocationZones(newProvince);
+        final newLocations = JobPostingUtils.getCurrentLocationZones(
+          newProvince,
+        );
         if (newLocations.isNotEmpty) {
           _selectedLocationZones = newLocations.first;
         }
@@ -312,7 +347,9 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _selectedTrainLine = newTrainLine;
-        final newStations = JobPostingUtils.getCurrentTrainStations(newTrainLine);
+        final newStations = JobPostingUtils.getCurrentTrainStations(
+          newTrainLine,
+        );
         if (newStations.isNotEmpty) {
           _selectedTrainStation = newStations.first;
         }
@@ -340,7 +377,9 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
     final user = authProvider.userModel!;
 
     final job = JobPostingUtils.createJobFromFormData(
-      jobId: widget.jobToEdit?.jobId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      jobId:
+          widget.jobToEdit?.jobId ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       clinicId: user.userId,
       clinicName: user.clinicName ?? user.userName,
       title: _titleController.text,
@@ -373,8 +412,8 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
-              widget.jobToEdit != null 
-                  ? 'อัปเดตงานสำเร็จแล้ว!' 
+              widget.jobToEdit != null
+                  ? 'อัปเดตงานสำเร็จแล้ว!'
                   : 'โพสต์งานสำเร็จแล้ว!',
             ),
           ),
@@ -389,4 +428,4 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
       }
     }
   }
-} 
+}

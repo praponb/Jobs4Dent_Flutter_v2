@@ -34,8 +34,10 @@ class _DentistDashboardState extends State<DentistDashboard> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.userModel != null) {
       // Load user's applications and related data
-      await Provider.of<JobProvider>(context, listen: false)
-          .loadUserApplications(authProvider.userModel!.userId);
+      await Provider.of<JobProvider>(
+        context,
+        listen: false,
+      ).loadUserApplications(authProvider.userModel!.userId);
     }
   }
 
@@ -75,8 +77,12 @@ class _DentistDashboardState extends State<DentistDashboard> {
 
           final applications = jobProvider.userApplications;
           final stats = DentistDataProcessor.calculateQuickStats(applications);
-          final upcomingInterviews = DentistDataProcessor.getUpcomingInterviews(applications);
-          final recentApplications = DentistDataProcessor.getRecentApplications(applications);
+          final upcomingInterviews = DentistDataProcessor.getUpcomingInterviews(
+            applications,
+          );
+          final recentApplications = DentistDataProcessor.getRecentApplications(
+            applications,
+          );
 
           return RefreshIndicator(
             onRefresh: _loadData,
@@ -110,11 +116,6 @@ class _DentistDashboardState extends State<DentistDashboard> {
                     recentApplications: recentApplications,
                   ),
                   const SizedBox(height: 24),
-
-                  // Availability Calendar Section
-                  // DentistAvailabilitySection(
-                  //   onManageTap: () => _showAvailabilityDialog(),
-                  // ),
                 ],
               ),
             ),
@@ -127,4 +128,4 @@ class _DentistDashboardState extends State<DentistDashboard> {
   void _showAvailabilityDialog() {
     AvailabilityDialog.show(context);
   }
-} 
+}

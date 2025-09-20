@@ -14,13 +14,14 @@ class AssistantJobPostingScreen extends StatefulWidget {
   const AssistantJobPostingScreen({super.key, this.jobToEdit});
 
   @override
-  State<AssistantJobPostingScreen> createState() => _AssistantJobPostingScreenState();
+  State<AssistantJobPostingScreen> createState() =>
+      _AssistantJobPostingScreenState();
 }
 
 class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   // Controllers
   final _clinicNameAndBranchController = TextEditingController();
   final _titlePostController = TextEditingController();
@@ -35,9 +36,11 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
 
   //--------------------Add manually by Aek---------------------------------------
   String _selectedProvinceZones = JobPostingConstants.thaiProvinceZones.first;
-  String _selectedLocationZones = JobPostingConstants.thaiLocationZones.first.first;
+  String _selectedLocationZones =
+      JobPostingConstants.thaiLocationZones.first.first;
   String _selectedTrainLine = JobPostingConstants.thaiTrainLines.last;
-  String _selectedTrainStation = JobPostingConstants.thaiTrainStations.last.first;
+  String _selectedTrainStation =
+      JobPostingConstants.thaiTrainStations.last.first;
   //-------------------------------------------------------------------------------
 
   // State variables
@@ -45,7 +48,8 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
   String _selectedWorkType = AssistantJobConstants.workTypes.first;
   List<String> _selectedSkills = [];
   List<DateTime> _selectedWorkDays = [];
-  String _selectedPaymentTerm = AssistantJobConstants.paymentTermsPartTime.first;
+  String _selectedPaymentTerm =
+      AssistantJobConstants.paymentTermsPartTime.first;
   String _selectedDayOff = AssistantJobConstants.dayOffFullTimeOptions.first;
 
   @override
@@ -77,12 +81,16 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
       _selectedSkills = List.from(job.skillAssistant);
       _selectedWorkType = job.workType;
       _selectedWorkDays = job.workDayPartTime ?? [];
-      _selectedPaymentTerm = job.paymentTermPartTime ?? AssistantJobConstants.paymentTermsPartTime.first;
+      _selectedPaymentTerm =
+          job.paymentTermPartTime ??
+          AssistantJobConstants.paymentTermsPartTime.first;
       _payPerDayPartTimeController.text = job.payPerDayPartTime ?? '';
       _payPerHourPartTimeController.text = job.payPerHourPartTime ?? '';
       _salaryFullTimeController.text = job.salaryFullTime ?? '';
       _totalIncomeFullTimeController.text = job.totalIncomeFullTime ?? '';
-      _selectedDayOff = job.dayOffFullTime ?? AssistantJobConstants.dayOffFullTimeOptions.first;
+      _selectedDayOff =
+          job.dayOffFullTime ??
+          AssistantJobConstants.dayOffFullTimeOptions.first;
       _workTimeStartController.text = job.workTimeStart ?? '';
       _workTimeEndController.text = job.workTimeEnd ?? '';
       _perkController.text = job.perk ?? '';
@@ -94,7 +102,11 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.jobToEdit != null ? 'แก้ไขประกาศงานผู้ช่วย' : 'ประกาศงานผู้ช่วย'),
+        title: Text(
+          widget.jobToEdit != null
+              ? 'แก้ไขประกาศงานผู้ช่วย'
+              : 'ประกาศงานผู้ช่วย',
+        ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -127,9 +139,12 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
               ),
               const SizedBox(height: 16),
 
-  //--------------------Add manually by Aek---------------------------------------
+              //--------------------Add manually by Aek---------------------------------------
               // Location Information Section
-              JobPostingFormWidgets.buildSectionHeader(context, 'ข้อมูลสถานที่'),
+              JobPostingFormWidgets.buildSectionHeader(
+                context,
+                'ข้อมูลสถานที่',
+              ),
               const SizedBox(height: 16),
 
               // Province
@@ -145,7 +160,10 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
               // City/Location Zone
               JobPostingFormWidgets.buildDropdownField<String>(
                 'จังหวัด/โซนในจังหวัด',
-                JobPostingUtils.getValidLocationZone(_selectedProvinceZones, _selectedLocationZones),
+                JobPostingUtils.getValidLocationZone(
+                  _selectedProvinceZones,
+                  _selectedLocationZones,
+                ),
                 JobPostingUtils.getCurrentLocationZones(_selectedProvinceZones),
                 (value) => setState(() => _selectedLocationZones = value!),
                 isRequired: true,
@@ -165,14 +183,17 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
               // Train Station
               JobPostingFormWidgets.buildDropdownField<String>(
                 'สถานีรถไฟฟ้า',
-                JobPostingUtils.getValidTrainStation(_selectedTrainLine, _selectedTrainStation),
+                JobPostingUtils.getValidTrainStation(
+                  _selectedTrainLine,
+                  _selectedTrainStation,
+                ),
                 JobPostingUtils.getCurrentTrainStations(_selectedTrainLine),
                 (value) => setState(() => _selectedTrainStation = value!),
                 isRequired: true,
               ),
               const SizedBox(height: 24),
-  //-------------------------------------------------------------------------------
-  
+              //-------------------------------------------------------------------------------
+
               // ประเภทงาน Section
               _buildSectionHeader('ประเภทงาน'),
               const SizedBox(height: 16),
@@ -276,7 +297,10 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Colors.blue),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
           ),
         ),
       ],
@@ -342,7 +366,7 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
       ),
       builder: (context) {
         List<String> tempSelectedSkills = List.from(_selectedSkills);
-        
+
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
@@ -360,7 +384,9 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
                   const SizedBox(height: 16),
                   Expanded(
                     child: ListView(
-                      children: AssistantJobConstants.allAssistantSkills.map((skill) {
+                      children: AssistantJobConstants.allAssistantSkills.map((
+                        skill,
+                      ) {
                         final isSelected = tempSelectedSkills.contains(skill);
                         return CheckboxListTile(
                           title: Text(skill),
@@ -390,7 +416,9 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            setState(() => _selectedSkills = tempSelectedSkills);
+                            setState(
+                              () => _selectedSkills = tempSelectedSkills,
+                            );
                             Navigator.pop(context);
                           },
                           child: const Text('ยืนยัน'),
@@ -424,7 +452,9 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
                 ? 'เลือกวันทำงาน'
                 : '${_selectedWorkDays.length} วันที่เลือก',
             style: TextStyle(
-              color: _selectedWorkDays.isEmpty ? Colors.grey[600] : Colors.black,
+              color: _selectedWorkDays.isEmpty
+                  ? Colors.grey[600]
+                  : Colors.black,
             ),
           ),
           trailing: const Icon(Icons.calendar_today),
@@ -554,24 +584,17 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
         maxLines: 5,
         maxLength: 2000,
       ),
-      // const SizedBox(height: 24),
-
-      // Title Post for Full-time
-      // _buildTextFormField(
-      //   controller: _titlePostController,
-      //   label: 'หัวข้อโพส',
-      //   hintText: 'รับสมัครผู้ช่วยทันตแพทย์ประจำ',
-      //   maxLength: 180,
-      //   validator: (value) => _requiredValidator(value, 'หัวข้อโพส'),
-      // ),
     ];
   }
+
   //--------------------Add manually by Aek---------------------------------------
   void _onProvinceChanged(String newProvince) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _selectedProvinceZones = newProvince;
-        final newLocations = JobPostingUtils.getCurrentLocationZones(newProvince);
+        final newLocations = JobPostingUtils.getCurrentLocationZones(
+          newProvince,
+        );
         if (newLocations.isNotEmpty) {
           _selectedLocationZones = newLocations.first;
         }
@@ -583,14 +606,17 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _selectedTrainLine = newTrainLine;
-        final newStations = JobPostingUtils.getCurrentTrainStations(newTrainLine);
+        final newStations = JobPostingUtils.getCurrentTrainStations(
+          newTrainLine,
+        );
         if (newStations.isNotEmpty) {
           _selectedTrainStation = newStations.first;
         }
       });
     });
   }
-//---------------------------------------------------------------------------------
+
+  //---------------------------------------------------------------------------------
   Widget _buildDropdownField({
     required String value,
     required List<String> items,
@@ -604,10 +630,7 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
       child: DropdownButtonFormField<String>(
         value: value,
         items: items.map((item) {
-          return DropdownMenuItem<String>(
-            value: item,
-            child: Text(item),
-          );
+          return DropdownMenuItem<String>(value: item, child: Text(item));
         }).toList(),
         onChanged: onChanged,
         decoration: const InputDecoration(
@@ -627,7 +650,7 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-    
+
     if (picked != null) {
       setState(() {
         if (!_selectedWorkDays.contains(picked)) {
@@ -651,7 +674,9 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
 
     if (_selectedSkills.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณาเลือกตำแหน่งผู้ช่วยทันตแพทย์อย่างน้อย 1 ตำแหน่ง')),
+        const SnackBar(
+          content: Text('กรุณาเลือกตำแหน่งผู้ช่วยทันตแพทย์อย่างน้อย 1 ตำแหน่ง'),
+        ),
       );
       return;
     }
@@ -674,18 +699,38 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
         titlePost: _titlePostController.text.trim(),
         skillAssistant: _selectedSkills,
         workType: _selectedWorkType,
-        workDayPartTime: _selectedWorkType == 'Part-time' ? _selectedWorkDays : null,
-        paymentTermPartTime: _selectedWorkType == 'Part-time' ? _selectedPaymentTerm : null,
-        payPerDayPartTime: _selectedWorkType == 'Part-time' ? _payPerDayPartTimeController.text.trim() : null,
-        payPerHourPartTime: _selectedWorkType == 'Part-time' ? _payPerHourPartTimeController.text.trim() : null,
-        salaryFullTime: _selectedWorkType == 'Full-time' ? _salaryFullTimeController.text.trim() : null,
-        totalIncomeFullTime: _selectedWorkType == 'Full-time' ? _totalIncomeFullTimeController.text.trim() : null,
-        dayOffFullTime: _selectedWorkType == 'Full-time' ? _selectedDayOff : null,
-        workTimeStart: _selectedWorkType == 'Full-time' ? _workTimeStartController.text.trim() : null,
-        workTimeEnd: _selectedWorkType == 'Full-time' ? _workTimeEndController.text.trim() : null,
-        perk: _selectedWorkType == 'Full-time' 
-            ? _perkController.text.trim() 
-            : (_perkPostController.text.trim().isNotEmpty ? _perkPostController.text.trim() : null),
+        workDayPartTime: _selectedWorkType == 'Part-time'
+            ? _selectedWorkDays
+            : null,
+        paymentTermPartTime: _selectedWorkType == 'Part-time'
+            ? _selectedPaymentTerm
+            : null,
+        payPerDayPartTime: _selectedWorkType == 'Part-time'
+            ? _payPerDayPartTimeController.text.trim()
+            : null,
+        payPerHourPartTime: _selectedWorkType == 'Part-time'
+            ? _payPerHourPartTimeController.text.trim()
+            : null,
+        salaryFullTime: _selectedWorkType == 'Full-time'
+            ? _salaryFullTimeController.text.trim()
+            : null,
+        totalIncomeFullTime: _selectedWorkType == 'Full-time'
+            ? _totalIncomeFullTimeController.text.trim()
+            : null,
+        dayOffFullTime: _selectedWorkType == 'Full-time'
+            ? _selectedDayOff
+            : null,
+        workTimeStart: _selectedWorkType == 'Full-time'
+            ? _workTimeStartController.text.trim()
+            : null,
+        workTimeEnd: _selectedWorkType == 'Full-time'
+            ? _workTimeEndController.text.trim()
+            : null,
+        perk: _selectedWorkType == 'Full-time'
+            ? _perkController.text.trim()
+            : (_perkPostController.text.trim().isNotEmpty
+                  ? _perkPostController.text.trim()
+                  : null),
         createdAt: widget.jobToEdit?.createdAt ?? now,
         updatedAt: now,
       );
@@ -699,8 +744,8 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              widget.jobToEdit != null 
-                  ? 'อัปเดตงานสำเร็จแล้ว!' 
+              widget.jobToEdit != null
+                  ? 'อัปเดตงานสำเร็จแล้ว!'
                   : 'โพสต์งานสำเร็จแล้ว!',
             ),
           ),
@@ -708,7 +753,9 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
         Navigator.pop(context);
       }
     } catch (e) {
-      debugPrint('Error posting assistant job: $e'); // Using debugPrint as per memory
+      debugPrint(
+        'Error posting assistant job: $e',
+      ); // Using debugPrint as per memory
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('เกิดข้อผิดพลาด: ${e.toString()}')),
@@ -720,4 +767,4 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
       }
     }
   }
-} 
+}

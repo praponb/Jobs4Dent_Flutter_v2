@@ -6,11 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../models/product_model.dart';
 
-
 class MarketplaceProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-
 
   List<ProductModel> _products = [];
   List<ProductModel> _myProducts = [];
@@ -38,10 +36,7 @@ class MarketplaceProvider with ChangeNotifier {
   Future<void> initializeMarketplace() async {
     _setLoading(true);
     try {
-      await Future.wait([
-        loadProducts(),
-        loadCategories(),
-      ]);
+      await Future.wait([loadProducts(), loadCategories()]);
     } catch (e) {
       debugPrint('Error initializing marketplace: $e');
     } finally {
@@ -61,7 +56,7 @@ class MarketplaceProvider with ChangeNotifier {
       _products = querySnapshot.docs
           .map((doc) => ProductModel.fromMap({...doc.data(), 'id': doc.id}))
           .toList();
-      
+
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading products: $e');
@@ -80,7 +75,7 @@ class MarketplaceProvider with ChangeNotifier {
       _myProducts = querySnapshot.docs
           .map((doc) => ProductModel.fromMap({...doc.data(), 'id': doc.id}))
           .toList();
-      
+
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading my products: $e');
@@ -90,18 +85,22 @@ class MarketplaceProvider with ChangeNotifier {
   // Load product categories
   Future<void> loadCategories() async {
     try {
-      final querySnapshot = await _firestore.collection('product_categories').get();
-      
+      final querySnapshot = await _firestore
+          .collection('product_categories')
+          .get();
+
       if (querySnapshot.docs.isEmpty) {
         // Initialize with default categories if none exist
         await _initializeDefaultCategories();
         _categories = DentalProductCategories.defaultCategories;
       } else {
         _categories = querySnapshot.docs
-            .map((doc) => ProductCategory.fromMap({...doc.data(), 'id': doc.id}))
+            .map(
+              (doc) => ProductCategory.fromMap({...doc.data(), 'id': doc.id}),
+            )
             .toList();
       }
-      
+
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading categories: $e');
@@ -115,12 +114,14 @@ class MarketplaceProvider with ChangeNotifier {
   Future<void> _initializeDefaultCategories() async {
     try {
       final batch = _firestore.batch();
-      
+
       for (final category in DentalProductCategories.defaultCategories) {
-        final docRef = _firestore.collection('product_categories').doc(category.id);
+        final docRef = _firestore
+            .collection('product_categories')
+            .doc(category.id);
         batch.set(docRef, category.toMap());
       }
-      
+
       await batch.commit();
     } catch (e) {
       debugPrint('Error initializing default categories: $e');
@@ -128,15 +129,22 @@ class MarketplaceProvider with ChangeNotifier {
   }
 
   // Upload product images
-  Future<List<String>> uploadProductImages(List<XFile> imageFiles, String productId) async {
+  Future<List<String>> uploadProductImages(
+    List<XFile> imageFiles,
+    String productId,
+  ) async {
     List<String> imageUrls = [];
-    
+
     try {
       for (int i = 0; i < imageFiles.length; i++) {
         final file = File(imageFiles[i].path);
         final fileName = '${productId}_$i.jpg';
-        final ref = _storage.ref().child('products').child(productId).child(fileName);
-        
+        final ref = _storage
+            .ref()
+            .child('products')
+            .child(productId)
+            .child(fileName);
+
         final uploadTask = await ref.putFile(file);
         final downloadUrl = await uploadTask.ref.getDownloadURL();
         imageUrls.add(downloadUrl);
@@ -145,30 +153,33 @@ class MarketplaceProvider with ChangeNotifier {
       debugPrint('Error uploading images: $e');
       rethrow;
     }
-    
+
     return imageUrls;
   }
 
   // Create a new product
-  Future<bool> createProduct(ProductModel product, List<XFile>? imageFiles) async {
+  Future<bool> createProduct(
+    ProductModel product,
+    List<XFile>? imageFiles,
+  ) async {
     try {
       _setLoading(true);
-      
+
       List<String> imageUrls = [];
       if (imageFiles != null && imageFiles.isNotEmpty) {
         imageUrls = await uploadProductImages(imageFiles, product.id);
       }
-      
+
       final productWithImages = product.copyWith(imageUrls: imageUrls);
-      
+
       await _firestore
           .collection('products')
           .doc(product.id)
           .set(productWithImages.toMap());
-      
+
       _products.insert(0, productWithImages);
       _myProducts.insert(0, productWithImages);
-      
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -180,38 +191,41 @@ class MarketplaceProvider with ChangeNotifier {
   }
 
   // Update an existing product
-  Future<bool> updateProduct(ProductModel product, List<XFile>? newImageFiles) async {
+  Future<bool> updateProduct(
+    ProductModel product,
+    List<XFile>? newImageFiles,
+  ) async {
     try {
       _setLoading(true);
-      
+
       List<String> imageUrls = product.imageUrls;
       if (newImageFiles != null && newImageFiles.isNotEmpty) {
         // Delete old images if new ones are uploaded
         await _deleteProductImages(product.id);
         imageUrls = await uploadProductImages(newImageFiles, product.id);
       }
-      
+
       final updatedProduct = product.copyWith(
         imageUrls: imageUrls,
         updatedAt: DateTime.now(),
       );
-      
+
       await _firestore
           .collection('products')
           .doc(product.id)
           .update(updatedProduct.toMap());
-      
+
       // Update in local lists
       final productIndex = _products.indexWhere((p) => p.id == product.id);
       if (productIndex != -1) {
         _products[productIndex] = updatedProduct;
       }
-      
+
       final myProductIndex = _myProducts.indexWhere((p) => p.id == product.id);
       if (myProductIndex != -1) {
         _myProducts[myProductIndex] = updatedProduct;
       }
-      
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -226,17 +240,17 @@ class MarketplaceProvider with ChangeNotifier {
   Future<bool> deleteProduct(String productId) async {
     try {
       _setLoading(true);
-      
+
       // Delete images from storage
       await _deleteProductImages(productId);
-      
+
       // Delete from Firestore
       await _firestore.collection('products').doc(productId).delete();
-      
+
       // Remove from local lists
       _products.removeWhere((p) => p.id == productId);
       _myProducts.removeWhere((p) => p.id == productId);
-      
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -250,8 +264,12 @@ class MarketplaceProvider with ChangeNotifier {
   // Delete product images from storage
   Future<void> _deleteProductImages(String productId) async {
     try {
-      final listResult = await _storage.ref().child('products').child(productId).listAll();
-      
+      final listResult = await _storage
+          .ref()
+          .child('products')
+          .child(productId)
+          .listAll();
+
       for (final item in listResult.items) {
         await item.delete();
       }
@@ -261,57 +279,81 @@ class MarketplaceProvider with ChangeNotifier {
   }
 
   // Search products with filters
-  Future<void> searchProducts(String query, ProductSearchFilters filters) async {
+  Future<void> searchProducts(
+    String query,
+    ProductSearchFilters filters,
+  ) async {
     try {
       _setLoading(true);
       _searchQuery = query;
       _searchFilters = filters;
-      
-      Query<Map<String, dynamic>> queryRef = _firestore.collection('products')
+
+      Query<Map<String, dynamic>> queryRef = _firestore
+          .collection('products')
           .where('isActive', isEqualTo: true);
-      
+
       // Apply category filter
       if (filters.categoryId != null && filters.categoryId!.isNotEmpty) {
         queryRef = queryRef.where('categoryId', isEqualTo: filters.categoryId);
       }
-      
+
       // Apply condition filter
       if (filters.condition != null) {
-        queryRef = queryRef.where('condition', isEqualTo: filters.condition.toString().split('.').last);
+        queryRef = queryRef.where(
+          'condition',
+          isEqualTo: filters.condition.toString().split('.').last,
+        );
       }
-      
+
       // Apply price range filter
       if (filters.minPrice != null) {
-        queryRef = queryRef.where('price', isGreaterThanOrEqualTo: filters.minPrice);
+        queryRef = queryRef.where(
+          'price',
+          isGreaterThanOrEqualTo: filters.minPrice,
+        );
       }
       if (filters.maxPrice != null) {
-        queryRef = queryRef.where('price', isLessThanOrEqualTo: filters.maxPrice);
+        queryRef = queryRef.where(
+          'price',
+          isLessThanOrEqualTo: filters.maxPrice,
+        );
       }
-      
+
       final querySnapshot = await queryRef.get();
-      
+
       List<ProductModel> results = querySnapshot.docs
           .map((doc) => ProductModel.fromMap({...doc.data(), 'id': doc.id}))
           .toList();
-      
+
       // Apply text search filter
       if (query.isNotEmpty) {
         final lowercaseQuery = query.toLowerCase();
-        results = results.where((product) =>
-            product.name.toLowerCase().contains(lowercaseQuery) ||
-            product.description.toLowerCase().contains(lowercaseQuery) ||
-            product.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery)) ||
-            product.categoryName.toLowerCase().contains(lowercaseQuery)
-        ).toList();
+        results = results
+            .where(
+              (product) =>
+                  product.name.toLowerCase().contains(lowercaseQuery) ||
+                  product.description.toLowerCase().contains(lowercaseQuery) ||
+                  product.tags.any(
+                    (tag) => tag.toLowerCase().contains(lowercaseQuery),
+                  ) ||
+                  product.categoryName.toLowerCase().contains(lowercaseQuery),
+            )
+            .toList();
       }
-      
+
       // Apply location filter
       if (filters.location != null && filters.location!.isNotEmpty) {
-        results = results.where((product) =>
-            product.sellerLocation?.toLowerCase().contains(filters.location!.toLowerCase()) ?? false
-        ).toList();
+        results = results
+            .where(
+              (product) =>
+                  product.sellerLocation?.toLowerCase().contains(
+                    filters.location!.toLowerCase(),
+                  ) ??
+                  false,
+            )
+            .toList();
       }
-      
+
       // Sort results
       results.sort((a, b) {
         switch (filters.sortBy) {
@@ -327,7 +369,7 @@ class MarketplaceProvider with ChangeNotifier {
             return b.viewCount.compareTo(a.viewCount);
         }
       });
-      
+
       _searchResults = results;
       notifyListeners();
     } catch (e) {
@@ -348,7 +390,7 @@ class MarketplaceProvider with ChangeNotifier {
         await _firestore.collection('products').doc(productId).update({
           'viewCount': FieldValue.increment(1),
         });
-        
+
         return ProductModel.fromMap({...doc.data()!, 'id': doc.id});
       }
       return null;
@@ -371,7 +413,9 @@ class MarketplaceProvider with ChangeNotifier {
 
   // Get products by category
   List<ProductModel> getProductsByCategory(String categoryId) {
-    return _products.where((product) => product.categoryId == categoryId).toList();
+    return _products
+        .where((product) => product.categoryId == categoryId)
+        .toList();
   }
 
   // Get featured products (most viewed/newest)
@@ -406,14 +450,6 @@ class MarketplaceProvider with ChangeNotifier {
           .orderBy('createdAt', descending: true)
           .get();
 
-      // Also check user sub-collection for additional data if needed
-      // final userProductsQuery = await _firestore
-      //     .collection('users')
-      //     .doc(sellerId)
-      //     .collection('marketplace_products')
-      //     .orderBy('createdAt', descending: true)
-      //     .get();
-
       _myProducts = productsQuery.docs
           .map((doc) => ProductModel.fromMap({...doc.data(), 'id': doc.id}))
           .toList();
@@ -427,17 +463,20 @@ class MarketplaceProvider with ChangeNotifier {
   }
 
   // Create product with dual storage (main collection + user sub-collection)
-  Future<bool> createProductWithUserStorage(ProductModel product, List<XFile>? imageFiles) async {
+  Future<bool> createProductWithUserStorage(
+    ProductModel product,
+    List<XFile>? imageFiles,
+  ) async {
     try {
       _setLoading(true);
-      
+
       List<String> imageUrls = [];
       if (imageFiles != null && imageFiles.isNotEmpty) {
         imageUrls = await uploadProductImages(imageFiles, product.id);
       }
-      
+
       final productWithImages = product.copyWith(imageUrls: imageUrls);
-      
+
       // Store in main products collection
       await _firestore
           .collection('products')
@@ -451,10 +490,10 @@ class MarketplaceProvider with ChangeNotifier {
           .collection('marketplace_products')
           .doc(product.id)
           .set(productWithImages.toMap());
-      
+
       _products.insert(0, productWithImages);
       _myProducts.insert(0, productWithImages);
-      
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -466,21 +505,24 @@ class MarketplaceProvider with ChangeNotifier {
   }
 
   // Update product in both locations
-  Future<bool> updateProductWithUserStorage(ProductModel product, List<XFile>? newImageFiles) async {
+  Future<bool> updateProductWithUserStorage(
+    ProductModel product,
+    List<XFile>? newImageFiles,
+  ) async {
     try {
       _setLoading(true);
-      
+
       List<String> imageUrls = product.imageUrls;
       if (newImageFiles != null && newImageFiles.isNotEmpty) {
         await _deleteProductImages(product.id);
         imageUrls = await uploadProductImages(newImageFiles, product.id);
       }
-      
+
       final updatedProduct = product.copyWith(
         imageUrls: imageUrls,
         updatedAt: DateTime.now(),
       );
-      
+
       // Update in main products collection
       await _firestore
           .collection('products')
@@ -494,18 +536,22 @@ class MarketplaceProvider with ChangeNotifier {
           .collection('marketplace_products')
           .doc(product.id)
           .update(updatedProduct.toMap());
-      
+
       // Update local lists
-      final productIndex = _products.indexWhere((p) => p.id == updatedProduct.id);
+      final productIndex = _products.indexWhere(
+        (p) => p.id == updatedProduct.id,
+      );
       if (productIndex != -1) {
         _products[productIndex] = updatedProduct;
       }
-      
-      final myProductIndex = _myProducts.indexWhere((p) => p.id == updatedProduct.id);
+
+      final myProductIndex = _myProducts.indexWhere(
+        (p) => p.id == updatedProduct.id,
+      );
       if (myProductIndex != -1) {
         _myProducts[myProductIndex] = updatedProduct;
       }
-      
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -517,10 +563,13 @@ class MarketplaceProvider with ChangeNotifier {
   }
 
   // Delete product from both locations
-  Future<bool> deleteProductWithUserStorage(String productId, String sellerId) async {
+  Future<bool> deleteProductWithUserStorage(
+    String productId,
+    String sellerId,
+  ) async {
     try {
       _setLoading(true);
-      
+
       // Delete from main products collection
       await _firestore.collection('products').doc(productId).delete();
 
@@ -531,14 +580,14 @@ class MarketplaceProvider with ChangeNotifier {
           .collection('marketplace_products')
           .doc(productId)
           .delete();
-      
+
       // Delete associated images
       await _deleteProductImages(productId);
-      
+
       // Remove from local lists
       _products.removeWhere((product) => product.id == productId);
       _myProducts.removeWhere((product) => product.id == productId);
-      
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -585,10 +634,4 @@ class ProductSearchFilters {
   }
 }
 
-enum ProductSortBy {
-  newest,
-  oldest,
-  priceAsc,
-  priceDesc,
-  mostViewed,
-} 
+enum ProductSortBy { newest, oldest, priceAsc, priceDesc, mostViewed }

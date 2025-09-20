@@ -9,14 +9,15 @@ class AssistantJobSearchScreen extends StatefulWidget {
   const AssistantJobSearchScreen({super.key});
 
   @override
-  State<AssistantJobSearchScreen> createState() => _AssistantJobSearchScreenState();
+  State<AssistantJobSearchScreen> createState() =>
+      _AssistantJobSearchScreenState();
 }
 
 class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _keywordController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  
+
   List<AssistantJobModel> _jobs = [];
   bool _isLoading = false;
   String? _error;
@@ -43,30 +44,40 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
     });
 
     try {
-      // First try the query with orderBy
+      // First try the query with orderBy and limit to 1000 records
       QuerySnapshot querySnapshot;
       try {
         querySnapshot = await _firestore
             .collection('job_posts_assistant')
             .where('isActive', isEqualTo: true)
             .orderBy('createdAt', descending: true)
+            .limit(1000)
             .get();
       } catch (indexError) {
-        debugPrint('Index error, falling back to query without orderBy: $indexError');
+        debugPrint(
+          'Index error, falling back to query without orderBy: $indexError',
+        );
         // Fallback: Query without orderBy if index doesn't exist
         querySnapshot = await _firestore
             .collection('job_posts_assistant')
             .where('isActive', isEqualTo: true)
+            .limit(1000)
             .get();
       }
 
       final jobs = <AssistantJobModel>[];
-      
+
       for (var doc in querySnapshot.docs) {
         try {
           final jobData = doc.data() as Map<String, dynamic>;
           // Add document ID to the data if it's missing
           jobData['jobId'] = jobData['jobId'] ?? doc.id;
+
+          // Debug: Print raw Firestore data for perk field
+          debugPrint('🔍 Initial load - Raw Firestore data for job ${doc.id}:');
+          debugPrint('   - perk field: "${jobData['perk']}"');
+          debugPrint('   - workType: "${jobData['workType']}"');
+
           final job = AssistantJobModel.fromMap(jobData);
           jobs.add(job);
         } catch (parseError) {
@@ -80,6 +91,13 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       if (querySnapshot.docs.isNotEmpty) {
         jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       }
+
+      debugPrint(
+        '📊 Loaded ${jobs.length} assistant jobs from Firestore (max 1000)',
+      );
+      debugPrint(
+        '📊 Total documents in query result: ${querySnapshot.docs.length}',
+      );
 
       setState(() {
         _jobs = jobs;
@@ -114,18 +132,27 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       try {
         querySnapshot = await query
             .orderBy('createdAt', descending: true)
+            .limit(1000)
             .get();
       } catch (indexError) {
-        debugPrint('Index error in search, falling back to query without orderBy: $indexError');
-        querySnapshot = await query.get();
+        debugPrint(
+          'Index error in search, falling back to query without orderBy: $indexError',
+        );
+        querySnapshot = await query.limit(1000).get();
       }
 
       List<AssistantJobModel> jobs = <AssistantJobModel>[];
-      
+
       for (var doc in querySnapshot.docs) {
         try {
           final jobData = doc.data() as Map<String, dynamic>;
           jobData['jobId'] = jobData['jobId'] ?? doc.id;
+
+          // Debug: Print raw Firestore data for perk field
+          debugPrint('🔍 Raw Firestore data for job ${doc.id}:');
+          debugPrint('   - perk field: "${jobData['perk']}"');
+          debugPrint('   - workType: "${jobData['workType']}"');
+
           final job = AssistantJobModel.fromMap(jobData);
           jobs.add(job);
         } catch (parseError) {
@@ -137,26 +164,87 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       // Sort by createdAt if we used fallback query
       jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
+      debugPrint(
+        '📊 Search loaded ${jobs.length} assistant jobs from Firestore (max 1000)',
+      );
+      debugPrint(
+        '📊 Total documents in search result: ${querySnapshot.docs.length}',
+      );
+
+      // Debug: Print perk values for all jobs
+      debugPrint('🔍 Debug: Perk values in jobs:');
+      for (int i = 0; i < jobs.length && i < 5; i++) {
+        final job = jobs[i];
+        debugPrint(
+          '   Job ${i + 1}: "${job.titlePost}" - Perk: "${job.perk ?? 'null'}"',
+        );
+      }
+
       // Apply text-based filters (Firestore doesn't support complex text search)
       if (_keywordController.text.trim().isNotEmpty) {
         final keyword = _keywordController.text.trim().toLowerCase();
+        debugPrint('🔍 Searching for keyword: "$keyword"');
+        debugPrint('📊 Total jobs before keyword filter: ${jobs.length}');
+
         jobs = jobs.where((job) {
-          return job.titlePost.toLowerCase().contains(keyword) ||
-                 job.clinicNameAndBranch.toLowerCase().contains(keyword);
+          final titleMatch = job.titlePost.toLowerCase().contains(keyword);
+          final clinicMatch = job.clinicNameAndBranch.toLowerCase().contains(
+            keyword,
+          );
+          final perkMatch =
+              job.perk != null && job.perk!.toLowerCase().contains(keyword);
+
+          // Debug print for each job
+          if (titleMatch || clinicMatch || perkMatch) {
+            debugPrint('✅ Job "${job.titlePost}" matches keyword "$keyword"');
+            if (perkMatch) {
+              debugPrint('   - Perk field contains keyword: "${job.perk}"');
+            }
+          }
+
+          return titleMatch || clinicMatch || perkMatch;
         }).toList();
+
+        debugPrint('📊 Total jobs after keyword filter: ${jobs.length}');
       }
 
       if (_locationController.text.trim().isNotEmpty) {
         final location = _locationController.text.trim().toLowerCase();
+        debugPrint('🔍 Searching for location: "$location"');
+        debugPrint('📊 Total jobs before location filter: ${jobs.length}');
+
         jobs = jobs.where((job) {
-          return job.clinicNameAndBranch.toLowerCase().contains(location);
+          final clinicMatch = job.clinicNameAndBranch.toLowerCase().contains(
+            location,
+          );
+          final perkMatch =
+              job.perk != null && job.perk!.toLowerCase().contains(location);
+
+          // Debug print for location matches
+          if (clinicMatch || perkMatch) {
+            debugPrint('✅ Job "${job.titlePost}" matches location "$location"');
+            if (perkMatch) {
+              debugPrint('   - Perk field contains location: "${job.perk}"');
+            }
+            if (clinicMatch) {
+              debugPrint(
+                '   - Clinic field contains location: "${job.clinicNameAndBranch}"',
+              );
+            }
+          }
+
+          return clinicMatch || perkMatch;
         }).toList();
+
+        debugPrint('📊 Total jobs after location filter: ${jobs.length}');
       }
 
       // Filter by selected skills
       if (_selectedSkills.isNotEmpty) {
         jobs = jobs.where((job) {
-          return _selectedSkills.any((skill) => job.skillAssistant.contains(skill));
+          return _selectedSkills.any(
+            (skill) => job.skillAssistant.contains(skill),
+          );
         }).toList();
       }
 
@@ -210,7 +298,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Filters Row
                 Row(
                   children: [
@@ -232,7 +320,10 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                         decoration: const InputDecoration(
                           hintText: 'ประเภทงาน',
                           border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                         ),
                         items: [
                           const DropdownMenuItem<String>(
@@ -255,7 +346,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Skills Filter
                 Container(
                   width: double.infinity,
@@ -270,7 +361,9 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                           ? 'เลือกทักษะที่ต้องการ'
                           : '${_selectedSkills.length} ทักษะที่เลือก',
                       style: TextStyle(
-                        color: _selectedSkills.isEmpty ? Colors.grey[600] : Colors.black,
+                        color: _selectedSkills.isEmpty
+                            ? Colors.grey[600]
+                            : Colors.black,
                       ),
                     ),
                     trailing: const Icon(Icons.arrow_drop_down),
@@ -280,14 +373,12 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
               ],
             ),
           ),
-          
+
           // Search Criteria Display
           if (_hasActiveFilters()) _buildSearchCriteria(),
-          
+
           // Results
-          Expanded(
-            child: _buildJobsList(),
-          ),
+          Expanded(child: _buildJobsList()),
         ],
       ),
     );
@@ -295,14 +386,14 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
 
   bool _hasActiveFilters() {
     return _keywordController.text.trim().isNotEmpty ||
-           _locationController.text.trim().isNotEmpty ||
-           _selectedWorkType != null ||
-           _selectedSkills.isNotEmpty;
+        _locationController.text.trim().isNotEmpty ||
+        _selectedWorkType != null ||
+        _selectedSkills.isNotEmpty;
   }
 
   Widget _buildSearchCriteria() {
     List<String> criteria = [];
-    
+
     if (_keywordController.text.trim().isNotEmpty) {
       criteria.add('คำค้นหา: ${_keywordController.text.trim()}');
     }
@@ -373,7 +464,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    
+
     if (_error != null) {
       return Center(
         child: Column(
@@ -385,21 +476,16 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadJobs,
-              child: const Text('ลองใหม่'),
-            ),
+            ElevatedButton(onPressed: _loadJobs, child: const Text('ลองใหม่')),
           ],
         ),
       );
     }
-    
+
     if (_jobs.isEmpty) {
-      return const Center(
-        child: Text('ไม่พบงานที่ค้นหา'),
-      );
+      return const Center(child: Text('ไม่พบงานที่ค้นหา'));
     }
-    
+
     return ListView.builder(
       itemCount: _jobs.length,
       itemBuilder: (context, index) {
@@ -434,16 +520,23 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: job.workType == 'Full-time' ? Colors.green.shade50 : Colors.orange.shade50,
+                          color: job.workType == 'Full-time'
+                              ? Colors.green.shade50
+                              : Colors.orange.shade50,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           job.workType,
                           style: TextStyle(
                             fontSize: 12,
-                            color: job.workType == 'Full-time' ? Colors.green.shade700 : Colors.orange.shade700,
+                            color: job.workType == 'Full-time'
+                                ? Colors.green.shade700
+                                : Colors.orange.shade700,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -470,7 +563,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               // Skills display
               if (job.skillAssistant.isNotEmpty) ...[
                 const Text(
@@ -490,7 +583,10 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                       runSpacing: 4,
                       children: job.skillAssistant.take(3).map((skill) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(4),
@@ -509,7 +605,10 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                         runSpacing: 4,
                         children: job.skillAssistant.skip(3).map((skill) {
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey.shade100,
                               borderRadius: BorderRadius.circular(4),
@@ -526,17 +625,25 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                 ),
                 const SizedBox(height: 8),
               ],
-              
+
               // Salary/Rate information
               if (job.workType == 'Part-time') ...[
-                if (job.payPerDayPartTime != null || job.payPerHourPartTime != null)
+                if (job.payPerDayPartTime != null ||
+                    job.payPerHourPartTime != null)
                   Row(
                     children: [
-                      const Icon(Icons.monetization_on, size: 16, color: Colors.grey),
+                      const Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         _formatPartTimeRate(job),
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -544,16 +651,23 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                 if (job.salaryFullTime != null)
                   Row(
                     children: [
-                      const Icon(Icons.monetization_on, size: 16, color: Colors.grey),
+                      const Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'เงินเดือน ${job.salaryFullTime} บาท',
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
               ],
-              
+
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -568,7 +682,10 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                       const SizedBox(width: 4),
                       Text(
                         '${job.applicationCount} ใบสมัคร',
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -595,7 +712,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays} วันที่แล้ว';
     } else if (difference.inHours > 0) {
@@ -616,7 +733,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       ),
       builder: (context) {
         List<String> tempSelectedSkills = List.from(_selectedSkills);
-        
+
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
@@ -626,15 +743,14 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                 children: [
                   const Text(
                     'เลือกทักษะที่ต้องการ',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
                     child: ListView(
-                      children: AssistantJobConstants.allAssistantSkills.map((skill) {
+                      children: AssistantJobConstants.allAssistantSkills.map((
+                        skill,
+                      ) {
                         final isSelected = tempSelectedSkills.contains(skill);
                         return CheckboxListTile(
                           title: Text(skill),
@@ -666,7 +782,9 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            setState(() => _selectedSkills = tempSelectedSkills);
+                            setState(
+                              () => _selectedSkills = tempSelectedSkills,
+                            );
                             Navigator.pop(context);
                             _searchJobs();
                           },
@@ -734,9 +852,9 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         _buildDetailRow('ประเภทงาน', job.workType),
-                        
+
                         // Skills
                         if (job.skillAssistant.isNotEmpty) ...[
                           const SizedBox(height: 8),
@@ -750,11 +868,16 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                             runSpacing: 4,
                             children: job.skillAssistant.map((skill) {
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade50,
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.blue.shade200),
+                                  border: Border.all(
+                                    color: Colors.blue.shade200,
+                                  ),
                                 ),
                                 child: Text(
                                   skill,
@@ -768,34 +891,64 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                           ),
                           const SizedBox(height: 8),
                         ],
-                        
+
                         // Part-time specific details
                         if (job.workType == 'Part-time') ...[
                           if (job.paymentTermPartTime != null)
-                            _buildDetailRow('เงื่อนไขการจ่าย', job.paymentTermPartTime!),
-                          if (job.payPerDayPartTime != null && job.payPerDayPartTime!.isNotEmpty)
-                            _buildDetailRow('ค่าแรงต่อวัน', '${job.payPerDayPartTime} บาท'),
-                          if (job.payPerHourPartTime != null && job.payPerHourPartTime!.isNotEmpty)
-                            _buildDetailRow('ค่าแรงต่อชั่วโมง', '${job.payPerHourPartTime} บาท'),
-                          if (job.workDayPartTime != null && job.workDayPartTime!.isNotEmpty)
-                            _buildDetailRow('วันทำงาน', _formatWorkDays(job.workDayPartTime!)),
+                            _buildDetailRow(
+                              'เงื่อนไขการจ่าย',
+                              job.paymentTermPartTime!,
+                            ),
+                          if (job.payPerDayPartTime != null &&
+                              job.payPerDayPartTime!.isNotEmpty)
+                            _buildDetailRow(
+                              'ค่าแรงต่อวัน',
+                              '${job.payPerDayPartTime} บาท',
+                            ),
+                          if (job.payPerHourPartTime != null &&
+                              job.payPerHourPartTime!.isNotEmpty)
+                            _buildDetailRow(
+                              'ค่าแรงต่อชั่วโมง',
+                              '${job.payPerHourPartTime} บาท',
+                            ),
+                          if (job.workDayPartTime != null &&
+                              job.workDayPartTime!.isNotEmpty)
+                            _buildDetailRow(
+                              'วันทำงาน',
+                              _formatWorkDays(job.workDayPartTime!),
+                            ),
                         ],
-                        
+
                         // Full-time specific details
                         if (job.workType == 'Full-time') ...[
-                          if (job.salaryFullTime != null && job.salaryFullTime!.isNotEmpty)
-                            _buildDetailRow('เงินเดือน', '${job.salaryFullTime} บาท'),
-                          if (job.totalIncomeFullTime != null && job.totalIncomeFullTime!.isNotEmpty)
-                            _buildDetailRow('รายได้รวม', '${job.totalIncomeFullTime} บาท'),
+                          if (job.salaryFullTime != null &&
+                              job.salaryFullTime!.isNotEmpty)
+                            _buildDetailRow(
+                              'เงินเดือน',
+                              '${job.salaryFullTime} บาท',
+                            ),
+                          if (job.totalIncomeFullTime != null &&
+                              job.totalIncomeFullTime!.isNotEmpty)
+                            _buildDetailRow(
+                              'รายได้รวม',
+                              '${job.totalIncomeFullTime} บาท',
+                            ),
                           if (job.dayOffFullTime != null)
                             _buildDetailRow('วันหยุด', job.dayOffFullTime!),
-                          if (job.workTimeStart != null && job.workTimeEnd != null)
-                            _buildDetailRow('เวลาทำงาน', '${job.workTimeStart} - ${job.workTimeEnd}'),
+                          if (job.workTimeStart != null &&
+                              job.workTimeEnd != null)
+                            _buildDetailRow(
+                              'เวลาทำงาน',
+                              '${job.workTimeStart} - ${job.workTimeEnd}',
+                            ),
                           if (job.perk != null && job.perk!.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             const Text(
                               'สวัสดิการและรายละเอียดเพิ่มเติม',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Text(
@@ -804,11 +957,14 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                             ),
                           ],
                         ],
-                        
+
                         const SizedBox(height: 16),
                         Text(
                           'โพสต์เมื่อ ${_formatDate(job.createdAt)}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -856,9 +1012,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
-          Expanded(
-            child: Text(value),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );
@@ -866,12 +1020,12 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
 
   String _formatWorkDays(List<DateTime> workDays) {
     if (workDays.isEmpty) return 'ไม่ระบุ';
-    
+
     final sortedDays = List<DateTime>.from(workDays)..sort();
     final formattedDays = sortedDays.map((date) {
       return '${date.day}/${date.month}/${date.year}';
     }).toList();
-    
+
     if (formattedDays.length <= 3) {
       return formattedDays.join(', ');
     } else {
@@ -885,7 +1039,9 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('รายงานโพสต์งาน'),
-          content: const Text('คุณต้องการรายงานโพสต์งานนี้ว่าไม่เหมาะสมหรือไม่?'),
+          content: const Text(
+            'คุณต้องการรายงานโพสต์งานนี้ว่าไม่เหมาะสมหรือไม่?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -946,7 +1102,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
 
   void _applyForJob(AssistantJobModel job) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.userModel == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('กรุณาเข้าสู่ระบบก่อนสมัครงาน')),
@@ -958,19 +1114,8 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('สมัครงาน: ${job.titlePost}'),
-        action: SnackBarAction(
-          label: 'ปิด',
-          onPressed: () {},
-        ),
+        action: SnackBarAction(label: 'ปิด', onPressed: () {}),
       ),
     );
-    
-    // Navigate to AssistantJobApplicationScreen when implemented
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => AssistantJobApplicationScreen(job: job),
-    //   ),
-    // );
   }
-} 
+}
