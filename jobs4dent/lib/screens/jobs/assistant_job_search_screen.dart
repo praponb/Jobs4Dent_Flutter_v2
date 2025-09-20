@@ -44,13 +44,14 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
     });
 
     try {
-      // First try the query with orderBy
+      // First try the query with orderBy and limit to 1000 records
       QuerySnapshot querySnapshot;
       try {
         querySnapshot = await _firestore
             .collection('job_posts_assistant')
             .where('isActive', isEqualTo: true)
             .orderBy('createdAt', descending: true)
+            .limit(1000)
             .get();
       } catch (indexError) {
         debugPrint(
@@ -60,6 +61,7 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
         querySnapshot = await _firestore
             .collection('job_posts_assistant')
             .where('isActive', isEqualTo: true)
+            .limit(1000)
             .get();
       }
 
@@ -70,6 +72,12 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
           final jobData = doc.data() as Map<String, dynamic>;
           // Add document ID to the data if it's missing
           jobData['jobId'] = jobData['jobId'] ?? doc.id;
+
+          // Debug: Print raw Firestore data for perk field
+          debugPrint('🔍 Initial load - Raw Firestore data for job ${doc.id}:');
+          debugPrint('   - perk field: "${jobData['perk']}"');
+          debugPrint('   - workType: "${jobData['workType']}"');
+
           final job = AssistantJobModel.fromMap(jobData);
           jobs.add(job);
         } catch (parseError) {
@@ -83,6 +91,13 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       if (querySnapshot.docs.isNotEmpty) {
         jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       }
+
+      debugPrint(
+        '📊 Loaded ${jobs.length} assistant jobs from Firestore (max 1000)',
+      );
+      debugPrint(
+        '📊 Total documents in query result: ${querySnapshot.docs.length}',
+      );
 
       setState(() {
         _jobs = jobs;
@@ -117,12 +132,13 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
       try {
         querySnapshot = await query
             .orderBy('createdAt', descending: true)
+            .limit(1000)
             .get();
       } catch (indexError) {
         debugPrint(
           'Index error in search, falling back to query without orderBy: $indexError',
         );
-        querySnapshot = await query.get();
+        querySnapshot = await query.limit(1000).get();
       }
 
       List<AssistantJobModel> jobs = <AssistantJobModel>[];
@@ -131,6 +147,12 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
         try {
           final jobData = doc.data() as Map<String, dynamic>;
           jobData['jobId'] = jobData['jobId'] ?? doc.id;
+
+          // Debug: Print raw Firestore data for perk field
+          debugPrint('🔍 Raw Firestore data for job ${doc.id}:');
+          debugPrint('   - perk field: "${jobData['perk']}"');
+          debugPrint('   - workType: "${jobData['workType']}"');
+
           final job = AssistantJobModel.fromMap(jobData);
           jobs.add(job);
         } catch (parseError) {
@@ -141,6 +163,13 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
 
       // Sort by createdAt if we used fallback query
       jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      debugPrint(
+        '📊 Search loaded ${jobs.length} assistant jobs from Firestore (max 1000)',
+      );
+      debugPrint(
+        '📊 Total documents in search result: ${querySnapshot.docs.length}',
+      );
 
       // Debug: Print perk values for all jobs
       debugPrint('🔍 Debug: Perk values in jobs:');
@@ -181,9 +210,33 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
 
       if (_locationController.text.trim().isNotEmpty) {
         final location = _locationController.text.trim().toLowerCase();
+        debugPrint('🔍 Searching for location: "$location"');
+        debugPrint('📊 Total jobs before location filter: ${jobs.length}');
+
         jobs = jobs.where((job) {
-          return job.clinicNameAndBranch.toLowerCase().contains(location);
+          final clinicMatch = job.clinicNameAndBranch.toLowerCase().contains(
+            location,
+          );
+          final perkMatch =
+              job.perk != null && job.perk!.toLowerCase().contains(location);
+
+          // Debug print for location matches
+          if (clinicMatch || perkMatch) {
+            debugPrint('✅ Job "${job.titlePost}" matches location "$location"');
+            if (perkMatch) {
+              debugPrint('   - Perk field contains location: "${job.perk}"');
+            }
+            if (clinicMatch) {
+              debugPrint(
+                '   - Clinic field contains location: "${job.clinicNameAndBranch}"',
+              );
+            }
+          }
+
+          return clinicMatch || perkMatch;
         }).toList();
+
+        debugPrint('📊 Total jobs after location filter: ${jobs.length}');
       }
 
       // Filter by selected skills
