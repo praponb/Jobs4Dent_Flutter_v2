@@ -221,6 +221,25 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
                 ],
               ),
 
+              // Job type indicator
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.work, size: 16, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      'ประเภทงาน: ${_getJobTypeFromApplication(application)}',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+
               // Phone number if available
               if (application.applicantPhone != null) ...[
                 const SizedBox(height: 4),
@@ -364,6 +383,12 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _getJobTypeFromApplication(JobApplicationModel application) {
+    // For now, we'll show a generic message since we don't have job type info
+    // This could be enhanced by looking up the job details or adding job type to the application model
+    return 'ทันตแพทย์/ผู้ช่วย';
   }
 
   void _showApplicationDetails(JobApplicationModel application) {

@@ -135,30 +135,60 @@ class JobApplicationService {
     }
   }
 
-  /// Get applicants for my jobs (for clinics)
+  /// Get applicants for my jobs (for clinics) - fetches from both dentist and assistant collections
   Future<List<JobApplicationModel>> getApplicantsForMyJobs(
     String clinicId,
   ) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('job_applications')
+      // Fetch from both collections in parallel
+      final dentistQuery = _firestore
+          .collection('job_applications_dentist')
           .where('clinicId', isEqualTo: clinicId)
           .get();
 
-      final applicants = querySnapshot.docs
-          .map((doc) => JobApplicationModel.fromMap(doc.data()))
+      final assistantQuery = _firestore
+          .collection('job_applications_assistant')
+          .where('clinicId', isEqualTo: clinicId)
+          .get();
+
+      // Wait for both queries to complete
+      final results = await Future.wait([dentistQuery, assistantQuery]);
+      final dentistSnapshot = results[0];
+      final assistantSnapshot = results[1];
+
+      // Process dentist applications
+      final dentistApplicants = dentistSnapshot.docs
+          .map(
+            (doc) => JobApplicationModel.fromMap({
+              ...doc.data(),
+              'applicationId': doc.id,
+            }),
+          )
           .toList();
 
-      // Sort by appliedAt in descending order
-      applicants.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+      // Process assistant applications
+      final assistantApplicants = assistantSnapshot.docs
+          .map(
+            (doc) => JobApplicationModel.fromMap({
+              ...doc.data(),
+              'applicationId': doc.id,
+            }),
+          )
+          .toList();
 
-      return applicants;
+      // Combine both lists
+      final allApplicants = [...dentistApplicants, ...assistantApplicants];
+
+      // Sort by appliedAt in descending order
+      allApplicants.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+
+      return allApplicants;
     } catch (e) {
       throw Exception('การดึงผู้สมัครไม่สำเร็จ: $e');
     }
   }
 
-  /// Update application status (for clinics)
+  /// Update application status (for clinics) - tries both collections
   Future<bool> updateApplicationStatus({
     required String applicationId,
     required String newStatus,
@@ -182,12 +212,26 @@ class JobApplicationService {
         updateData['interviewLocation'] = interviewLocation;
       }
 
-      await _firestore
-          .collection('job_applications')
-          .doc(applicationId)
-          .update(updateData);
-
-      return true;
+      // Try to update in dentist applications collection first
+      try {
+        await _firestore
+            .collection('job_applications_dentist')
+            .doc(applicationId)
+            .update(updateData);
+        return true;
+      } catch (e) {
+        // If not found in dentist collection, try assistant collection
+        try {
+          await _firestore
+              .collection('job_applications_assistant')
+              .doc(applicationId)
+              .update(updateData);
+          return true;
+        } catch (e2) {
+          // If not found in either collection, throw error
+          throw Exception('ไม่พบใบสมัครในระบบ');
+        }
+      }
     } catch (e) {
       throw Exception('การอัปเดตสถานะใบสมัครไม่สำเร็จ: $e');
     }
