@@ -3,11 +3,11 @@ import '../dashboard_utils.dart';
 import '../../jobs/dentist_job_posting_screen.dart';
 import '../../jobs/assistant_job_posting_screen.dart';
 import '../../jobs/my_posted_assistant_jobs_screen.dart';
+import '../../jobs/my_posted_dentist_jobs_screen.dart';
 import '../../jobs/applicant_management_screen.dart';
 import '../../profile/branch_management_screen.dart';
 import '../../profile/document_verification_screen.dart';
 import '../../profile/sub_branch_management_screen.dart';
-import '../../marketplace/marketplace_screen.dart';
 
 /// Dashboard quick actions widget
 class DashboardQuickActions extends StatelessWidget {
@@ -38,7 +38,9 @@ class DashboardQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const DentistJobPostingScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const DentistJobPostingScreen(),
+                    ),
                   );
                 },
               ),
@@ -53,7 +55,9 @@ class DashboardQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AssistantJobPostingScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const AssistantJobPostingScreen(),
+                    ),
                   );
                 },
               ),
@@ -66,18 +70,41 @@ class DashboardQuickActions extends StatelessWidget {
             Expanded(
               child: _ActionCard(
                 title: 'งานที่ประกาศ',
+                subtitle: 'ดูงานทันตแพทย์',
+                icon: Icons.work_history,
+                color: Colors.teal,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MyPostedDentistJobsScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ActionCard(
+                title: 'งานที่ประกาศ',
                 subtitle: 'ดูงานผู้ช่วยทันตแพทย์',
                 icon: Icons.work_history,
                 color: Colors.teal,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const MyPostedAssistantJobsScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const MyPostedAssistantJobsScreen(),
+                    ),
                   );
                 },
               ),
             ),
-            const SizedBox(width: 12),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
             Expanded(
               child: _ActionCard(
                 title: 'ดูใบสมัคร',
@@ -87,7 +114,26 @@ class DashboardQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ApplicantManagementScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const ApplicantManagementScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ActionCard(
+                title: 'ยืนยันตัวตน',
+                subtitle: 'อัปโหลดเอกสาร',
+                icon: Icons.verified_user,
+                color: Colors.indigo,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DocumentVerificationScreen(),
+                    ),
                   );
                 },
               ),
@@ -106,31 +152,14 @@ class DashboardQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const BranchManagementScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const BranchManagementScreen(),
+                    ),
                   );
                 },
               ),
             ),
             const SizedBox(width: 12),
-            Expanded(
-              child: _ActionCard(
-                title: 'ยืนยันตัวตน',
-                subtitle: 'อัปโหลดเอกสาร',
-                icon: Icons.verified_user,
-                color: Colors.indigo,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DocumentVerificationScreen()),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
             Expanded(
               child: _ActionCard(
                 title: 'จัดการผู้ใช้ย่อย',
@@ -140,22 +169,9 @@ class DashboardQuickActions extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SubBranchManagementScreen()),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionCard(
-                title: 'ตลาดซื้อขาย',
-                subtitle: 'ซื้อ/ขายสินค้า',
-                icon: Icons.store,
-                color: Colors.green,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MarketplaceScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const SubBranchManagementScreen(),
+                    ),
                   );
                 },
               ),
@@ -206,14 +222,11 @@ class _ActionCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
       ),
     );
   }
-} 
+}
