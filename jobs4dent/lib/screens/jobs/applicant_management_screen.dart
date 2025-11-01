@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_application_model.dart';
@@ -15,6 +16,8 @@ class ApplicantManagementScreen extends StatefulWidget {
 class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final Map<String, String> _jobTypeCache = {}; // Cache for job types
 
   @override
   void initState() {
@@ -31,12 +34,54 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
     super.dispose();
   }
 
-  void _loadApplications() {
+  Future<void> _loadApplications() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
 
     if (authProvider.userModel != null) {
-      jobProvider.getApplicantsForMyJobs(authProvider.userModel!.userId);
+      await jobProvider.getApplicantsForMyJobs(authProvider.userModel!.userId);
+      // Clear cache and reload job types
+      _jobTypeCache.clear();
+      await _loadJobTypes(jobProvider.applicantsForMyJobs);
+    }
+  }
+
+  Future<void> _loadJobTypes(List<JobApplicationModel> applications) async {
+    for (final application in applications) {
+      if (!_jobTypeCache.containsKey(application.jobId)) {
+        final jobType = await _getJobTypeFromJobId(application.jobId);
+        _jobTypeCache[application.jobId] = jobType;
+      }
+    }
+    if (mounted) {
+      setState(() {}); // Refresh to show job types
+    }
+  }
+
+  Future<String> _getJobTypeFromJobId(String jobId) async {
+    try {
+      // Try dentist job collection first
+      final dentistDoc = await _firestore
+          .collection('job_posts_dentist')
+          .doc(jobId)
+          .get();
+      if (dentistDoc.exists) {
+        return 'ทันตแพทย์';
+      }
+
+      // Try assistant job collection
+      final assistantDoc = await _firestore
+          .collection('job_posts_assistant')
+          .doc(jobId)
+          .get();
+      if (assistantDoc.exists) {
+        return 'ผู้ช่วยทันตแพทย์';
+      }
+
+      // Default fallback
+      return 'ทันตแพทย์/ผู้ช่วย';
+    } catch (e) {
+      return 'ทันตแพทย์/ผู้ช่วย';
     }
   }
 
@@ -404,9 +449,8 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
   }
 
   String _getJobTypeFromApplication(JobApplicationModel application) {
-    // For now, we'll show a generic message since we don't have job type info
-    // This could be enhanced by looking up the job details or adding job type to the application model
-    return 'ทันตแพทย์/ผู้ช่วย';
+    // Return from cache if available, otherwise return default
+    return _jobTypeCache[application.jobId] ?? 'ทันตแพทย์/ผู้ช่วย';
   }
 
   void _showApplicationDetails(JobApplicationModel application) {
