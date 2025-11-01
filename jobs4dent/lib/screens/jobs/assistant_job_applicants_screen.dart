@@ -972,20 +972,23 @@ class _AssistantJobApplicantsScreenState
 
     if (success) {
       // Reload assistant applicants
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      if (authProvider.userModel != null) {
-        await jobProvider.getAssistantApplicantsForMyJobs(
-          authProvider.userModel!.userId,
-        );
-      }
-
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('อัปเดตสถานะใบสมัครเรียบร้อยแล้ว!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        if (authProvider.userModel != null) {
+          await jobProvider.getAssistantApplicantsForMyJobs(
+            authProvider.userModel!.userId,
+          );
+        }
+
+        // Check mounted again after async operation
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('อัปเดตสถานะใบสมัครเรียบร้อยแล้ว!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       }
     } else {
       if (mounted) {

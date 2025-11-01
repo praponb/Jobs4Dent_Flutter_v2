@@ -1,19 +1,94 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow users to read their own document (including deviceTokens)
+    match /users/{userId} {
+      // Allow users to read their own document
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Allow authenticated users to read other users' documents (for notifications)
+      // This is needed to get deviceTokens when sending notifications
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2999, 12, 31);
+    // Allow Cloud Functions to read user documents
+    match /users/{userId} {
+      allow read: if request.auth.token.admin == true;
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null &&
+                     resource.data.clinicId == request.auth.uid;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null &&
+                       resource.data.clinicId == request.auth.uid;
+    }
+
+    // Job Posts (Dentist jobs) - Allow all authenticated users to read active jobs
+    match /job_posts_dentist/{jobId} {
+      // Allow all authenticated users to read job posts
+      allow read: if request.auth != null;
+      // Allow clinics to create and update their own job posts
+      allow create: if request.auth != null &&
+                       request.resource.data.clinicId == request.auth.uid;
+      // Allow clinics to update/delete their own job posts
+      allow update, delete: if request.auth != null &&
+                                resource.data.clinicId == request.auth.uid;
+      // Allow applicants to update applicationCount and applicationIds when applying
+      // This allows dentists to increment the application count when they apply
+      // Note: We validate that critical fields (clinicId, jobId) remain unchanged
+      allow update: if request.auth != null &&
+                       // Ensure clinicId and jobId cannot be changed
+                       request.resource.data.clinicId == resource.data.clinicId &&
+                       request.resource.data.jobId == resource.data.jobId;
+    }
+
+    // Job Posts (Assistant jobs) - Allow all authenticated users to read active jobs
+    match /job_posts_assistant/{jobId} {
+      // Allow all authenticated users to read job posts
+      allow read: if request.auth != null;
+      // Allow clinics to create and update their own job posts
+      allow create: if request.auth != null &&
+                       request.resource.data.clinicId == request.auth.uid;
+      // Allow clinics to update/delete their own job posts
+      allow update, delete: if request.auth != null &&
+                                resource.data.clinicId == request.auth.uid;
+      // Allow applicants to update applicationCount and applicationIds when applying
+      // This allows assistants to increment the application count when they apply
+      // Note: We validate that critical fields (clinicId, jobId) remain unchanged
+      allow update: if request.auth != null &&
+                       // Ensure clinicId and jobId cannot be changed
+                       request.resource.data.clinicId == resource.data.clinicId &&
+                       request.resource.data.jobId == resource.data.jobId;
+    }
+
+    // Job Applications (Dentist) - Allow applicants and clinics to access
+    match /job_applications_dentist/{applicationId} {
+      // Allow applicants to read their own applications
+      allow read: if request.auth != null &&
+                     (resource.data.applicantId == request.auth.uid ||
+                      resource.data.clinicId == request.auth.uid);
+      // Allow applicants to create applications
+      allow create: if request.auth != null &&
+                       request.resource.data.applicantId == request.auth.uid;
+      // Allow clinics to update applications for their jobs
+      allow update: if request.auth != null &&
+                       resource.data.clinicId == request.auth.uid;
+    }
+
+    // Job Applications (Assistant) - Allow applicants and clinics to access
+    match /job_applications_assistant/{applicationId} {
+      // Allow applicants to read their own applications
+      allow read: if request.auth != null &&
+                     (resource.data.applicantId == request.auth.uid ||
+                      resource.data.clinicId == request.auth.uid);
+      // Allow applicants to create applications
+      allow create: if request.auth != null &&
+                       request.resource.data.applicantId == request.auth.uid;
+      // Allow clinics to update applications for their jobs
+      allow update: if request.auth != null &&
+                       resource.data.clinicId == request.auth.uid;
     }
   }
 }

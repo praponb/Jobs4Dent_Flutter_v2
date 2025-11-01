@@ -65,6 +65,10 @@ class UserManagementService {
     data['authProvider'] = data['authProvider'] ?? 'email';
     data['isEmailVerified'] = data['isEmailVerified'] ?? false;
     data['verificationStatus'] = data['verificationStatus'] ?? 'unverified';
+    // Initialize deviceTokens as empty array if not present
+    if (!data.containsKey('deviceTokens') || data['deviceTokens'] == null) {
+      data['deviceTokens'] = [];
+    }
 
     // Handle timestamps - convert Firestore Timestamp to int milliseconds
     data = _processTimestamps(data);
@@ -145,6 +149,12 @@ class UserManagementService {
       Map<String, dynamic> userData = userModel.toMap();
       if (additionalData != null) {
         userData.addAll(additionalData);
+      }
+
+      // Initialize deviceTokens as empty array if not provided
+      if (!userData.containsKey('deviceTokens') ||
+          userData['deviceTokens'] == null) {
+        userData['deviceTokens'] = [];
       }
 
       // Explicitly remove the 'roles' field to ensure it's not preserved from old documents

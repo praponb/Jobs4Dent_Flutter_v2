@@ -5,6 +5,8 @@ import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_model.dart';
 import '../../models/job_application_model.dart';
+import '../profile/profile_screen.dart';
+import '../../services/notification_service.dart';
 
 class DentistJobSearchScreen extends StatefulWidget {
   const DentistJobSearchScreen({super.key});
@@ -706,7 +708,36 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
 
     debugPrint('User authenticated: ${authProvider.userModel!.userId}');
 
+    // Check user verification status
+    final user = authProvider.userModel!;
+    String verificationStatus = user.verificationStatus;
+
+    // Fetch latest verification status from Firestore if not available in user model
+    if (verificationStatus.isEmpty || verificationStatus == 'unverified') {
+      try {
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(user.userId)
+            .get();
+        if (userDoc.exists) {
+          final userData = userDoc.data() as Map<String, dynamic>;
+          verificationStatus = userData['verificationStatus'] ?? 'unverified';
+        }
+      } catch (e) {
+        debugPrint('Error fetching verification status: $e');
+      }
+    }
+
+    // Check if user is verified
+    if (verificationStatus != 'verified') {
+      if (mounted) {
+        _showVerificationWarningDialog();
+      }
+      return;
+    }
+
     // Show loading indicator
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -926,6 +957,25 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
           .doc(applicationId)
           .set(application.toMap());
 
+      debugPrint('✅ Job application saved successfully: $applicationId');
+
+      // Send push notification to clinic's mobile devices
+      // This notifies the clinic when a dentist applies for their job
+      try {
+        final notificationService = NotificationService();
+        await notificationService.sendJobApplicationNotification(
+          clinicId: job.clinicId,
+          applicantName: userData['fullName']?.toString() ?? user.userName,
+          jobTitle: job.title,
+          applicationId: applicationId,
+        );
+        debugPrint('✅ Push notification sent to clinic: ${job.clinicId}');
+      } catch (e) {
+        debugPrint('⚠️ Error sending notification (non-critical): $e');
+        // Don't fail the application process if notification fails
+        // The application is already saved, notification is just a convenience
+      }
+
       // Update job's application count - try direct update first, then fallback
       try {
         await _firestore.collection('job_posts_dentist').doc(job.jobId).update({
@@ -991,5 +1041,64 @@ class _DentistJobSearchScreenState extends State<DentistJobSearchScreen> {
       }
       rethrow; // Re-throw to be caught by the outer try-catch
     }
+  }
+
+  void _showVerificationWarningDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+              SizedBox(width: 8),
+              Expanded(child: Text('ไม่สามารถสมัครงานได้')),
+            ],
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'กรุณายืนยันตัวตนก่อนสมัครงาน',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: 12),
+              Text(
+                'เพื่อความปลอดภัยและความน่าเชื่อถือ ระบบต้องยืนยันตัวตนของคุณก่อนจึงจะสามารถสมัครงานได้',
+                style: TextStyle(fontSize: 14),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'กรุณาไปที่หน้าโปรไฟล์เพื่อยืนยันตัวตน',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('ปิด'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the warning dialog
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+              child: const Text('ไปที่โปรไฟล์'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

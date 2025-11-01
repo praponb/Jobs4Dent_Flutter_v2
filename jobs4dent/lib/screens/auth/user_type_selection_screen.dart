@@ -7,7 +7,8 @@ class UserTypeSelectionScreen extends StatefulWidget {
   const UserTypeSelectionScreen({super.key});
 
   @override
-  State<UserTypeSelectionScreen> createState() => _UserTypeSelectionScreenState();
+  State<UserTypeSelectionScreen> createState() =>
+      _UserTypeSelectionScreenState();
 }
 
 class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
@@ -36,13 +37,13 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
       'icon': Icons.business,
       'isDentist': false,
     },
-    {
-      'type': 'seller',
-      'title': 'ผู้ขายอุปกรณ์',
-      'description': 'ผู้ขายอุปกรณ์และเวชภัณฑ์ทันตกรรม',
-      'icon': Icons.store,
-      'isDentist': false,
-    },
+    // {
+    //   'type': 'seller',
+    //   'title': 'ผู้ขายอุปกรณ์',
+    //   'description': 'ผู้ขายอุปกรณ์และเวชภัณฑ์ทันตกรรม',
+    //   'icon': Icons.store,
+    //   'isDentist': false,
+    // },
   ];
 
   @override
@@ -61,7 +62,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              
+
               // Header
               const Text(
                 'อะไรที่อธิบายคุณได้ดีที่สุด?',
@@ -75,15 +76,12 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
               const SizedBox(height: 8),
               const Text(
                 'เลือกบทบาทของคุณเพื่อปรับแต่งประสบการณ์ของคุณ',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // User Type Selection
               Expanded(
                 child: ListView.builder(
@@ -91,7 +89,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                   itemBuilder: (context, index) {
                     final userType = userTypes[index];
                     final isSelected = selectedUserType == userType['type'];
-                    
+
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       child: InkWell(
@@ -106,14 +104,16 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: isSelected 
-                                  ? const Color(0xFF2196F3) 
+                              color: isSelected
+                                  ? const Color(0xFF2196F3)
                                   : Colors.grey[300]!,
                               width: isSelected ? 2 : 1,
                             ),
                             borderRadius: BorderRadius.circular(12),
-                            color: isSelected 
-                                ? const Color(0xFF2196F3).withValues(alpha: 0.05)
+                            color: isSelected
+                                ? const Color(
+                                    0xFF2196F3,
+                                  ).withValues(alpha: 0.05)
                                 : Colors.white,
                           ),
                           child: Row(
@@ -128,8 +128,8 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                                 ),
                                 child: Icon(
                                   userType['icon'],
-                                  color: isSelected 
-                                      ? Colors.white 
+                                  color: isSelected
+                                      ? Colors.white
                                       : Colors.grey[600],
                                   size: 24,
                                 ),
@@ -144,7 +144,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
-                                        color: isSelected 
+                                        color: isSelected
                                             ? const Color(0xFF2196F3)
                                             : Colors.black87,
                                       ),
@@ -174,7 +174,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                   },
                 ),
               ),
-              
+
               // Continue Button
               Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
@@ -186,7 +186,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                               isDentist: isDentist,
                               userType: selectedUserType!,
                             );
-                            
+
                             if (success && context.mounted) {
                               // Navigate to home screen
                               Navigator.pushReplacement(
@@ -195,7 +195,8 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                                   builder: (context) => const HomeScreen(),
                                 ),
                               );
-                            } else if (authProvider.error != null && context.mounted) {
+                            } else if (authProvider.error != null &&
+                                context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(authProvider.error!),
@@ -223,7 +224,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                   );
                 },
               ),
-              
+
               const SizedBox(height: 20),
             ],
           ),
@@ -231,4 +232,4 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
       ),
     );
   }
-} 
+}
