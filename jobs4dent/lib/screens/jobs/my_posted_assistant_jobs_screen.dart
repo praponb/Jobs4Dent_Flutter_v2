@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/assistant_job_model.dart';
 import 'assistant_job_posting_screen.dart';
+import 'assistant_job_applicants_screen.dart';
 
 class MyPostedAssistantJobsScreen extends StatefulWidget {
   const MyPostedAssistantJobsScreen({super.key});
@@ -212,7 +213,7 @@ class _MyPostedAssistantJobsScreenState
     return RefreshIndicator(
       onRefresh: _loadJobs,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(40),
         itemCount: jobs.length,
         itemBuilder: (context, index) {
           final job = jobs[index];
@@ -449,12 +450,11 @@ class _MyPostedAssistantJobsScreenState
                     child: ElevatedButton.icon(
                       onPressed: job.applicationCount > 0
                           ? () {
-                              // Navigate to assistant applicant management when implemented
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'ฟีเจอร์การจัดการผู้สมัครงานผู้ช่วยทันตแพทย์จะพัฒนาเพิ่มในอนาคต',
-                                  ),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AssistantJobApplicantsScreen(),
                                 ),
                               );
                             }
@@ -790,12 +790,11 @@ class _MyPostedAssistantJobsScreenState
                           onPressed: job.applicationCount > 0
                               ? () {
                                   Navigator.pop(context);
-                                  // Navigate to assistant applicant management when implemented
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'ฟีเจอร์การจัดการผู้สมัครงานผู้ช่วยทันตแพทย์จะพัฒนาเพิ่มในอนาคต',
-                                      ),
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AssistantJobApplicantsScreen(),
                                     ),
                                   );
                                 }

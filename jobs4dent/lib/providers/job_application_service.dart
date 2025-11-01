@@ -188,6 +188,34 @@ class JobApplicationService {
     }
   }
 
+  /// Get assistant job applicants for my jobs (for clinics) - only assistant applications
+  Future<List<JobApplicationModel>> getAssistantApplicantsForMyJobs(
+    String clinicId,
+  ) async {
+    try {
+      final assistantQuery = await _firestore
+          .collection('job_applications_assistant')
+          .where('clinicId', isEqualTo: clinicId)
+          .get();
+
+      final assistantApplicants = assistantQuery.docs
+          .map(
+            (doc) => JobApplicationModel.fromMap({
+              ...doc.data(),
+              'applicationId': doc.id,
+            }),
+          )
+          .toList();
+
+      // Sort by appliedAt in descending order
+      assistantApplicants.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+
+      return assistantApplicants;
+    } catch (e) {
+      throw Exception('การดึงผู้สมัครงานผู้ช่วยทันตแพทย์ไม่สำเร็จ: $e');
+    }
+  }
+
   /// Update application status (for clinics) - tries both collections
   Future<bool> updateApplicationStatus({
     required String applicationId,

@@ -4,15 +4,16 @@ import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_application_model.dart';
 
-class ApplicantManagementScreen extends StatefulWidget {
-  const ApplicantManagementScreen({super.key});
+class AssistantJobApplicantsScreen extends StatefulWidget {
+  const AssistantJobApplicantsScreen({super.key});
 
   @override
-  State<ApplicantManagementScreen> createState() =>
-      _ApplicantManagementScreenState();
+  State<AssistantJobApplicantsScreen> createState() =>
+      _AssistantJobApplicantsScreenState();
 }
 
-class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
+class _AssistantJobApplicantsScreenState
+    extends State<AssistantJobApplicantsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -36,7 +37,9 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
 
     if (authProvider.userModel != null) {
-      jobProvider.getApplicantsForMyJobs(authProvider.userModel!.userId);
+      jobProvider.getAssistantApplicantsForMyJobs(
+        authProvider.userModel!.userId,
+      );
     }
   }
 
@@ -44,7 +47,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('จัดการผู้สมัคร'),
+        title: const Text('จัดการผู้สมัครงานผู้ช่วย'),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -99,7 +102,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
         }
 
         List<JobApplicationModel> applications =
-            jobProvider.applicantsForMyJobs;
+            jobProvider.assistantApplicantsForMyJobs;
 
         // Apply status filter
         if (statusFilter == 'new') {
@@ -119,12 +122,14 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
                 const SizedBox(height: 16),
                 Text(
                   statusFilter == null
-                      ? 'ยังไม่มีการสมัคร'
-                      : 'ไม่มีการสมัคร${statusFilter.replaceAll('_', ' ')}',
+                      ? 'ยังไม่มีการสมัครงานผู้ช่วย'
+                      : 'ไม่มีการสมัครงานผู้ช่วย${statusFilter.replaceAll('_', ' ')}',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                const Text('การสมัครจะปรากฏที่นี่เมื่อมีคนสมัครงานของคุณ'),
+                const Text(
+                  'การสมัครจะปรากฏที่นี่เมื่อมีคนสมัครงานผู้ช่วยของคุณ',
+                ),
               ],
             ),
           );
@@ -247,7 +252,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      'ประเภทงาน: ${_getJobTypeFromApplication(application)}',
+                      'ประเภทงาน: ผู้ช่วยทันตแพทย์',
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
@@ -401,12 +406,6 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
-  }
-
-  String _getJobTypeFromApplication(JobApplicationModel application) {
-    // For now, we'll show a generic message since we don't have job type info
-    // This could be enhanced by looking up the job details or adding job type to the application model
-    return 'ทันตแพทย์/ผู้ช่วย';
   }
 
   void _showApplicationDetails(JobApplicationModel application) {
@@ -972,6 +971,14 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
     );
 
     if (success) {
+      // Reload assistant applicants
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.userModel != null) {
+        await jobProvider.getAssistantApplicantsForMyJobs(
+          authProvider.userModel!.userId,
+        );
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

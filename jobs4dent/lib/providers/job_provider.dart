@@ -23,6 +23,7 @@ class JobProvider with ChangeNotifier {
   List<AssistantJobModel> _myPostedAssistantJobs = [];
   List<JobApplicationModel> _myApplications = [];
   List<JobApplicationModel> _applicantsForMyJobs = [];
+  List<JobApplicationModel> _assistantApplicantsForMyJobs = [];
   bool _isLoading = false;
   String? _error;
   Map<String, dynamic>? _lastSearchCriteria;
@@ -36,6 +37,8 @@ class JobProvider with ChangeNotifier {
   List<JobApplicationModel> get userApplications =>
       _myApplications; // Alias for dashboard
   List<JobApplicationModel> get applicantsForMyJobs => _applicantsForMyJobs;
+  List<JobApplicationModel> get assistantApplicantsForMyJobs =>
+      _assistantApplicantsForMyJobs;
   bool get isLoading => _isLoading;
   String? get error => _error;
   Map<String, dynamic>? get lastSearchCriteria => _lastSearchCriteria;
@@ -441,6 +444,21 @@ class JobProvider with ChangeNotifier {
 
       _applicantsForMyJobs = await _jobApplicationService
           .getApplicantsForMyJobs(clinicId);
+      notifyListeners();
+    } catch (e) {
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> getAssistantApplicantsForMyJobs(String clinicId) async {
+    try {
+      _setLoading(true);
+      _setError(null);
+
+      _assistantApplicantsForMyJobs = await _jobApplicationService
+          .getAssistantApplicantsForMyJobs(clinicId);
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
