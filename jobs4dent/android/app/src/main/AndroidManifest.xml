@@ -21,6 +21,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAxi78QlJpgUxs0JLT6HJQ5FbMJAoz-HQY" />
 
+        <!-- Firebase Cloud Messaging default notification channel -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="job_applications" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

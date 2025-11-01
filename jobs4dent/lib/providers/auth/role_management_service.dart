@@ -91,6 +91,8 @@ class RoleManagementService {
       );
 
       Map<String, dynamic> subUserData = subUserModel.toMap();
+      // Initialize deviceTokens as empty array for new sub-user
+      subUserData['deviceTokens'] = [];
       // Explicitly remove the 'roles' field to ensure it's not preserved from old documents
       subUserData.remove('roles');
 

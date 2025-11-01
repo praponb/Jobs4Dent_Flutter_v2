@@ -78,6 +78,9 @@ class UserModel {
   final bool isProfileComplete;
   final DateTime? lastLoginAt;
 
+  // Push notification device tokens
+  final List<String>? deviceTokens; // Array of FCM device tokens
+
   // Verification System
   final String
   verificationStatus; // 'unverified', 'pending', 'verified', 'rejected'
@@ -157,6 +160,7 @@ class UserModel {
     this.isActive = true,
     this.isProfileComplete = false,
     this.lastLoginAt,
+    this.deviceTokens,
     this.verificationStatus = 'unverified',
     this.verificationDocuments,
     this.verificationDocumentCounts,
@@ -232,6 +236,7 @@ class UserModel {
       lastLoginAt: map['lastLoginAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['lastLoginAt'])
           : null,
+      deviceTokens: List<String>.from(map['deviceTokens'] ?? []),
       verificationStatus: map['verificationStatus'] ?? 'unverified',
       verificationDocuments: List<String>.from(
         map['verificationDocuments'] ?? [],
@@ -310,6 +315,7 @@ class UserModel {
       'isActive': isActive,
       'isProfileComplete': isProfileComplete,
       'lastLoginAt': lastLoginAt?.millisecondsSinceEpoch,
+      'deviceTokens': deviceTokens,
       'verificationStatus': verificationStatus,
       'verificationDocuments': verificationDocuments,
       'verificationDocumentCounts': verificationDocumentCounts,
@@ -382,6 +388,7 @@ class UserModel {
     bool? isActive,
     bool? isProfileComplete,
     DateTime? lastLoginAt,
+    List<String>? deviceTokens,
     String? verificationStatus,
     List<String>? verificationDocuments,
     int? verificationDocumentCounts,
@@ -452,6 +459,7 @@ class UserModel {
       isActive: isActive ?? this.isActive,
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      deviceTokens: deviceTokens ?? this.deviceTokens,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       verificationDocuments:
           verificationDocuments ?? this.verificationDocuments,

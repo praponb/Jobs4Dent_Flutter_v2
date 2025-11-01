@@ -9,12 +9,16 @@ import 'auth/user_management_service.dart';
 import 'auth/role_management_service.dart';
 import 'auth/auth_error_handler.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+import '../services/notification_service.dart';
+
 class AuthProvider with ChangeNotifier {
   User? _user;
   UserModel? _userModel;
   bool _isLoading = true;
   String? _error;
   String? _successMessage;
+  bool _fcmTokenRefreshListenerSetup = false;
 
   User? get user => _user;
   UserModel? get userModel => _userModel;
@@ -59,6 +63,9 @@ class AuthProvider with ChangeNotifier {
           await UserManagementService.removeRolesField(user.uid);
 
           await UserManagementService.updateLastLogin(user.uid);
+
+          // Initialize FCM token when app starts and user is already logged in
+          await initializeFCMToken();
         } else {
           debugPrint('❌ Failed to load user model');
         }
@@ -186,6 +193,9 @@ class AuthProvider with ChangeNotifier {
         // Load user data from Firestore
         await _loadUserModel();
 
+        // Initialize FCM token after user is authenticated
+        await initializeFCMToken();
+
         _isLoading = false;
         notifyListeners();
         return true;
@@ -200,6 +210,74 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return false;
+    }
+  }
+
+  // Initialize FCM token for push notifications
+  Future<void> initializeFCMToken() async {
+    try {
+      final messaging = FirebaseMessaging.instance;
+
+      // Request permission for iOS
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional:
+            false, // Set to true if you want provisional authorization (iOS 12+)
+      );
+
+      debugPrint('📱 FCM Permission status: ${settings.authorizationStatus}');
+
+      // Check if permission is granted
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        // Get the FCM token for this device
+        String? token = await messaging.getToken();
+
+        if (token != null && _userModel != null) {
+          debugPrint('📱 FCM Token retrieved: ${token.substring(0, 20)}...');
+
+          // Save token to Firestore
+          final notificationService = NotificationService();
+          await notificationService.saveDeviceToken(
+            userId: _userModel!.userId,
+            deviceToken: token,
+          );
+
+          debugPrint('✅ FCM Token saved to Firestore');
+        } else if (token == null) {
+          debugPrint('⚠️ FCM Token is null');
+        } else {
+          debugPrint('⚠️ User model is null, cannot save token');
+        }
+
+        // Listen for token refresh events (only set up once)
+        // When token changes (e.g., app reinstall, token rotation), update Firestore
+        if (!_fcmTokenRefreshListenerSetup) {
+          _fcmTokenRefreshListenerSetup = true;
+          messaging.onTokenRefresh.listen((String newToken) async {
+            debugPrint(
+              '🔄 FCM Token refreshed: ${newToken.substring(0, 20)}...',
+            );
+
+            if (_userModel != null) {
+              final notificationService = NotificationService();
+              await notificationService.saveDeviceToken(
+                userId: _userModel!.userId,
+                deviceToken: newToken,
+              );
+              debugPrint('✅ Refreshed FCM Token saved to Firestore');
+            }
+          });
+        }
+      } else {
+        debugPrint(
+          '❌ Notification permission not granted: ${settings.authorizationStatus}',
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ Error initializing FCM token: $e');
     }
   }
 
@@ -278,6 +356,8 @@ class AuthProvider with ChangeNotifier {
           debugPrint(
             '✅ New Google user created in Firestore: ${googleResult.user!.email}',
           );
+          // Load user model after creating document
+          await _loadUserModel();
         } else {
           debugPrint('🔄 Loading existing user data from Firestore...');
           // Load existing user data from Firestore
@@ -286,6 +366,9 @@ class AuthProvider with ChangeNotifier {
             '✅ Existing Google user loaded from Firestore: ${googleResult.user!.email}',
           );
         }
+
+        // Initialize FCM token after user is authenticated
+        await initializeFCMToken();
 
         _isLoading = false;
         notifyListeners();
@@ -481,6 +564,7 @@ class AuthProvider with ChangeNotifier {
       _userModel = null;
       _error = null;
       _successMessage = null;
+      _fcmTokenRefreshListenerSetup = false; // Reset FCM listener setup flag
       _isLoading = false;
 
       debugPrint('✅ Sign out completed successfully');

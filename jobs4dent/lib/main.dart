@@ -16,20 +16,52 @@ import 'screens/auth/user_type_selection_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/splash_screen.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+// Background message handler (must be top-level function)
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint("Handling a background message: ${message.messageId}");
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Set up background message handler BEFORE Firebase initialization
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   // Load environment variables
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     debugPrint('Warning: Could not load .env file: $e');
-    debugPrint('Please make sure .env file exists in the project root with your API key');
+    debugPrint(
+      'Please make sure .env file exists in the project root with your API key',
+    );
   }
-  
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Set up foreground message handlers AFTER Firebase initialization
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    debugPrint('Got a message whilst in the foreground!');
+    debugPrint('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      debugPrint(
+        'Message also contained a notification: ${message.notification}',
+      );
+      // Show local notification or update UI
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    debugPrint('A new onMessageOpenedApp event was published!');
+    // Navigate to relevant screen based on notification data
+  });
+
   runApp(const Jobs4DentApp());
 }
 
@@ -92,12 +124,14 @@ class AuthWrapper extends StatelessWidget {
           debugPrint('⏳ Showing SplashScreen - loading...');
           return const SplashScreen();
         }
-        
+
         if (authProvider.user != null) {
           debugPrint('👤 User is authenticated: ${authProvider.user!.email}');
           // Check if user needs to complete profile setup
           if (authProvider.needsProfileSetup) {
-            debugPrint('📝 User needs profile setup - showing UserTypeSelectionScreen');
+            debugPrint(
+              '📝 User needs profile setup - showing UserTypeSelectionScreen',
+            );
             return const UserTypeSelectionScreen();
           } else {
             debugPrint('✅ User profile complete - showing HomeScreen');
