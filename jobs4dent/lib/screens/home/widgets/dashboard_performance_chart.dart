@@ -8,10 +8,7 @@ import '../dashboard_utils.dart';
 class DashboardPerformanceChart extends StatelessWidget {
   final List<JobApplicationModel> applications;
 
-  const DashboardPerformanceChart({
-    super.key,
-    required this.applications,
-  });
+  const DashboardPerformanceChart({super.key, required this.applications});
 
   @override
   Widget build(BuildContext context) {
@@ -35,27 +32,26 @@ class DashboardPerformanceChart extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              TextButton(
-                onPressed: () {
-                  DashboardUtils.showDetailedAnalytics(context);
-                },
-                child: const Text('ดูรายละเอียด'),
-              ),
+              // TextButton(
+              //   onPressed: () {
+              //     DashboardUtils.showDetailedAnalytics(context);
+              //   },
+              //   child: const Text('ดูรายละเอียด'),
+              // ),
             ],
           ),
           const SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: _buildJobsChart(),
-          ),
+          SizedBox(height: 200, child: _buildJobsChart()),
         ],
       ),
     );
   }
 
   Widget _buildJobsChart() {
-    final chartData = DashboardDataProcessor.getApplicationsChartData(applications);
-    
+    final chartData = DashboardDataProcessor.getApplicationsChartData(
+      applications,
+    );
+
     return LineChart(
       LineChartData(
         gridData: const FlGridData(show: false),
@@ -64,7 +60,20 @@ class DashboardPerformanceChart extends StatelessWidget {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                const months = [
+                  'ม.ค.',
+                  'ก.พ.',
+                  'มี.ค.',
+                  'เม.ย.',
+                  'พ.ค.',
+                  'มิ.ย.',
+                  'ก.ค.',
+                  'ส.ค.',
+                  'ก.ย.',
+                  'ต.ค.',
+                  'พ.ย.',
+                  'ธ.ค.',
+                ];
                 if (value.toInt() >= 0 && value.toInt() < months.length) {
                   return Text(months[value.toInt()]);
                 }
@@ -99,4 +108,4 @@ class DashboardPerformanceChart extends StatelessWidget {
       ),
     );
   }
-} 
+}

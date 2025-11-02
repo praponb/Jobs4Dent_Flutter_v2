@@ -63,12 +63,12 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // Note: Notifications feature pending implementation
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.notifications),
+          //   onPressed: () {
+          //     // Note: Notifications feature pending implementation
+          //   },
+          // ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
@@ -133,7 +133,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                   const SizedBox(height: 24),
 
                   // Branch Management Section
-                  _buildBranchManagement(user),
+                  //_buildBranchManagement(user),
                 ],
               ),
             ),
@@ -143,6 +143,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildBranchManagement(user) {
     final branches = DashboardDataProcessor.getBranchesForOverview(
       user.branches,

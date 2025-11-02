@@ -314,30 +314,10 @@ class DentistRecentApplications extends StatelessWidget {
         textColor = Colors.blue[700]!;
         icon = Icons.send;
         break;
-      case 'under_review':
-        backgroundColor = Colors.orange[100]!;
-        textColor = Colors.orange[700]!;
-        icon = Icons.search;
-        break;
-      case 'shortlisted':
-        backgroundColor = Colors.purple[100]!;
-        textColor = Colors.purple[700]!;
-        icon = Icons.star;
-        break;
       case 'interview_scheduled':
         backgroundColor = Colors.indigo[100]!;
         textColor = Colors.indigo[700]!;
         icon = Icons.event;
-        break;
-      case 'interview_completed':
-        backgroundColor = Colors.teal[100]!;
-        textColor = Colors.teal[700]!;
-        icon = Icons.check_circle;
-        break;
-      case 'offered':
-        backgroundColor = Colors.green[100]!;
-        textColor = Colors.green[700]!;
-        icon = Icons.local_offer;
         break;
       case 'hired':
         backgroundColor = Colors.green[200]!;
@@ -383,16 +363,8 @@ class DentistRecentApplications extends StatelessWidget {
     switch (status) {
       case 'submitted':
         return 'ส่งแล้ว';
-      case 'under_review':
-        return 'กำลังพิจารณา';
-      case 'shortlisted':
-        return 'คัดเลือก';
       case 'interview_scheduled':
         return 'สัมภาษณ์';
-      case 'interview_completed':
-        return 'สัมภาษณ์แล้ว';
-      case 'offered':
-        return 'ได้รับข้อเสนอ';
       case 'hired':
         return 'ได้งาน';
       case 'rejected':
