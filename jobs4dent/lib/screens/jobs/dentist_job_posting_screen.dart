@@ -376,6 +376,26 @@ class _DentistJobPostingScreenState extends State<DentistJobPostingScreen> {
 
     final user = authProvider.userModel!;
 
+    // Check verification status
+    if (user.verificationStatus != 'verified') {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('ไม่สามารถโพสต์งานได้'),
+          content: const Text(
+            'บัญชีของคุณยังไม่ได้รับการยืนยันตัวตน กรุณายืนยันตัวตนก่อนโพสต์งาน',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('ปิด'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     final job = JobPostingUtils.createJobFromFormData(
       jobId:
           widget.jobToEdit?.jobId ??
