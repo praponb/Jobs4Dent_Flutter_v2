@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/assistant_job_model.dart';
 import '../../models/job_application_model.dart';
+import '../../services/notification_service.dart';
 import 'assistant_job_constants.dart';
 
 class AssistantJobSearchScreen extends StatefulWidget {
@@ -1192,6 +1193,30 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
         );
       }
 
+      // Check verification status
+      final verificationStatus = userData['verificationStatus'] ?? 'unverified';
+      if (verificationStatus != 'verified') {
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('ไม่สามารถสมัครงานได้'),
+              content: const Text(
+                'บัญชีของคุณยังไม่ได้รับการยืนยันตัวตน กรุณายืนยันตัวตนก่อนสมัครงาน',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('ปิด'),
+                ),
+              ],
+            ),
+          );
+        }
+        return;
+      }
+
       // Create application ID
       final applicationId = _firestore
           .collection('job_applications_assistant')
@@ -1268,6 +1293,25 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
           .collection('job_applications_assistant')
           .doc(applicationId)
           .set(application.toMap());
+
+      debugPrint('✅ Job application saved successfully: $applicationId');
+
+      // Send push notification to clinic's mobile devices
+      // This notifies the clinic when an assistant applies for their job
+      try {
+        final notificationService = NotificationService();
+        await notificationService.sendJobApplicationNotification(
+          clinicId: job.clinicId,
+          applicantName: userData['fullName']?.toString() ?? user.userName,
+          jobTitle: job.titlePost,
+          applicationId: applicationId,
+        );
+        debugPrint('✅ Push notification sent to clinic: ${job.clinicId}');
+      } catch (e) {
+        debugPrint('⚠️ Error sending notification (non-critical): $e');
+        // Don't fail the application process if notification fails
+        // The application is already saved, notification is just a convenience
+      }
 
       // Update job's application count
       await _firestore.collection('job_posts_assistant').doc(job.jobId).update({
