@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/job_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/job_application_model.dart';
+import '../../services/notification_service.dart';
 
 class ApplicantManagementScreen extends StatefulWidget {
   const ApplicantManagementScreen({super.key});
@@ -371,25 +372,9 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
         backgroundColor = Colors.blue[100]!;
         textColor = Colors.blue[700]!;
         break;
-      case 'under_review':
-        backgroundColor = Colors.orange[100]!;
-        textColor = Colors.orange[700]!;
-        break;
-      case 'shortlisted':
-        backgroundColor = Colors.purple[100]!;
-        textColor = Colors.purple[700]!;
-        break;
       case 'interview_scheduled':
         backgroundColor = Colors.indigo[100]!;
         textColor = Colors.indigo[700]!;
-        break;
-      case 'interview_completed':
-        backgroundColor = Colors.teal[100]!;
-        textColor = Colors.teal[700]!;
-        break;
-      case 'offered':
-        backgroundColor = Colors.green[100]!;
-        textColor = Colors.green[700]!;
         break;
       case 'hired':
         backgroundColor = Colors.green[200]!;
@@ -425,16 +410,8 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
     switch (status) {
       case 'submitted':
         return 'ใหม่';
-      case 'under_review':
-        return 'กำลังพิจารณา';
-      case 'shortlisted':
-        return 'ผ่านเข้ารอบ';
       case 'interview_scheduled':
         return 'นัดสัมภาษณ์';
-      case 'interview_completed':
-        return 'สัมภาษณ์แล้ว';
-      case 'offered':
-        return 'ได้รับข้อเสนอ';
       case 'hired':
         return 'รับเข้าทำงาน';
       case 'rejected':
@@ -863,11 +840,11 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
   // List of valid application status values (English)
   List<String> get _applicationStatusValues => [
     'submitted',
-    'under_review',
-    'shortlisted',
+    //'under_review',
+    //'shortlisted',
     'interview_scheduled',
-    'interview_completed',
-    'offered',
+    //'interview_completed',
+    //'offered',
     'hired',
     'rejected',
   ];
@@ -978,7 +955,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
             ),
             ElevatedButton(
               onPressed: () => _updateApplicationStatus(
-                application.applicationId,
+                application,
                 selectedStatus,
                 notesController.text.trim().isEmpty
                     ? null
@@ -997,7 +974,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
   }
 
   Future<void> _updateApplicationStatus(
-    String applicationId,
+    JobApplicationModel application,
     String newStatus,
     String? notes,
     DateTime? interviewDate,
@@ -1008,7 +985,7 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
     Navigator.pop(context); // Close dialog
 
     final success = await jobProvider.updateApplicationStatus(
-      applicationId: applicationId,
+      applicationId: application.applicationId,
       newStatus: newStatus,
       notes: notes,
       interviewDate: interviewDate,
@@ -1016,6 +993,68 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
     );
 
     if (success) {
+      // If status is 'hired' or 'rejected', close the job posting
+      if (newStatus == 'hired' || newStatus == 'rejected') {
+        try {
+          // Check if this is an assistant job and close it
+          final assistantJobDoc = await _firestore
+              .collection('job_posts_assistant')
+              .doc(application.jobId)
+              .get();
+
+          if (assistantJobDoc.exists) {
+            await _firestore
+                .collection('job_posts_assistant')
+                .doc(application.jobId)
+                .update({
+                  'isActive': false,
+                  'updatedAt': DateTime.now().millisecondsSinceEpoch,
+                });
+            debugPrint('✅ Assistant job posting closed: ${application.jobId}');
+          } else {
+            // Check if this is a dentist job and close it
+            final dentistJobDoc = await _firestore
+                .collection('job_posts_dentist')
+                .doc(application.jobId)
+                .get();
+
+            if (dentistJobDoc.exists) {
+              await _firestore
+                  .collection('job_posts_dentist')
+                  .doc(application.jobId)
+                  .update({
+                    'isActive': false,
+                    'updatedAt': DateTime.now().millisecondsSinceEpoch,
+                  });
+              debugPrint('✅ Dentist job posting closed: ${application.jobId}');
+            }
+          }
+        } catch (e) {
+          debugPrint('⚠️ Error closing job posting (non-critical): $e');
+          // Don't fail the status update process if closing job fails
+        }
+      }
+
+      // Send push notification to applicant's mobile devices
+      // This notifies the applicant when clinic updates their application status
+      try {
+        final notificationService = NotificationService();
+        await notificationService.sendApplicationStatusUpdateNotification(
+          applicantId: application.applicantId,
+          clinicName: application.clinicName ?? 'คลินิก',
+          jobTitle: application.jobTitle ?? 'ตำแหน่งงาน',
+          status: newStatus,
+          applicationId: application.applicationId,
+        );
+        debugPrint(
+          '✅ Push notification sent to applicant: ${application.applicantId}',
+        );
+      } catch (e) {
+        debugPrint('⚠️ Error sending notification (non-critical): $e');
+        // Don't fail the status update process if notification fails
+        // The status is already updated, notification is just a convenience
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

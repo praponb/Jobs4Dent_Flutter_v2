@@ -5,9 +5,9 @@ import '../../jobs/assistant_job_posting_screen.dart';
 import '../../jobs/my_posted_assistant_jobs_screen.dart';
 import '../../jobs/my_posted_dentist_jobs_screen.dart';
 import '../../jobs/applicant_management_screen.dart';
-import '../../profile/branch_management_screen.dart';
+// import '../../profile/branch_management_screen.dart';
 import '../../profile/document_verification_screen.dart';
-import '../../profile/sub_branch_management_screen.dart';
+// import '../../profile/sub_branch_management_screen.dart';
 
 /// Dashboard quick actions widget
 class DashboardQuickActions extends StatelessWidget {
@@ -141,43 +141,43 @@ class DashboardQuickActions extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _ActionCard(
-                title: 'จัดการข้อมูลสาขา',
-                subtitle: 'จัดการสาขาคลินิก',
-                icon: Icons.business,
-                color: Colors.purple,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BranchManagementScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionCard(
-                title: 'จัดการผู้ใช้ย่อย',
-                subtitle: 'Sub-users & permissions',
-                icon: Icons.account_tree,
-                color: Colors.amber,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SubBranchManagementScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: _ActionCard(
+        //         title: 'จัดการข้อมูลสาขา',
+        //         subtitle: 'จัดการสาขาคลินิก',
+        //         icon: Icons.business,
+        //         color: Colors.purple,
+        //         onTap: () {
+        //           Navigator.push(
+        //             context,
+        //             MaterialPageRoute(
+        //               builder: (context) => const BranchManagementScreen(),
+        //             ),
+        //           );
+        //         },
+        //       ),
+        //     ),
+        //     const SizedBox(width: 12),
+        //     Expanded(
+        //       child: _ActionCard(
+        //         title: 'จัดการผู้ใช้ย่อย',
+        //         subtitle: 'Sub-users & permissions',
+        //         icon: Icons.account_tree,
+        //         color: Colors.amber,
+        //         onTap: () {
+        //           Navigator.push(
+        //             context,
+        //             MaterialPageRoute(
+        //               builder: (context) => const SubBranchManagementScreen(),
+        //             ),
+        //           );
+        //         },
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }

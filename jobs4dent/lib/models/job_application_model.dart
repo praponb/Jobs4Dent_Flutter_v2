@@ -10,7 +10,7 @@ class JobApplicationModel {
   final String coverLetter;
   final List<String> additionalDocuments; // URLs of uploaded documents
   final String
-  status; // 'submitted', 'under_review', 'shortlisted', 'interview_scheduled', 'interview_completed', 'offered', 'hired', 'rejected'
+  status; // 'submitted', 'interview_scheduled', 'hired', 'rejected'
   final DateTime appliedAt;
   final DateTime updatedAt;
   final String? notes; // Notes from clinic/HR
@@ -154,16 +154,8 @@ class JobApplicationModel {
     switch (status) {
       case 'submitted':
         return 'ส่งใบสมัครแล้ว';
-      case 'under_review':
-        return 'กำลังพิจารณา';
-      case 'shortlisted':
-        return 'คัดเลือกแล้ว';
       case 'interview_scheduled':
         return 'นัดสัมภาษณ์แล้ว';
-      case 'interview_completed':
-        return 'สัมภาษณ์เสร็จสิ้น';
-      case 'offered':
-        return 'ได้รับข้อเสนองาน';
       case 'hired':
         return 'ได้งานแล้ว';
       case 'rejected':
@@ -178,16 +170,11 @@ class JobApplicationModel {
   }
 
   bool get isPending {
-    return ['submitted', 'under_review'].contains(status);
+    return ['submitted'].contains(status);
   }
 
   bool get isInProgress {
-    return [
-      'shortlisted',
-      'interview_scheduled',
-      'interview_completed',
-      'offered',
-    ].contains(status);
+    return ['interview_scheduled'].contains(status);
   }
 
   bool get isCompleted {

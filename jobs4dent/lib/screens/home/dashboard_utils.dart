@@ -10,8 +10,6 @@ class DashboardUtils {
     switch (status) {
       case 'submitted':
         return Colors.blue;
-      case 'under_review':
-        return Colors.orange;
       case 'interview_scheduled':
         return Colors.purple;
       case 'offer_made':
@@ -30,8 +28,6 @@ class DashboardUtils {
     switch (status) {
       case 'submitted':
         return 'ใหม่';
-      case 'under_review':
-        return 'กำลังพิจารณา';
       case 'interview_scheduled':
         return 'นัดสัมภาษณ์';
       case 'offer_made':
@@ -48,7 +44,7 @@ class DashboardUtils {
   /// Format time ago from datetime
   static String getTimeAgo(DateTime dateTime) {
     final difference = DateTime.now().difference(dateTime);
-    
+
     if (difference.inDays > 7) {
       return _dateFormat.format(dateTime);
     } else if (difference.inDays > 0) {
@@ -126,4 +122,4 @@ class DashboardUtils {
       ),
     );
   }
-} 
+}

@@ -88,12 +88,12 @@ class _DentistDashboardState extends State<DentistDashboard> {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // Note: Notifications feature pending implementation
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.notifications),
+          //   onPressed: () {
+          //     // Note: Notifications feature pending implementation
+          //   },
+          // ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {

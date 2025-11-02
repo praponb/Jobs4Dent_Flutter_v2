@@ -163,4 +163,134 @@ class NotificationService {
       debugPrint('❌ Error removing device token: $e');
     }
   }
+
+  /// Send notification to applicant when clinic updates application status
+  /// This method should be called after application status is successfully updated
+  Future<void> sendApplicationStatusUpdateNotification({
+    required String applicantId,
+    required String clinicName,
+    required String jobTitle,
+    required String status,
+    required String applicationId,
+  }) async {
+    try {
+      debugPrint(
+        '📤 Sending status update notification to applicant: $applicantId',
+      );
+
+      // Get applicant's device tokens from Firestore
+      final applicantDoc = await _firestore
+          .collection('users')
+          .doc(applicantId)
+          .get();
+
+      if (!applicantDoc.exists) {
+        debugPrint('⚠️ Applicant document not found: $applicantId');
+        return;
+      }
+
+      final applicantData = applicantDoc.data() as Map<String, dynamic>;
+      final deviceTokens =
+          applicantData['deviceTokens'] as List<dynamic>? ?? [];
+
+      if (deviceTokens.isEmpty) {
+        debugPrint('⚠️ No device tokens found for applicant: $applicantId');
+        return;
+      }
+
+      // Get Thai status display name
+      String statusDisplayName;
+      switch (status) {
+        case 'submitted':
+          statusDisplayName = 'ส่งใบสมัครแล้ว';
+          break;
+        case 'interview_scheduled':
+          statusDisplayName = 'นัดสัมภาษณ์แล้ว';
+          break;
+        case 'hired':
+          statusDisplayName = 'ได้งานแล้ว';
+          break;
+        case 'rejected':
+          statusDisplayName = 'ไม่ได้รับคัดเลือก';
+          break;
+        default:
+          statusDisplayName = 'อัปเดตสถานะ';
+      }
+
+      // Call Cloud Function to send notification
+      try {
+        final callable = _functions.httpsCallable(
+          'sendJobApplicationNotification',
+        );
+
+        final result = await callable.call({
+          'clinicId':
+              applicantId, // Note: using applicantId as userId for the function
+          'deviceTokens': deviceTokens,
+          'title': 'อัปเดตสถานะใบสมัครงาน',
+          'body':
+              'สถานะใบสมัครของคุณที่ $clinicName ตำแหน่ง $jobTitle ถูกเปลี่ยนเป็น: $statusDisplayName',
+          'data': {
+            'type': 'application_status_update',
+            'applicationId': applicationId,
+            'jobTitle': jobTitle,
+            'clinicName': clinicName,
+            'status': status,
+            'applicantId': applicantId,
+          },
+        });
+
+        debugPrint(
+          '✅ Status update notification sent successfully: ${result.data}',
+        );
+      } catch (e) {
+        debugPrint('❌ Error calling Cloud Function: $e');
+
+        // Fallback: Store notification in Firestore for the applicant to retrieve
+        await _storeStatusUpdateNotificationInFirestore(
+          applicantId: applicantId,
+          clinicName: clinicName,
+          jobTitle: jobTitle,
+          status: status,
+          statusDisplayName: statusDisplayName,
+          applicationId: applicationId,
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ Error sending status update notification: $e');
+      // Don't throw - notifications are not critical for the status update process
+    }
+  }
+
+  /// Store status update notification in Firestore as fallback
+  Future<void> _storeStatusUpdateNotificationInFirestore({
+    required String applicantId,
+    required String clinicName,
+    required String jobTitle,
+    required String status,
+    required String statusDisplayName,
+    required String applicationId,
+  }) async {
+    try {
+      await _firestore.collection('notifications').add({
+        'applicantId': applicantId,
+        'type': 'application_status_update',
+        'title': 'อัปเดตสถานะใบสมัครงาน',
+        'body':
+            'สถานะใบสมัครของคุณที่ $clinicName ตำแหน่ง $jobTitle ถูกเปลี่ยนเป็น: $statusDisplayName',
+        'applicationId': applicationId,
+        'jobTitle': jobTitle,
+        'clinicName': clinicName,
+        'status': status,
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      debugPrint(
+        '✅ Status update notification stored in Firestore as fallback',
+      );
+    } catch (e) {
+      debugPrint('❌ Error storing status update notification in Firestore: $e');
+    }
+  }
 }

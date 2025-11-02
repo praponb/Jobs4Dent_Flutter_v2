@@ -331,25 +331,9 @@ class _AssistantJobApplicantsScreenState
         backgroundColor = Colors.blue[100]!;
         textColor = Colors.blue[700]!;
         break;
-      case 'under_review':
-        backgroundColor = Colors.orange[100]!;
-        textColor = Colors.orange[700]!;
-        break;
-      case 'shortlisted':
-        backgroundColor = Colors.purple[100]!;
-        textColor = Colors.purple[700]!;
-        break;
       case 'interview_scheduled':
         backgroundColor = Colors.indigo[100]!;
         textColor = Colors.indigo[700]!;
-        break;
-      case 'interview_completed':
-        backgroundColor = Colors.teal[100]!;
-        textColor = Colors.teal[700]!;
-        break;
-      case 'offered':
-        backgroundColor = Colors.green[100]!;
-        textColor = Colors.green[700]!;
         break;
       case 'hired':
         backgroundColor = Colors.green[200]!;
@@ -385,16 +369,8 @@ class _AssistantJobApplicantsScreenState
     switch (status) {
       case 'submitted':
         return 'ใหม่';
-      case 'under_review':
-        return 'กำลังพิจารณา';
-      case 'shortlisted':
-        return 'ผ่านเข้ารอบ';
       case 'interview_scheduled':
         return 'นัดสัมภาษณ์';
-      case 'interview_completed':
-        return 'สัมภาษณ์แล้ว';
-      case 'offered':
-        return 'ได้รับข้อเสนอ';
       case 'hired':
         return 'รับเข้าทำงาน';
       case 'rejected':
@@ -818,11 +794,11 @@ class _AssistantJobApplicantsScreenState
   // List of valid application status values (English)
   List<String> get _applicationStatusValues => [
     'submitted',
-    'under_review',
-    'shortlisted',
+    //'under_review',
+    //'shortlisted',
     'interview_scheduled',
-    'interview_completed',
-    'offered',
+    //'interview_completed',
+    //'offered',
     'hired',
     'rejected',
   ];
