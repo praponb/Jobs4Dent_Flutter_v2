@@ -24,6 +24,14 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Load .env file
+val envProperties = Properties()
+val envFile = rootProject.file("../.env")
+if (envFile.exists()) {
+    envProperties.load(FileInputStream(envFile))
+}
+
+
 android {
     namespace = "bavonparadon.prapon.jobs4dent"
     compileSdk = flutter.compileSdkVersion
@@ -55,6 +63,10 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // Read Google Maps API Key from .env
+        val googleMapsApiKey = envProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
+        manifestPlaceholders["googleMapsApiKey"] = googleMapsApiKey
     }
 
     signingConfigs {
