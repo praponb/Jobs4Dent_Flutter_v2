@@ -12,7 +12,8 @@ class JobAIService {
   Future<List<JobModel>> searchJobsByDayHours(String searchQuery) async {
     try {
       // First, get all active jobs
-      final query = _firestore.collection('job_posts_dentist')
+      final query = _firestore
+          .collection('job_posts_dentist')
           .where('isActive', isEqualTo: true)
           .limit(500);
 
@@ -22,26 +23,28 @@ class JobAIService {
           .toList();
 
       // Filter jobs that have workingDays or workingHours
-      final jobsWithSchedule = allJobs.where((job) => 
-        (job.workingDays != null && job.workingDays!.isNotEmpty) ||
-        (job.workingHours != null && job.workingHours!.isNotEmpty)
-      ).toList();
+      final jobsWithSchedule = allJobs
+          .where(
+            (job) =>
+                (job.workingDays != null && job.workingDays!.isNotEmpty) ||
+                (job.workingHours != null && job.workingHours!.isNotEmpty),
+          )
+          .toList();
 
       if (jobsWithSchedule.isEmpty) {
         return [];
       }
 
       // Use Gemini API to analyze the search query and match with job schedules
-      final apiKey = dotenv.env['GOOGLE_AI_STUDIO_APIKEY_AEK'] ?? '';
-      
+      final apiKey = dotenv.env['GOOGLE_AI_STUDIO_APIKEY'] ?? '';
+
       if (apiKey.isEmpty) {
-        throw Exception('Google AI Studio API key not found. Please check your .env file.');
+        throw Exception(
+          'Google AI Studio API key not found. Please check your .env file.',
+        );
       }
-      
-      final model = GenerativeModel(
-        model: 'gemini-2.5-flash',
-        apiKey: apiKey,
-      );
+
+      final model = GenerativeModel(model: 'gemini-2.5-flash', apiKey: apiKey);
 
       // Prepare the data for Gemini
       final jobScheduleData = jobsWithSchedule.map((job) {
@@ -56,7 +59,8 @@ class JobAIService {
         };
       }).toList();
 
-      final prompt = '''
+      final prompt =
+          '''
 You are an AI assistant helping to match job seekers with jobs based on their preferred working days and hours.
 
 User's search query: "$searchQuery"
@@ -85,9 +89,9 @@ MATCHING_JOB_IDS: []
       final matchingJobIds = _parseGeminiResponse(responseText);
 
       // Filter the original jobs based on matching IDs
-      final matchingJobs = jobsWithSchedule.where((job) =>
-        matchingJobIds.contains(job.jobId)
-      ).toList();
+      final matchingJobs = jobsWithSchedule
+          .where((job) => matchingJobIds.contains(job.jobId))
+          .toList();
 
       // Sort by creation date (newest first)
       matchingJobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -130,7 +134,7 @@ MATCHING_JOB_IDS: []
 
       // Build search criteria from non-empty fields only
       final searchCriteria = <String, dynamic>{};
-      
+
       if (keyword != null && keyword.trim().isNotEmpty) {
         searchCriteria['keyword'] = keyword.trim();
       }
@@ -167,10 +171,14 @@ MATCHING_JOB_IDS: []
       if (isUrgent == true) {
         searchCriteria['isUrgent'] = isUrgent;
       }
-      if (trainLine != null && trainLine.trim().isNotEmpty && trainLine != 'ไม่ใกล้รถไฟฟ้า') {
+      if (trainLine != null &&
+          trainLine.trim().isNotEmpty &&
+          trainLine != 'ไม่ใกล้รถไฟฟ้า') {
         searchCriteria['trainLine'] = trainLine.trim();
       }
-      if (trainStation != null && trainStation.trim().isNotEmpty && trainStation != 'ไม่ใกล้รถไฟฟ้า') {
+      if (trainStation != null &&
+          trainStation.trim().isNotEmpty &&
+          trainStation != 'ไม่ใกล้รถไฟฟ้า') {
         searchCriteria['trainStation'] = trainStation.trim();
       }
       if (workingDays != null && workingDays.isNotEmpty) {
@@ -179,8 +187,10 @@ MATCHING_JOB_IDS: []
       if (workingHours != null && workingHours.trim().isNotEmpty) {
         searchCriteria['workingHours'] = workingHours.trim();
       }
-      if (additionalRequirements != null && additionalRequirements.trim().isNotEmpty) {
-        searchCriteria['additionalRequirements'] = additionalRequirements.trim();
+      if (additionalRequirements != null &&
+          additionalRequirements.trim().isNotEmpty) {
+        searchCriteria['additionalRequirements'] = additionalRequirements
+            .trim();
       }
       if (workingType != null && workingType.trim().isNotEmpty) {
         searchCriteria['workingType'] = workingType.trim();
@@ -201,18 +211,20 @@ MATCHING_JOB_IDS: []
   }
 
   /// Perform AI search using Gemini
-  Future<List<JobModel>> _performAISearch(List<JobModel> allJobs, Map<String, dynamic> searchCriteria) async {
+  Future<List<JobModel>> _performAISearch(
+    List<JobModel> allJobs,
+    Map<String, dynamic> searchCriteria,
+  ) async {
     try {
-      final apiKey = dotenv.env['GOOGLE_AI_STUDIO_APIKEY_AEK'] ?? '';
-      
+      final apiKey = dotenv.env['GOOGLE_AI_STUDIO_APIKEY'] ?? '';
+
       if (apiKey.isEmpty) {
-        throw Exception('Google AI Studio API key not found. Please check your .env file.');
+        throw Exception(
+          'Google AI Studio API key not found. Please check your .env file.',
+        );
       }
-      
-      final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: apiKey,
-      );
+
+      final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
 
       // Prepare job data for AI analysis
       final jobData = allJobs.map((job) {
@@ -236,7 +248,8 @@ MATCHING_JOB_IDS: []
         };
       }).toList();
 
-      final prompt = '''
+      final prompt =
+          '''
 You are an intelligent job matching AI assistant for a dental job platform in Thailand. Your task is to analyze user search criteria and match them with available job posts.
 
 User's Search Criteria:
@@ -298,18 +311,20 @@ MATCHING_JOB_IDS: []
       final matchingJobIds = _parseGeminiResponse(responseText);
 
       // Filter and sort the matching jobs
-      final matchingJobs = allJobs.where((job) => matchingJobIds.contains(job.jobId)).toList();
-      
+      final matchingJobs = allJobs
+          .where((job) => matchingJobIds.contains(job.jobId))
+          .toList();
+
       // Sort by creation date (newest first) while preserving AI ranking for similar dates
       matchingJobs.sort((a, b) {
         final aIndex = matchingJobIds.indexOf(a.jobId);
         final bIndex = matchingJobIds.indexOf(b.jobId);
-        
+
         // If both jobs are close in AI ranking, sort by date
         if ((aIndex - bIndex).abs() <= 2) {
           return b.createdAt.compareTo(a.createdAt);
         }
-        
+
         // Otherwise preserve AI ranking
         return aIndex.compareTo(bIndex);
       });
@@ -328,20 +343,20 @@ MATCHING_JOB_IDS: []
     try {
       final regex = RegExp(r'MATCHING_JOB_IDS:\s*\[(.*?)\]');
       final match = regex.firstMatch(responseText);
-      
+
       if (match != null) {
         final jobIdsString = match.group(1) ?? '';
         if (jobIdsString.trim().isEmpty) {
           return [];
         }
-        
+
         return jobIdsString
             .split(',')
             .map((id) => id.trim().replaceAll('"', '').replaceAll("'", ''))
             .where((id) => id.isNotEmpty)
             .toList();
       }
-      
+
       return [];
     } catch (e) {
       if (kDebugMode) {
@@ -350,4 +365,4 @@ MATCHING_JOB_IDS: []
       return [];
     }
   }
-} 
+}
