@@ -22,7 +22,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
-  
+
   final List<XFile> _selectedImages = [];
   ProductCategory? _selectedCategory;
   ProductCondition _selectedCondition = ProductCondition.used;
@@ -42,11 +42,15 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
     _descriptionController.text = product.description;
     _priceController.text = product.price.toString();
     _selectedCondition = product.condition;
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final marketplaceProvider = Provider.of<MarketplaceProvider>(context, listen: false);
-      _selectedCategory = marketplaceProvider.categories
-          .firstWhere((cat) => cat.id == product.categoryId);
+      final marketplaceProvider = Provider.of<MarketplaceProvider>(
+        context,
+        listen: false,
+      );
+      _selectedCategory = marketplaceProvider.categories.firstWhere(
+        (cat) => cat.id == product.categoryId,
+      );
       setState(() {});
     });
   }
@@ -189,11 +193,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 16,
-                ),
+                child: const Icon(Icons.close, color: Colors.white, size: 16),
               ),
             ),
           ),
@@ -217,12 +217,12 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
-                                  labelText: 'ชื่อสินค้า *',
+                labelText: 'ชื่อสินค้า *',
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                                      return 'ต้องระบุชื่อสินค้า';
+                  return 'ต้องระบุชื่อสินค้า';
                 }
                 return null;
               },
@@ -232,22 +232,23 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
               controller: _descriptionController,
               maxLines: 4,
               decoration: const InputDecoration(
-                                  labelText: 'คำอธิบาย *',
+                labelText: 'คำอธิบาย *',
                 border: OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                                      return 'ต้องระบุคำอธิบาย';
+                  return 'ต้องระบุคำอธิบาย';
                 }
                 return null;
               },
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<ProductCondition>(
-              value: _selectedCondition,
+              key: ValueKey(_selectedCondition),
+              initialValue: _selectedCondition,
               decoration: const InputDecoration(
-                                  labelText: 'สภาพสินค้า *',
+                labelText: 'สภาพสินค้า *',
                 border: OutlineInputBorder(),
               ),
               items: ProductCondition.values.map((condition) {
@@ -285,13 +286,13 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
-                                  labelText: 'ราคา (฿) *',
+                labelText: 'ราคา (฿) *',
                 border: OutlineInputBorder(),
                 prefixText: '฿ ',
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                                      return 'ต้องระบุราคา';
+                  return 'ต้องระบุราคา';
                 }
                 final price = double.tryParse(value);
                 if (price == null || price <= 0) {
@@ -321,7 +322,8 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
             Consumer<MarketplaceProvider>(
               builder: (context, marketplaceProvider, child) {
                 return DropdownButtonFormField<ProductCategory>(
-                  value: _selectedCategory,
+                  key: ValueKey(_selectedCategory),
+                  initialValue: _selectedCategory,
                   decoration: const InputDecoration(
                     labelText: 'หมวดหมู่สินค้า *',
                     border: OutlineInputBorder(),
@@ -363,7 +365,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('เกิดข้อผิดพลาดในการเลือกรูปภาพ: $e')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการเลือกรูปภาพ: $e')),
         );
       }
     }
@@ -380,11 +382,15 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final marketplaceProvider = Provider.of<MarketplaceProvider>(context, listen: false);
+      final marketplaceProvider = Provider.of<MarketplaceProvider>(
+        context,
+        listen: false,
+      );
       final user = authProvider.userModel!;
 
-      final productId = widget.productToEdit?.id ?? marketplaceProvider.generateProductId();
-      
+      final productId =
+          widget.productToEdit?.id ?? marketplaceProvider.generateProductId();
+
       final product = ProductModel(
         id: productId,
         name: _nameController.text.trim(),
@@ -412,9 +418,15 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
 
       bool success;
       if (widget.productToEdit != null) {
-        success = await marketplaceProvider.updateProduct(product, _selectedImages);
+        success = await marketplaceProvider.updateProduct(
+          product,
+          _selectedImages,
+        );
       } else {
-        success = await marketplaceProvider.createProduct(product, _selectedImages);
+        success = await marketplaceProvider.createProduct(
+          product,
+          _selectedImages,
+        );
       }
 
       if (mounted) {
@@ -422,9 +434,9 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                widget.productToEdit != null 
-                                    ? 'อัปเดตสินค้าเรียบร้อยแล้ว!'
-                : 'ประกาศขายสินค้าเรียบร้อยแล้ว!',
+                widget.productToEdit != null
+                    ? 'อัปเดตสินค้าเรียบร้อยแล้ว!'
+                    : 'ประกาศขายสินค้าเรียบร้อยแล้ว!',
               ),
               backgroundColor: Colors.green,
             ),
@@ -454,4 +466,4 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
       });
     }
   }
-} 
+}

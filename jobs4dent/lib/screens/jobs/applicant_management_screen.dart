@@ -874,7 +874,8 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
 
                 // Status dropdown - use English status values
                 DropdownButtonFormField<String>(
-                  value: selectedStatus,
+                  key: ValueKey(selectedStatus),
+                  initialValue: selectedStatus,
                   decoration: const InputDecoration(
                     labelText: 'สถานะ',
                     border: OutlineInputBorder(),

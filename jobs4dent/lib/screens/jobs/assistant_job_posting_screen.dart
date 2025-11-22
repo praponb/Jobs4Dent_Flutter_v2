@@ -641,7 +641,8 @@ class _AssistantJobPostingScreenState extends State<AssistantJobPostingScreen> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButtonFormField<String>(
-        value: value,
+        key: ValueKey(value),
+        initialValue: value,
         items: items.map((item) {
           return DropdownMenuItem<String>(value: item, child: Text(item));
         }).toList(),
