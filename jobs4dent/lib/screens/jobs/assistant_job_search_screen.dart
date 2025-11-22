@@ -318,7 +318,8 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _selectedWorkType,
+                        key: ValueKey(_selectedWorkType),
+                        initialValue: _selectedWorkType,
                         decoration: const InputDecoration(
                           hintText: 'ประเภทงาน',
                           border: OutlineInputBorder(),

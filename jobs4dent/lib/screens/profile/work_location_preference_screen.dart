@@ -7,10 +7,12 @@ class WorkLocationPreferenceScreen extends StatefulWidget {
   const WorkLocationPreferenceScreen({super.key});
 
   @override
-  State<WorkLocationPreferenceScreen> createState() => _WorkLocationPreferenceScreenState();
+  State<WorkLocationPreferenceScreen> createState() =>
+      _WorkLocationPreferenceScreenState();
 }
 
-class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScreen> {
+class _WorkLocationPreferenceScreenState
+    extends State<WorkLocationPreferenceScreen> {
   bool _isLoading = false;
   List<String> _selectedProvinces = [];
   List<String> _selectedCities = [];
@@ -106,7 +108,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
 
   final List<String> _workTypes = [
     'เต็มเวลา',
-    'ไม่เต็มเวลา', 
+    'ไม่เต็มเวลา',
     'ตามสัญญา',
     'อิสระ',
     'ชั่วคราว',
@@ -124,8 +126,9 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
     if (user != null) {
       _selectedProvinces = List<String>.from(user.workLocationPreference ?? []);
       _isWillingToRelocate = user.availability?['willingToRelocate'] ?? false;
-      _preferredWorkType = user.availability?['preferredWorkType'] ?? 'เต็มเวลา';
-      
+      _preferredWorkType =
+          user.availability?['preferredWorkType'] ?? 'เต็มเวลา';
+
       // Extract cities from selected provinces
       _selectedCities = [];
       for (String province in _selectedProvinces) {
@@ -233,10 +236,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                     const SizedBox(height: 4),
                     Text(
                       'เลือกจังหวัด/เมืองที่คุณต้องการทำงาน',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -247,7 +247,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
           ..._thailandProvinces.entries.map((entry) {
             final region = entry.key;
             final cities = entry.value;
-            
+
             return ExpansionTile(
               title: Text(
                 region,
@@ -258,14 +258,14 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
               ),
               subtitle: Text(
                 '${cities.where((city) => _selectedCities.contains(city)).length} of ${cities.length} selected',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
               ),
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -296,10 +296,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
           if (_selectedCities.isNotEmpty) ...[
             const Text(
               'พื้นที่ที่เลือก:',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-              ),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -393,10 +390,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                     const SizedBox(height: 4),
                     Text(
                       'เลือกประเภทการจ้างงานที่ต้องการ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -467,10 +461,7 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
                     const SizedBox(height: 4),
                     Text(
                       'คุณเต็มใจย้ายที่ทำงานสำหรับโอกาสที่เหมาะสมหรือไม่?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -488,14 +479,11 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
             title: const Text('เต็มใจย้ายที่อยู่'),
             subtitle: Text(
               _isWillingToRelocate
-                                  ? 'เปิดรับโอกาสงานในพื้นที่อื่น'
-                : 'ต้องการทำงานในพื้นที่ที่เลือกเท่านั้น',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+                  ? 'เปิดรับโอกาสงานในพื้นที่อื่น'
+                  : 'ต้องการทำงานในพื้นที่ที่เลือกเท่านั้น',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
-            activeColor: const Color(0xFF2196F3),
+            activeThumbColor: const Color(0xFF2196F3),
             contentPadding: EdgeInsets.zero,
           ),
         ],
@@ -511,19 +499,12 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 8,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF2196F3)
-              : Colors.grey[100],
+          color: isSelected ? const Color(0xFF2196F3) : Colors.grey[100],
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xFF2196F3)
-                : Colors.grey[300]!,
+            color: isSelected ? const Color(0xFF2196F3) : Colors.grey[300]!,
           ),
         ),
         child: Text(
@@ -589,4 +570,4 @@ class _WorkLocationPreferenceScreenState extends State<WorkLocationPreferenceScr
       });
     }
   }
-} 
+}

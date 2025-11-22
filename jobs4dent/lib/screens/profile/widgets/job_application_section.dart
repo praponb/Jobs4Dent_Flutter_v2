@@ -38,11 +38,7 @@ class JobApplicationSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.work,
-                color: Colors.blue[600],
-                size: 24,
-              ),
+              Icon(Icons.work, color: Colors.blue[600], size: 24),
               const SizedBox(width: 8),
               const Expanded(
                 child: Text(
@@ -58,17 +54,15 @@ class JobApplicationSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: selectedEducationLevel,
+            key: ValueKey(selectedEducationLevel),
+            initialValue: selectedEducationLevel,
             isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'ระดับการศึกษา',
               border: OutlineInputBorder(),
             ),
             items: AssistantSkillsData.educationLevelOptions.map((level) {
-              return DropdownMenuItem(
-                value: level,
-                child: Text(level),
-              );
+              return DropdownMenuItem(value: level, child: Text(level));
             }).toList(),
             onChanged: onEducationLevelChanged,
             validator: (value) {
@@ -80,17 +74,15 @@ class JobApplicationSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: selectedJobType,
+            key: ValueKey(selectedJobType),
+            initialValue: selectedJobType,
             isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'ประเภทงาน',
               border: OutlineInputBorder(),
             ),
             items: AssistantSkillsData.jobTypeOptions.map((type) {
-              return DropdownMenuItem(
-                value: type,
-                child: Text(type),
-              );
+              return DropdownMenuItem(value: type, child: Text(type));
             }).toList(),
             onChanged: onJobTypeChanged,
             validator: (value) {
@@ -107,7 +99,10 @@ class JobApplicationSection extends StatelessWidget {
             decoration: const InputDecoration(
               labelText: 'รายได้ที่ต้องการขั้นต่ำ (บาท/เดือน)',
               border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -127,7 +122,10 @@ class JobApplicationSection extends StatelessWidget {
             decoration: const InputDecoration(
               labelText: 'รายได้ที่ต้องการสูงสุด (บาท/เดือน)',
               border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -142,17 +140,15 @@ class JobApplicationSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: selectedJobReadiness,
+            key: ValueKey(selectedJobReadiness),
+            initialValue: selectedJobReadiness,
             isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'ความพร้อมเริ่มงาน',
               border: OutlineInputBorder(),
             ),
             items: AssistantSkillsData.jobReadinessOptions.map((readiness) {
-              return DropdownMenuItem(
-                value: readiness,
-                child: Text(readiness),
-              );
+              return DropdownMenuItem(value: readiness, child: Text(readiness));
             }).toList(),
             onChanged: onJobReadinessChanged,
             validator: (value) {
@@ -166,4 +162,4 @@ class JobApplicationSection extends StatelessWidget {
       ),
     );
   }
-} 
+}

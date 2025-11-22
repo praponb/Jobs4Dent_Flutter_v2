@@ -5,7 +5,6 @@ import 'job_posting_constants.dart';
 
 /// Reusable form widgets for job posting screen
 class JobPostingFormWidgets {
-  
   /// Build a section header with styled text
   static Widget buildSectionHeader(BuildContext context, String title) {
     return Text(
@@ -35,8 +34,8 @@ class JobPostingFormWidgets {
       ),
       buttonIcon: const Icon(Icons.arrow_drop_down),
       buttonText: Text(
-        selectedValues.isEmpty 
-            ? 'เลือก$title' 
+        selectedValues.isEmpty
+            ? 'เลือก$title'
             : 'เลือก ${selectedValues.length} รายการ',
       ),
       onConfirm: onConfirm,
@@ -60,15 +59,14 @@ class JobPostingFormWidgets {
       ),
       child: ListTile(
         title: Text(
-          selectedValues.isEmpty 
-              ? 'เลือก$title' 
-              : selectedValues.join(", "),
+          selectedValues.isEmpty ? 'เลือก$title' : selectedValues.join(", "),
           style: TextStyle(
             color: selectedValues.isEmpty ? Colors.grey[600] : Colors.black,
           ),
         ),
         trailing: const Icon(Icons.arrow_drop_down),
-        onTap: () => _showSelectModal(context, title, items, selectedValues, onConfirm),
+        onTap: () =>
+            _showSelectModal(context, title, items, selectedValues, onConfirm),
       ),
     );
   }
@@ -116,7 +114,7 @@ class JobPostingFormWidgets {
                     ],
                   ),
                   const Divider(),
-                  
+
                   // Select/Deselect All buttons
                   Row(
                     children: [
@@ -138,7 +136,7 @@ class JobPostingFormWidgets {
                       ),
                     ],
                   ),
-                  
+
                   // Items list
                   Expanded(
                     child: ListView.builder(
@@ -146,7 +144,7 @@ class JobPostingFormWidgets {
                       itemBuilder: (context, index) {
                         final item = items[index];
                         final isSelected = tempSelectedValues.contains(item);
-                        
+
                         return CheckboxListTile(
                           title: Text(item),
                           value: isSelected,
@@ -166,7 +164,7 @@ class JobPostingFormWidgets {
                       },
                     ),
                   ),
-                  
+
                   // Action buttons
                   const SizedBox(height: 16),
                   Row(
@@ -212,7 +210,8 @@ class JobPostingFormWidgets {
     bool isRequired = false,
   }) {
     return DropdownButtonFormField<T>(
-      value: value,
+      key: ValueKey(value),
+      initialValue: value,
       isExpanded: true,
       decoration: InputDecoration(
         labelText: isRequired ? '$labelText *' : labelText,
@@ -313,10 +312,7 @@ class JobPostingFormWidgets {
         onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? const CircularProgressIndicator(color: Colors.white)
-            : Text(
-                text,
-                style: const TextStyle(fontSize: 16),
-              ),
+            : Text(text, style: const TextStyle(fontSize: 16)),
       ),
     );
   }
@@ -360,7 +356,13 @@ class JobPostingFormWidgets {
     required Function(String, bool) onDayToggled,
   }) {
     const workingDayOptions = [
-      'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'
+      'จันทร์',
+      'อังคาร',
+      'พุธ',
+      'พฤหัสบดี',
+      'ศุกร์',
+      'เสาร์',
+      'อาทิตย์',
     ];
 
     return Column(
@@ -391,23 +393,26 @@ class JobPostingFormWidgets {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('ประเภทการทำงาน:', style: TextStyle(fontWeight: FontWeight.w500)),
+        const Text(
+          'ประเภทการทำงาน:',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
         const SizedBox(height: 8),
-        Row(
-          children: JobPostingConstants.workingTypes.map((type) {
-            return Expanded(
-              child: Row(
-                children: [
-                  Radio<String>(
-                    value: type,
-                    groupValue: selectedType,
-                    onChanged: onChanged,
-                  ),
-                  Text(type),
-                ],
-              ),
-            );
-          }).toList(),
+        RadioGroup<String?>(
+          groupValue: selectedType,
+          onChanged: onChanged,
+          child: Row(
+            children: JobPostingConstants.workingTypes.map((type) {
+              return Expanded(
+                child: Row(
+                  children: [
+                    Radio<String>(value: type),
+                    Text(type),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -458,17 +463,15 @@ class JobPostingFormWidgets {
     required Function(int?) onChanged,
   }) {
     return DropdownButtonFormField<int>(
-      value: selectedIndex,
+      key: ValueKey(selectedIndex),
+      initialValue: selectedIndex,
       isExpanded: true,
       decoration: const InputDecoration(
         labelText: 'พื้นที่',
         border: OutlineInputBorder(),
       ),
       items: [
-        const DropdownMenuItem(
-          value: null,
-          child: Text('เลือกพื้นที่'),
-        ),
+        const DropdownMenuItem(value: null, child: Text('เลือกพื้นที่')),
         for (int i = 0; i < JobPostingConstants.thaiProvinceZones.length; i++)
           DropdownMenuItem(
             value: i,
@@ -488,23 +491,20 @@ class JobPostingFormWidgets {
     if (selectedProvinceZoneIndex == null) return const SizedBox.shrink();
 
     return DropdownButtonFormField<String>(
-      value: selectedLocation,
+      key: ValueKey(selectedLocation),
+      initialValue: selectedLocation,
       isExpanded: true,
       decoration: const InputDecoration(
         labelText: 'จังหวัด/โซนในจังหวัด',
         border: OutlineInputBorder(),
       ),
       items: [
-        const DropdownMenuItem(
-          value: null,
-          child: Text('เลือกโซนทำงาน'),
+        const DropdownMenuItem(value: null, child: Text('เลือกโซนทำงาน')),
+        ...JobPostingConstants.thaiLocationZones[selectedProvinceZoneIndex].map(
+          (location) {
+            return DropdownMenuItem(value: location, child: Text(location));
+          },
         ),
-        ...JobPostingConstants.thaiLocationZones[selectedProvinceZoneIndex].map((location) {
-          return DropdownMenuItem(
-            value: location,
-            child: Text(location),
-          );
-        }),
       ],
       onChanged: onChanged,
     );
@@ -516,17 +516,15 @@ class JobPostingFormWidgets {
     required Function(int?) onChanged,
   }) {
     return DropdownButtonFormField<int>(
-      value: selectedIndex,
+      key: ValueKey(selectedIndex),
+      initialValue: selectedIndex,
       isExpanded: true,
       decoration: const InputDecoration(
         labelText: 'สายรถไฟฟ้า',
         border: OutlineInputBorder(),
       ),
       items: [
-        const DropdownMenuItem(
-          value: null,
-          child: Text('เลือกสายรถไฟฟ้า'),
-        ),
+        const DropdownMenuItem(value: null, child: Text('เลือกสายรถไฟฟ้า')),
         for (int i = 0; i < JobPostingConstants.thaiTrainLines.length; i++)
           DropdownMenuItem(
             value: i,
@@ -546,25 +544,22 @@ class JobPostingFormWidgets {
     if (selectedTrainLineIndex == null) return const SizedBox.shrink();
 
     return DropdownButtonFormField<String>(
-      value: selectedStation,
+      key: ValueKey(selectedStation),
+      initialValue: selectedStation,
       isExpanded: true,
       decoration: const InputDecoration(
         labelText: 'สถานีรถไฟฟ้า',
         border: OutlineInputBorder(),
       ),
       items: [
-        const DropdownMenuItem(
-          value: null,
-          child: Text('เลือกสถานี'),
-        ),
-        ...JobPostingConstants.thaiTrainStations[selectedTrainLineIndex].map((station) {
-          return DropdownMenuItem(
-            value: station,
-            child: Text(station),
-          );
+        const DropdownMenuItem(value: null, child: Text('เลือกสถานี')),
+        ...JobPostingConstants.thaiTrainStations[selectedTrainLineIndex].map((
+          station,
+        ) {
+          return DropdownMenuItem(value: station, child: Text(station));
         }),
       ],
       onChanged: onChanged,
     );
   }
-} 
+}

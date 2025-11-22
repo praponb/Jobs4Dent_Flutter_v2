@@ -11,7 +11,8 @@ class AdvancedJobSearchScreen extends StatefulWidget {
   const AdvancedJobSearchScreen({super.key});
 
   @override
-  State<AdvancedJobSearchScreen> createState() => _AdvancedJobSearchScreenState();
+  State<AdvancedJobSearchScreen> createState() =>
+      _AdvancedJobSearchScreenState();
 }
 
 class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
@@ -38,15 +39,13 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
   void _searchJobs() {
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     _formHelper.saveStateAndSearch(jobProvider, authProvider.userModel?.userId);
 
     // Navigate to job search screen with results
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-                        builder: (context) => const DentistJobSearchScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const DentistJobSearchScreen()),
     );
   }
 
@@ -63,7 +62,10 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
         actions: [
           TextButton(
             onPressed: _clearFilters,
-            child: const Text('ล้างทั้งหมด', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'ล้างทั้งหมด',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -121,24 +123,28 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
         const SizedBox(height: 8),
         JobPostingFormWidgets.buildProvinceZoneDropdown(
           selectedIndex: _formHelper.selectedProvinceZoneIndex,
-          onChanged: (value) => _formHelper.onProvinceZoneChanged(value, () => setState(() {})),
+          onChanged: (value) =>
+              _formHelper.onProvinceZoneChanged(value, () => setState(() {})),
         ),
         const SizedBox(height: 16),
         JobPostingFormWidgets.buildLocationDropdown(
           selectedProvinceZoneIndex: _formHelper.selectedProvinceZoneIndex,
           selectedLocation: _formHelper.selectedLocation,
-          onChanged: (value) => _formHelper.onLocationChanged(value, () => setState(() {})),
+          onChanged: (value) =>
+              _formHelper.onLocationChanged(value, () => setState(() {})),
         ),
         const SizedBox(height: 16),
         JobPostingFormWidgets.buildTrainLineDropdown(
           selectedIndex: _formHelper.selectedTrainLineIndex,
-          onChanged: (value) => _formHelper.onTrainLineChanged(value, () => setState(() {})),
+          onChanged: (value) =>
+              _formHelper.onTrainLineChanged(value, () => setState(() {})),
         ),
         const SizedBox(height: 16),
         JobPostingFormWidgets.buildTrainStationDropdown(
           selectedTrainLineIndex: _formHelper.selectedTrainLineIndex,
           selectedStation: _formHelper.selectedTrainStation,
-          onChanged: (value) => _formHelper.onTrainStationChanged(value, () => setState(() {})),
+          onChanged: (value) =>
+              _formHelper.onTrainStationChanged(value, () => setState(() {})),
         ),
       ],
     );
@@ -148,10 +154,13 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        JobPostingFormWidgets.buildSectionTitle('เลือกความถนัดเฉพาะทาง หรือ ระดับประสบการณ์'),
+        JobPostingFormWidgets.buildSectionTitle(
+          'เลือกความถนัดเฉพาะทาง หรือ ระดับประสบการณ์',
+        ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: _formHelper.selectedJobCategory,
+          key: ValueKey(_formHelper.selectedJobCategory),
+          initialValue: _formHelper.selectedJobCategory,
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'หมวดหมู่งาน',
@@ -163,10 +172,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
               child: Text('เลือกหมวดหมู่งาน'),
             ),
             ...JobConstants.jobCategories.map((category) {
-              return DropdownMenuItem(
-                value: category,
-                child: Text(category),
-              );
+              return DropdownMenuItem(value: category, child: Text(category));
             }),
           ],
           onChanged: (value) {
@@ -177,7 +183,8 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          value: _formHelper.selectedExperienceLevel,
+          key: ValueKey(_formHelper.selectedExperienceLevel),
+          initialValue: _formHelper.selectedExperienceLevel,
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'ระดับประสบการณ์',
@@ -189,10 +196,7 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
               child: Text('เลือกระดับประสบการณ์'),
             ),
             ...JobConstants.experienceLevels.map((level) {
-              return DropdownMenuItem(
-                value: level,
-                child: Text(level),
-              );
+              return DropdownMenuItem(value: level, child: Text(level));
             }),
           ],
           onChanged: (value) {
@@ -209,25 +213,22 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        JobPostingFormWidgets.buildSectionTitle('ประกันรายได้รายวัน หรือ เงินเดือน'),
+        JobPostingFormWidgets.buildSectionTitle(
+          'ประกันรายได้รายวัน หรือ เงินเดือน',
+        ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: _formHelper.selectedSalaryType,
+          key: ValueKey(_formHelper.selectedSalaryType),
+          initialValue: _formHelper.selectedSalaryType,
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'ประเภทเงินเดือน',
             border: OutlineInputBorder(),
           ),
           items: [
-            const DropdownMenuItem(
-              value: null,
-              child: Text('อัตราส่วนรายได้'),
-            ),
+            const DropdownMenuItem(value: null, child: Text('อัตราส่วนรายได้')),
             ...JobConstants.salaryTypes.map((type) {
-              return DropdownMenuItem(
-                value: type,
-                child: Text(type),
-              );
+              return DropdownMenuItem(value: type, child: Text(type));
             }),
           ],
           onChanged: (value) {
@@ -287,7 +288,11 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
         const SizedBox(height: 16),
         JobPostingFormWidgets.buildWorkingDaysSelection(
           selectedDays: _formHelper.selectedWorkingDays,
-          onDayToggled: (day, selected) => _formHelper.onWorkingDayToggled(day, selected, () => setState(() {})),
+          onDayToggled: (day, selected) => _formHelper.onWorkingDayToggled(
+            day,
+            selected,
+            () => setState(() {}),
+          ),
         ),
         const SizedBox(height: 16),
         TextField(
@@ -324,9 +329,12 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                     suffixIcon: Icon(Icons.calendar_today),
                   ),
                   child: Text(
-                    _formHelper.startDate?.toString().split(' ')[0] ?? 'เลือกวันที่',
+                    _formHelper.startDate?.toString().split(' ')[0] ??
+                        'เลือกวันที่',
                     style: TextStyle(
-                      color: _formHelper.startDate != null ? Colors.black : Colors.grey,
+                      color: _formHelper.startDate != null
+                          ? Colors.black
+                          : Colors.grey,
                     ),
                   ),
                 ),
@@ -347,9 +355,12 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
                     suffixIcon: Icon(Icons.calendar_today),
                   ),
                   child: Text(
-                    _formHelper.endDate?.toString().split(' ')[0] ?? 'เลือกวันที่',
+                    _formHelper.endDate?.toString().split(' ')[0] ??
+                        'เลือกวันที่',
                     style: TextStyle(
-                      color: _formHelper.endDate != null ? Colors.black : Colors.grey,
+                      color: _formHelper.endDate != null
+                          ? Colors.black
+                          : Colors.grey,
                     ),
                   ),
                 ),
@@ -399,4 +410,4 @@ class _AdvancedJobSearchScreenState extends State<AdvancedJobSearchScreen> {
       ],
     );
   }
-} 
+}

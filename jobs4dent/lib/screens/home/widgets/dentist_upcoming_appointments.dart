@@ -20,12 +20,15 @@ class DentistUpcomingAppointments extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'การสัมภาษณ์ที่กำลังจะมา',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            const Expanded(
+              child: Text(
+                'การสัมภาษณ์ที่กำลังจะมา',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             if (upcomingInterviews.isNotEmpty)
@@ -48,8 +51,9 @@ class DentistUpcomingAppointments extends StatelessWidget {
         if (upcomingInterviews.isEmpty)
           _buildEmptyState(context)
         else
-          ...upcomingInterviews.map((interview) => 
-            _InterviewCard(interview: interview)),
+          ...upcomingInterviews.map(
+            (interview) => _InterviewCard(interview: interview),
+          ),
       ],
     );
   }
@@ -91,9 +95,7 @@ class DentistUpcomingAppointments extends StatelessWidget {
 class _InterviewCard extends StatelessWidget {
   final JobApplicationModel interview;
 
-  const _InterviewCard({
-    required this.interview,
-  });
+  const _InterviewCard({required this.interview});
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +137,9 @@ class _InterviewCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  DashboardUtils.formatDate(interview.interviewDate!),
+                  interview.interviewDate != null
+                      ? DashboardUtils.formatDate(interview.interviewDate!)
+                      : 'ไม่ระบุวันที่',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.orange[700],
@@ -148,9 +152,7 @@ class _InterviewCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Clinic: ${interview.clinicId}', // In real app, fetch clinic name
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.w500),
           ),
           if (interview.interviewLocation != null) ...[
             const SizedBox(height: 4),
@@ -171,4 +173,4 @@ class _InterviewCard extends StatelessWidget {
       ),
     );
   }
-} 
+}
