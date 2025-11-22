@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -46,8 +47,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCw1Qa62VGHN0aEF46rmkQWLLlz_PxoMFA',
+  static FirebaseOptions get web => FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_WEB_API_KEY'] ?? '',
     appId: '1:693132385676:web:4c28d9bc8af8b6e0890aa9',
     messagingSenderId: '693132385676',
     projectId: 'flutter-jobs4dent',
@@ -56,16 +57,16 @@ class DefaultFirebaseOptions {
     measurementId: 'G-MMDTGGDY33',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBAUkkfFwTmmaiH6WALVE7nwTcGeWCZLFc',
+  static FirebaseOptions get android => FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY'] ?? '',
     appId: '1:693132385676:android:68d5f7ecd83909ad890aa9',
     messagingSenderId: '693132385676',
     projectId: 'flutter-jobs4dent',
     storageBucket: 'flutter-jobs4dent.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDXdEu1PvH_yroPHFXixS7mxG36BynbeIo',
+  static FirebaseOptions get ios => FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_IOS_API_KEY'] ?? '',
     appId: '1:693132385676:ios:f02e307f92d035de890aa9',
     messagingSenderId: '693132385676',
     projectId: 'flutter-jobs4dent',

@@ -1,9 +1,11 @@
 # Google Maps Setup Instructions
 
 ## Overview
+
 The location picker feature uses Google Maps to allow clinic owners to select precise branch locations. This requires Google Maps API configuration for both Android and iOS platforms.
 
 ## Prerequisites
+
 1. Google Cloud Console account
 2. Google Maps API key with Maps SDK enabled
 
@@ -21,27 +23,29 @@ The location picker feature uses Google Maps to allow clinic owners to select pr
 ## Step 2: Android Configuration
 
 ### Add API Key to Android Manifest
+
 1. Open `android/app/src/main/AndroidManifest.xml`
 2. Add the following inside the `<application>` tag:
 
 ```xml
 <meta-data
     android:name="com.google.android.geo.API_KEY"
-    android:value="AIzaSyAxi78QlJpgUxs0JLT6HJQ5FbMJAoz-HQY" />
+    android:value="API Key" />
 ```
 
 ### Example:
+
 ```xml
 <application
     android:label="jobs4dent"
     android:name="${applicationName}"
     android:icon="@mipmap/ic_launcher">
-    
+
     <!-- Google Maps API Key -->
     <meta-data
         android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyB..." />
-    
+        android:value="API Key" />
+
     <activity
         android:name=".MainActivity"
         android:exported="true"
@@ -58,6 +62,7 @@ The location picker feature uses Google Maps to allow clinic owners to select pr
 ## Step 3: iOS Configuration
 
 ### Add API Key to iOS
+
 1. Open `ios/Runner/AppDelegate.swift`
 2. Import GoogleMaps and add the API key:
 
@@ -80,6 +85,7 @@ import GoogleMaps
 ```
 
 ### Update iOS Deployment Target
+
 1. Open `ios/Podfile`
 2. Ensure minimum deployment target is iOS 11.0:
 
@@ -90,11 +96,14 @@ platform :ios, '11.0'
 ## Step 4: Permissions Setup
 
 ### Android Permissions
+
 The following permissions are already configured in `android/app/src/main/AndroidManifest.xml`:
+
 - `ACCESS_FINE_LOCATION`
 - `ACCESS_COARSE_LOCATION`
 
 ### iOS Permissions
+
 Add location permissions to `ios/Runner/Info.plist`:
 
 ```xml
@@ -134,6 +143,7 @@ Add location permissions to `ios/Runner/Info.plist`:
 ## Feature Usage
 
 Once configured, users can:
+
 - Tap "คลิกเพื่อปักหมุดตำแหน่ง" to open map picker
 - Select location by tapping on the map
 - Use current location button for convenience
@@ -143,6 +153,7 @@ Once configured, users can:
 ## Database Storage
 
 Selected locations are stored in Firestore as:
+
 ```json
 {
   "coordinates": {
@@ -152,4 +163,4 @@ Selected locations are stored in Firestore as:
 }
 ```
 
-The coordinates are automatically saved when creating or updating branch information. 
+The coordinates are automatically saved when creating or updating branch information.

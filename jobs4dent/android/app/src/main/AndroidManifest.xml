@@ -19,7 +19,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAxi78QlJpgUxs0JLT6HJQ5FbMJAoz-HQY" />
+            android:value="${googleMapsApiKey}" />
 
         <!-- Firebase Cloud Messaging default notification channel -->
         <meta-data
