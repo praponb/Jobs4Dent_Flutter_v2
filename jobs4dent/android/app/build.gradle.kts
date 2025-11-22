@@ -83,16 +83,18 @@ android {
                 // Fallback to debug signing for first upload (Google Play App Signing will handle re-signing)
                 signingConfig = signingConfigs.getByName("debug")
             }
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }
 
 // Add compiler args to suppress warnings for all build types
 tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf("-Xlint:-deprecation", "-Xlint:-options"))
+    options.compilerArgs.addAll(listOf("-Xlint:none", "-nowarn"))
     options.isDeprecation = false
+    options.isWarnings = false
 }
 
 // Suppress warnings in Kotlin compilation for all build types
