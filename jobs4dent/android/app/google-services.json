@@ -66,6 +66,14 @@
           }
         },
         {
+          "client_id": "693132385676-gid37nddd4bin5cq9se6ovl5de8nmhn7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jobs4dent.jobs4dent",
+            "certificate_hash": "fb04c84c33ea614deb109faef9bb38ea1c0c29d1"
+          }
+        },
+        {
           "client_id": "693132385676-jl2eqn3q6qn3f0hn2aejko6diin4cfd9.apps.googleusercontent.com",
           "client_type": 3
         }
