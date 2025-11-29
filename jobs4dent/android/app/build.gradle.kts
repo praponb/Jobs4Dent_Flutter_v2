@@ -33,7 +33,7 @@ if (envFile.exists()) {
 
 
 android {
-    namespace = "bavonparadon.prapon.jobs4dent"
+    namespace = "com.jobs4dent.jobs4dent"
     compileSdk = flutter.compileSdkVersion
     //ndkVersion = flutter.ndkVersion
     ndkVersion = "27.0.12077973"
@@ -58,7 +58,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "bavonparadon.prapon.jobs4dent"
+        applicationId = "com.jobs4dent.jobs4dent"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

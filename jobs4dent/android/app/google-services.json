@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:693132385676:android:a47d5aebb5773f96890aa9",
+        "mobilesdk_app_id": "1:693132385676:android:9c214a309572242a890aa9",
         "android_client_info": {
-          "package_name": "bavonparadon.prapon.jobs4dent"
+          "package_name": "com.jobs4dent.admin_jobs4dent"
         }
       },
       "oauth_client": [
         {
-          "client_id": "693132385676-35smgj1fkl6ge1n7l4nid7kvn988abn2.apps.googleusercontent.com",
+          "client_id": "693132385676-1an63ggn4679p0hcnp5904j661ej9q5t.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "bavonparadon.prapon.jobs4dent",
+            "package_name": "com.jobs4dent.admin_jobs4dent",
             "certificate_hash": "477d926b6ab335f4b9993f7b5e814ac865d26246"
           }
         },
@@ -39,10 +39,54 @@
               "client_type": 3
             },
             {
-              "client_id": "693132385676-3to0idnhrpe36p24r4eaaofv6he0n6du.apps.googleusercontent.com",
+              "client_id": "693132385676-3sptr7eu8p1m5eu72dtcsnfpkud048jm.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.jobs4dent"
+                "bundle_id": "com.jobs4dent.jobs4dent"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693132385676:android:b2581d58b3ea312f890aa9",
+        "android_client_info": {
+          "package_name": "com.jobs4dent.jobs4dent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "693132385676-03p410rvr4k5p5pld45jor14t0e5cdu6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jobs4dent.jobs4dent",
+            "certificate_hash": "477d926b6ab335f4b9993f7b5e814ac865d26246"
+          }
+        },
+        {
+          "client_id": "693132385676-jl2eqn3q6qn3f0hn2aejko6diin4cfd9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAUkkfFwTmmaiH6WALVE7nwTcGeWCZLFc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "693132385676-jl2eqn3q6qn3f0hn2aejko6diin4cfd9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "693132385676-3sptr7eu8p1m5eu72dtcsnfpkud048jm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.jobs4dent.jobs4dent"
               }
             }
           ]
