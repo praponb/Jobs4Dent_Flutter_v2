@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>693132385676-3sptr7eu8p1m5eu72dtcsnfpkud048jm.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.693132385676-3sptr7eu8p1m5eu72dtcsnfpkud048jm</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>693132385676-1an63ggn4679p0hcnp5904j661ej9q5t.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDXdEu1PvH_yroPHFXixS7mxG36BynbeIo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>693132385676</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.jobs4dent.jobs4dent</string>
+	<key>PROJECT_ID</key>
+	<string>flutter-jobs4dent</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flutter-jobs4dent.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:693132385676:ios:cfeb22c1d87a8e74890aa9</string>
+</dict>
+</plist>
