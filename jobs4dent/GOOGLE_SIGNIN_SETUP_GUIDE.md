@@ -156,6 +156,15 @@ Firebase changes can take **5-10 minutes** to propagate. If it still doesn't wor
 - ✅ Uninstall and reinstall the app
 - ✅ Make sure you're using the right SHA-1 for your build type (debug vs release)
 
+### Issue: Support Email Not Set (Critical)
+
+Even if your SHA-1 is correct, Google Sign-In will fail with `ApiException: 10` if the **Support Email** is not set in your Firebase project.
+
+**Solution:**
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Open **Project Settings** (gear icon) > **General**
+3. Ensure the **Support email** field is set to a valid email address.
+
 ### Issue: Different Package Name in Different Files
 
 Run this command to verify:
