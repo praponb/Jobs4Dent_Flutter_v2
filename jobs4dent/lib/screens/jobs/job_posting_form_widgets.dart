@@ -210,7 +210,7 @@ class JobPostingFormWidgets {
     bool isRequired = false,
   }) {
     return DropdownButtonFormField<T>(
-      key: ValueKey(value),
+      key: ValueKey(labelText),
       initialValue: value,
       isExpanded: true,
       decoration: InputDecoration(

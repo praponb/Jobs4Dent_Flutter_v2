@@ -18,10 +18,10 @@ Your package name must be consistent across all configuration files:
 1.  **`android/app/build.gradle.kts`**:
     ```kotlin
     android {
-        namespace = "com.jobs4dent.jobs4dent"
+        namespace = "com.jobs4dent.jobs4dent2"
         
         defaultConfig {
-            applicationId = "com.jobs4dent.jobs4dent"
+            applicationId = "com.jobs4dent.jobs4dent2"
             // ...
         }
     }
@@ -65,7 +65,7 @@ After uploading your first AAB to Google Play Console:
 2.  Select your project
 3.  Click the **Settings gear icon** > **Project settings**
 4.  Scroll down to **Your apps** section
-5.  Select the Android app with your package name (e.g., `com.jobs4dent.jobs4dent`)
+5.  Select the Android app with your package name (e.g., `com.jobs4dent.jobs4dent2`)
 6.  Click **Add fingerprint**
 7.  Paste the SHA-1 fingerprint
 8.  Click **Save**
@@ -109,7 +109,7 @@ Open `android/app/google-services.json` and find the section with your package n
   "client_info": {
     "mobilesdk_app_id": "1:693132385676:android:b2581d58b3ea312f890aa9",
     "android_client_info": {
-      "package_name": "com.jobs4dent.jobs4dent"
+      "package_name": "com.jobs4dent.jobs4dent2"
     }
   },
   "oauth_client": [
@@ -117,7 +117,7 @@ Open `android/app/google-services.json` and find the section with your package n
       "client_id": "693132385676-gf05212q88btq3kmpq5ldvl130vt5ueo.apps.googleusercontent.com",
       "client_type": 1,
       "android_info": {
-        "package_name": "com.jobs4dent.jobs4dent",
+        "package_name": "com.jobs4dent.jobs4dent2",
         "certificate_hash": "6a3917e3d11d47cdb372c4e9c608b85ce61f3c1c"
       }
     }
@@ -156,6 +156,15 @@ Firebase changes can take **5-10 minutes** to propagate. If it still doesn't wor
 - ✅ Uninstall and reinstall the app
 - ✅ Make sure you're using the right SHA-1 for your build type (debug vs release)
 
+### Issue: Support Email Not Set (Critical)
+
+Even if your SHA-1 is correct, Google Sign-In will fail with `ApiException: 10` if the **Support Email** is not set in your Firebase project.
+
+**Solution:**
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Open **Project Settings** (gear icon) > **General**
+3. Ensure the **Support email** field is set to a valid email address.
+
 ### Issue: Different Package Name in Different Files
 
 Run this command to verify:
@@ -163,7 +172,7 @@ Run this command to verify:
 grep -r "applicationId" android/app/build.gradle.kts
 ```
 
-Should output: `applicationId = "com.jobs4dent.jobs4dent"`
+Should output: `applicationId = "com.jobs4dent.jobs4dent2"`
 
 Check that `google-services.json` has the same package name.
 

@@ -30,8 +30,9 @@ class GoogleSignInService {
 
       debugPrint('✅ Google user selected: ${googleUser.email}');
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
       if (googleAuth.accessToken == null || googleAuth.idToken == null) {
         throw Exception('Failed to get Google authentication tokens');
       }
@@ -44,17 +45,21 @@ class GoogleSignInService {
       );
 
       debugPrint('🔄 Signing in with Firebase...');
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
-      
+      UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+
       if (userCredential.user == null) {
         throw Exception('Failed to sign in with Firebase');
       }
 
-      debugPrint('✅ Firebase sign-in successful: ${userCredential.user!.email}');
-      
+      debugPrint(
+        '✅ Firebase sign-in successful: ${userCredential.user!.email}',
+      );
+
       // Check if user is new or existing
       bool isNewUser = userCredential.additionalUserInfo?.isNewUser == true;
-      
+
       return GoogleSignInResult.success(
         user: userCredential.user!,
         isNewUser: isNewUser,
@@ -113,17 +118,11 @@ class GoogleSignInResult {
   }
 
   factory GoogleSignInResult.cancelled() {
-    return GoogleSignInResult._(
-      success: false,
-      cancelled: true,
-    );
+    return GoogleSignInResult._(success: false, cancelled: true);
   }
 
   factory GoogleSignInResult.error(String error) {
-    return GoogleSignInResult._(
-      success: false,
-      error: error,
-    );
+    return GoogleSignInResult._(success: false, error: error);
   }
 }
 
@@ -133,17 +132,9 @@ class GoogleUserProfile {
   final String? photoURL;
   final String email;
 
-  GoogleUserProfile({
-    this.displayName,
-    this.photoURL,
-    required this.email,
-  });
+  GoogleUserProfile({this.displayName, this.photoURL, required this.email});
 
   Map<String, dynamic> toMap() {
-    return {
-      'displayName': displayName,
-      'photoURL': photoURL,
-      'email': email,
-    };
+    return {'displayName': displayName, 'photoURL': photoURL, 'email': email};
   }
-} 
+}

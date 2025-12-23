@@ -1,4 +1,4 @@
-package com.jobs4dent.jobs4dent
+package com.jobs4dent.jobs4dent2
 
 import io.flutter.embedding.android.FlutterActivity
 
