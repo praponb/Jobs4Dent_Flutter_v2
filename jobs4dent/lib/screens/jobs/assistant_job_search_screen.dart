@@ -490,226 +490,18 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
     }
 
     return ListView.builder(
+      cacheExtent: 500, // Optimize rendering buffer
+      addAutomaticKeepAlives: false, // Don't keep heavy items alive off-screen
       itemCount: _jobs.length,
       itemBuilder: (context, index) {
         final job = _jobs[index];
-        return _buildJobCard(job);
+        return AssistantJobCard(
+          job: job,
+          onTap: () => _showJobDetails(job),
+          onReport: () => _showReportDialog(job),
+        );
       },
     );
-  }
-
-  Widget _buildJobCard(AssistantJobModel job) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: InkWell(
-        onTap: () => _showJobDetails(job),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      job.titlePost,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: job.workType == 'Full-time'
-                              ? Colors.green.shade50
-                              : Colors.orange.shade50,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          job.workType,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: job.workType == 'Full-time'
-                                ? Colors.green.shade700
-                                : Colors.orange.shade700,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () => _showReportDialog(job),
-                        icon: const Icon(Icons.flag_outlined, size: 20),
-                        color: Colors.red,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                job.clinicNameAndBranch,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Skills display
-              if (job.skillAssistant.isNotEmpty) ...[
-                const Text(
-                  'ทักษะที่ต้องการ:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 4,
-                      runSpacing: 4,
-                      children: job.skillAssistant.take(3).map((skill) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            skill,
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    if (job.skillAssistant.length > 3) ...[
-                      const SizedBox(height: 4),
-                      Wrap(
-                        spacing: 4,
-                        runSpacing: 4,
-                        children: job.skillAssistant.skip(3).map((skill) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              skill,
-                              style: const TextStyle(fontSize: 11),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 8),
-              ],
-
-              // Salary/Rate information
-              if (job.workType == 'Part-time') ...[
-                if (job.payPerDayPartTime != null ||
-                    job.payPerHourPartTime != null)
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.monetization_on,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _formatPartTimeRate(job),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-              ] else ...[
-                if (job.salaryFullTime != null)
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.monetization_on,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'เงินเดือน ${job.salaryFullTime} บาท',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'โพสต์เมื่อ ${_formatDate(job.createdAt)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.people, size: 16, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${job.applicationCount} ใบสมัคร',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _formatPartTimeRate(AssistantJobModel job) {
-    List<String> rates = [];
-    if (job.payPerDayPartTime != null && job.payPerDayPartTime!.isNotEmpty) {
-      rates.add('${job.payPerDayPartTime}/วัน');
-    }
-    if (job.payPerHourPartTime != null && job.payPerHourPartTime!.isNotEmpty) {
-      rates.add('${job.payPerHourPartTime}/ชม.');
-    }
-    return rates.isEmpty ? 'ตามตกลง' : rates.join(', ');
   }
 
   String _formatDate(DateTime date) {
@@ -1342,6 +1134,237 @@ class _AssistantJobSearchScreenState extends State<AssistantJobSearchScreen> {
         );
       }
       debugPrint('Error applying for job: $e');
+    }
+  }
+}
+
+class AssistantJobCard extends StatelessWidget {
+  final AssistantJobModel job;
+  final VoidCallback onTap;
+  final VoidCallback onReport;
+
+  const AssistantJobCard({
+    super.key,
+    required this.job,
+    required this.onTap,
+    required this.onReport,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      // Use lower elevation to reduce shadow cost
+      elevation: 2,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      job.titlePost,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: job.workType == 'Full-time'
+                              ? Colors.green.shade50
+                              : Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          job.workType,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: job.workType == 'Full-time'
+                                ? Colors.green.shade700
+                                : Colors.orange.shade700,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Use Semantics for better accessibility and potential performance hint
+                      IconButton(
+                        onPressed: onReport,
+                        icon: const Icon(Icons.flag_outlined, size: 20),
+                        color: Colors.red,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                job.clinicNameAndBranch,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Skills display
+              if (job.skillAssistant.isNotEmpty) ...[
+                const Text(
+                  'ทักษะที่ต้องการ:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: job.skillAssistant.take(3).map((skill) {
+                        return _buildSkillTag(skill);
+                      }).toList(),
+                    ),
+                    if (job.skillAssistant.length > 3) ...[
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: job.skillAssistant.skip(3).map((skill) {
+                          return _buildSkillTag(skill);
+                        }).toList(),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+
+              // Salary/Rate information
+              if (job.workType == 'Part-time') ...[
+                if (job.payPerDayPartTime != null ||
+                    job.payPerHourPartTime != null)
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatPartTimeRate(job),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+              ] else ...[
+                if (job.salaryFullTime != null)
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'เงินเดือน ${job.salaryFullTime} บาท',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'โพสต์เมื่อ ${_formatDate(job.createdAt)}',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.people, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${job.applicationCount} ใบสมัคร',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkillTag(String skill) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(skill, style: const TextStyle(fontSize: 11)),
+    );
+  }
+
+  String _formatPartTimeRate(AssistantJobModel job) {
+    List<String> rates = [];
+    if (job.payPerDayPartTime != null && job.payPerDayPartTime!.isNotEmpty) {
+      rates.add('${job.payPerDayPartTime}/วัน');
+    }
+    if (job.payPerHourPartTime != null && job.payPerHourPartTime!.isNotEmpty) {
+      rates.add('${job.payPerHourPartTime}/ชม.');
+    }
+    return rates.isEmpty ? 'ตามตกลง' : rates.join(', ');
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} วันที่แล้ว';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} ชั่วโมงที่แล้ว';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} นาทีที่แล้ว';
+    } else {
+      return 'เพิ่งโพสต์';
     }
   }
 }
