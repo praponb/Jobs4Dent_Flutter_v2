@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class JobModel {
   final String jobId;
   final String clinicId;
@@ -7,27 +9,27 @@ class JobModel {
   final String jobCategory;
   final String experienceLevel;
   final String? minExperienceYears;
-  
+
   // Salary Information
   final String salaryType;
   final String? minSalary;
   final String? perks;
-  
-  // Location Information  
+
+  // Location Information
   final String province;
   final String city;
   final String? trainLine;
   final String? trainStation;
-  
+
   // Time Information
   final DateTime? startDate;
   final DateTime? endDate;
   final String? workingDays;
   final String? workingHours;
-  
+
   // Requirements
   final String? additionalRequirements;
-  
+
   // Application Information
   final List<String> applicationIds;
   final int applicationCount;
@@ -36,7 +38,7 @@ class JobModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deadline;
-  
+
   // Matching Score (for search results)
   final double? matchingScore;
 
@@ -88,8 +90,8 @@ class JobModel {
       city: map['city'] ?? '',
       trainLine: map['trainLine'],
       trainStation: map['trainStation'],
-      startDate: map['startDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['startDate']) : null,
-      endDate: map['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endDate']) : null,
+      startDate: _parseDateTimeNullable(map['startDate']),
+      endDate: _parseDateTimeNullable(map['endDate']),
       workingDays: _parseWorkingDays(map['workingDays']),
       workingHours: map['workingHours'],
       additionalRequirements: map['additionalRequirements'],
@@ -97,17 +99,28 @@ class JobModel {
       applicationCount: map['applicationCount'] ?? 0,
       isActive: map['isActive'] ?? true,
       reported: map['reported'] ?? false,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] ?? 0),
-      deadline: map['deadline'] != null ? DateTime.fromMillisecondsSinceEpoch(map['deadline']) : null,
+      createdAt:
+          _parseDateTimeNullable(map['createdAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt:
+          _parseDateTimeNullable(map['updatedAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      deadline: _parseDateTimeNullable(map['deadline']),
       matchingScore: map['matchingScore']?.toDouble(),
     );
+  }
+
+  static DateTime? _parseDateTimeNullable(dynamic val) {
+    if (val == null) return null;
+    if (val is Timestamp) return val.toDate();
+    if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+    return null;
   }
 
   // Helper method to parse workingDays field which can be either String or List
   static String? _parseWorkingDays(dynamic workingDaysData) {
     if (workingDaysData == null) return null;
-    
+
     if (workingDaysData is String) {
       return workingDaysData;
     } else if (workingDaysData is List) {
@@ -200,7 +213,8 @@ class JobModel {
       endDate: endDate ?? this.endDate,
       workingDays: workingDays ?? this.workingDays,
       workingHours: workingHours ?? this.workingHours,
-      additionalRequirements: additionalRequirements ?? this.additionalRequirements,
+      additionalRequirements:
+          additionalRequirements ?? this.additionalRequirements,
       applicationIds: applicationIds ?? this.applicationIds,
       applicationCount: applicationCount ?? this.applicationCount,
       isActive: isActive ?? this.isActive,
@@ -211,4 +225,4 @@ class JobModel {
       matchingScore: matchingScore ?? this.matchingScore,
     );
   }
-} 
+}

@@ -75,6 +75,7 @@ dependencies:
 
   # Logo icon
   flutter_launcher_icons: "^0.14.4" # Add this line
+  firebase_app_check: ^0.3.2+10
 
 dev_dependencies:
   flutter_test:

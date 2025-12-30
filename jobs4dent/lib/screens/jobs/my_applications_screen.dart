@@ -6,6 +6,8 @@ import '../../providers/auth_provider.dart';
 import '../../models/job_application_model.dart';
 import '../../models/assistant_job_model.dart';
 import '../../models/job_model.dart';
+import 'assistant_job_search_screen.dart';
+import 'dentist_job_search_screen.dart';
 
 class MyApplicationsScreen extends StatefulWidget {
   final String? initialFilter;
@@ -213,7 +215,27 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/job-search');
+                    final authProvider = Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    );
+                    final user = authProvider.userModel;
+                    if (user?.userType == 'dentist') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DentistJobSearchScreen(),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const AssistantJobSearchScreen(),
+                        ),
+                      );
+                    }
                   },
                   child: const Text('ค้นหางาน'),
                 ),
