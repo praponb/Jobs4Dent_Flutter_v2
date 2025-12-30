@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
 
   static FirebaseOptions get android => FirebaseOptions(
     apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY'] ?? '',
-    appId: '1:693132385676:android:b2581d58b3ea312f890aa9',
+    appId: '1:693132385676:android:a9c08f8177a49177890aa9',
     messagingSenderId: '693132385676',
     projectId: 'flutter-jobs4dent',
     storageBucket: 'flutter-jobs4dent.firebasestorage.app',
@@ -71,6 +71,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '693132385676',
     projectId: 'flutter-jobs4dent',
     storageBucket: 'flutter-jobs4dent.firebasestorage.app',
-    iosBundleId: 'com.jobs4dent.jobs4dent',
+    iosBundleId: 'com.jobs4dent.jobs4dent2',
   );
 }

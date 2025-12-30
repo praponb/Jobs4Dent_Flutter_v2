@@ -54,7 +54,7 @@ class JobApplicationSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            key: ValueKey(selectedEducationLevel),
+            key: ValueKey('education_$selectedEducationLevel'),
             initialValue: selectedEducationLevel,
             isExpanded: true,
             decoration: const InputDecoration(
@@ -74,7 +74,7 @@ class JobApplicationSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            key: ValueKey(selectedJobType),
+            key: ValueKey('jobType_$selectedJobType'),
             initialValue: selectedJobType,
             isExpanded: true,
             decoration: const InputDecoration(
@@ -140,7 +140,7 @@ class JobApplicationSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            key: ValueKey(selectedJobReadiness),
+            key: ValueKey('readiness_$selectedJobReadiness'),
             initialValue: selectedJobReadiness,
             isExpanded: true,
             decoration: const InputDecoration(

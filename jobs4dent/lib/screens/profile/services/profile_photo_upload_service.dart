@@ -10,7 +10,7 @@ class ProfilePhotoUploadService {
   static Future<void> showPhotoSelectionModal(BuildContext context) async {
     showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext modalContext) {
         return Container(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -18,10 +18,7 @@ class ProfilePhotoUploadService {
             children: [
               const Text(
                 'เลือกรูปภาพโปรไฟล์',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 35),
               Row(
@@ -30,7 +27,7 @@ class ProfilePhotoUploadService {
                   // Gallery option
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      Navigator.pop(modalContext);
                       _pickImageFromGallery(context);
                     },
                     child: Column(
@@ -61,7 +58,7 @@ class ProfilePhotoUploadService {
                   // Camera option
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      Navigator.pop(modalContext);
                       _pickImageFromCamera(context);
                     },
                     child: Column(
@@ -107,8 +104,8 @@ class ProfilePhotoUploadService {
       final XFile? image = await picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 50, // Reduced quality for smaller file size
-        maxWidth: 200,    // 10% resolution (reduced from 1920)
-        maxHeight: 200,   // 10% resolution (reduced from 1920)
+        maxWidth: 200, // 10% resolution (reduced from 1920)
+        maxHeight: 200, // 10% resolution (reduced from 1920)
       );
 
       debugPrint('📷 Image picker result: ${image?.path ?? "null"}');
@@ -117,7 +114,7 @@ class ProfilePhotoUploadService {
         debugPrint('✅ Image selected: ${image.path}');
         final imageFile = File(image.path);
         debugPrint('📁 File exists: ${await imageFile.exists()}');
-        
+
         if (context.mounted) {
           debugPrint('📤 Starting upload process...');
           await _uploadProfilePhoto(context, imageFile);
@@ -156,8 +153,8 @@ class ProfilePhotoUploadService {
       final XFile? image = await picker.pickImage(
         source: ImageSource.camera,
         imageQuality: 50, // Reduced quality for smaller file size
-        maxWidth: 200,    // 10% resolution (reduced from 1920)
-        maxHeight: 200,   // 10% resolution (reduced from 1920)
+        maxWidth: 200, // 10% resolution (reduced from 1920)
+        maxHeight: 200, // 10% resolution (reduced from 1920)
         preferredCameraDevice: CameraDevice.rear,
       );
 
@@ -167,7 +164,7 @@ class ProfilePhotoUploadService {
         debugPrint('✅ Photo captured: ${image.path}');
         final imageFile = File(image.path);
         debugPrint('📁 File exists: ${await imageFile.exists()}');
-        
+
         if (context.mounted) {
           debugPrint('📤 Starting upload process...');
           await _uploadProfilePhoto(context, imageFile);
@@ -199,15 +196,18 @@ class ProfilePhotoUploadService {
   }
 
   // Upload profile photo to Firebase Storage and update Firestore
-  static Future<void> _uploadProfilePhoto(BuildContext context, File imageFile) async {
+  static Future<void> _uploadProfilePhoto(
+    BuildContext context,
+    File imageFile,
+  ) async {
     try {
       debugPrint('🔧 Starting upload process...');
       debugPrint('📁 Image file path: ${imageFile.path}');
-      
+
       // Check authentication first (before any async operations)
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       debugPrint('👤 AuthProvider obtained');
-      
+
       final user = authProvider.userModel;
       debugPrint('👤 User model: ${user?.email ?? "null"}');
       debugPrint('👤 User ID: ${user?.userId ?? "null"}');
@@ -224,7 +224,7 @@ class ProfilePhotoUploadService {
         }
         return;
       }
-      
+
       // Check if file exists
       if (!await imageFile.exists()) {
         debugPrint('❌ Image file does not exist');
@@ -263,10 +263,14 @@ class ProfilePhotoUploadService {
 
       // Validate file size (max 5MB) - With 10% resolution, expect much smaller files (~50-200KB)
       final fileSize = await imageFile.length();
-      debugPrint('📏 File size: $fileSize bytes (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB) - Compressed to 10% resolution');
-      
+      debugPrint(
+        '📏 File size: $fileSize bytes (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB) - Compressed to 10% resolution',
+      );
+
       if (fileSize > 5 * 1024 * 1024) {
-        debugPrint('❌ File too large: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+        debugPrint(
+          '❌ File too large: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB',
+        );
         if (context.mounted) {
           Navigator.pop(context); // Close loading dialog
           ScaffoldMessenger.of(context).showSnackBar(
@@ -306,7 +310,7 @@ class ProfilePhotoUploadService {
         debugPrint('⏳ Waiting for upload to complete...');
         final snapshot = await uploadTask;
         debugPrint('✅ Upload completed successfully');
-        
+
         debugPrint('🔗 Getting download URL...');
         downloadUrl = await snapshot.ref.getDownloadURL();
         debugPrint('✅ Download URL obtained: $downloadUrl');
@@ -315,15 +319,13 @@ class ProfilePhotoUploadService {
         if (context.mounted) {
           Navigator.pop(context); // Close loading dialog
           String errorMessage = 'เกิดข้อผิดพลาดในการอัปโหลด';
-          if (storageError.toString().contains('network') || 
+          if (storageError.toString().contains('network') ||
               storageError.toString().contains('Unable to resolve host')) {
-            errorMessage = 'ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้ กรุณาตรวจสอบการเชื่อมต่อ';
+            errorMessage =
+                'ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้ กรุณาตรวจสอบการเชื่อมต่อ';
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
           );
         }
         return;
@@ -335,9 +337,9 @@ class ProfilePhotoUploadService {
           .collection('users')
           .doc(user.userId)
           .update({
-        'profilePhotoUrl': downloadUrl,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+            'profilePhotoUrl': downloadUrl,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
       debugPrint('✅ Firestore updated successfully');
 
       // Refresh user data to update UI
@@ -359,7 +361,7 @@ class ProfilePhotoUploadService {
       debugPrint('❌ Error in _uploadProfilePhoto: $e');
       debugPrint('❌ Error type: ${e.runtimeType}');
       debugPrint('❌ Stack trace: ${StackTrace.current}');
-      
+
       if (context.mounted) {
         Navigator.pop(context); // Close loading dialog if it's open
         ScaffoldMessenger.of(context).showSnackBar(
@@ -371,4 +373,4 @@ class ProfilePhotoUploadService {
       }
     }
   }
-} 
+}

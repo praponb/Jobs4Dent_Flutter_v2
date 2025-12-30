@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   final String userId;
   final String email;
@@ -186,8 +188,8 @@ class UserModel {
       profilePhotoUrl: map['profilePhotoUrl'],
       isDentist: map['isDentist'] ?? false,
       userType: map['userType'] ?? 'dentist',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] ?? 0),
+      createdAt: _parseDateTime(map['createdAt']),
+      updatedAt: _parseDateTime(map['updatedAt']),
       isEmailVerified: map['isEmailVerified'] ?? false,
       authProvider: map['authProvider'] ?? 'email',
       permissions: map['permissions'],
@@ -233,9 +235,7 @@ class UserModel {
       managedUserTypes: List<String>.from(map['managedUserTypes'] ?? []),
       isActive: map['isActive'] ?? true,
       isProfileComplete: map['isProfileComplete'] ?? false,
-      lastLoginAt: map['lastLoginAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['lastLoginAt'])
-          : null,
+      lastLoginAt: _parseDateTime(map['lastLoginAt']),
       deviceTokens: List<String>.from(map['deviceTokens'] ?? []),
       verificationStatus: map['verificationStatus'] ?? 'unverified',
       verificationDocuments: List<String>.from(
@@ -243,12 +243,8 @@ class UserModel {
       ),
       verificationDocumentCounts: map['verificationDocumentCounts'],
       verificationRejectionReason: map['verificationRejectionReason'],
-      verificationSubmittedAt: map['verificationSubmittedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['verificationSubmittedAt'])
-          : null,
-      verificationReviewedAt: map['verificationReviewedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['verificationReviewedAt'])
-          : null,
+      verificationSubmittedAt: _parseDateTime(map['verificationSubmittedAt']),
+      verificationReviewedAt: _parseDateTime(map['verificationReviewedAt']),
       reviewedByAdminId: map['reviewedByAdminId'],
       educationInstitute: map['educationInstitute'],
       educationSpecialist: map['educationSpecialist'],
@@ -259,6 +255,29 @@ class UserModel {
       eqSkills: List<String>.from(map['eqSkills'] ?? []),
       workLimitations: List<String>.from(map['workLimitations'] ?? []),
     );
+  }
+
+  static DateTime _parseDateTime(dynamic val) {
+    if (val == null)
+      return DateTime.now(); // Fallback for required fields if null passed (context dependent)
+    // Note: logic below handles nullable by returning DateTime. now() mostly for non-nullable usage or careful calling.
+    // For nullable fields, caller helper should handle null or we handle it here.
+    // Let's make it robust:
+    return _parseDateTimeNullable(val) ??
+        DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  static DateTime? _parseDateTimeNullable(dynamic val) {
+    if (val == null) return null;
+    if (val is Timestamp) {
+      return val.toDate();
+    } else if (val is int) {
+      return DateTime.fromMillisecondsSinceEpoch(val);
+    } else if (val is String) {
+      // Try parse string if needed, or ignore
+      return DateTime.tryParse(val);
+    }
+    return null;
   }
 
   Map<String, dynamic> toMap() {
