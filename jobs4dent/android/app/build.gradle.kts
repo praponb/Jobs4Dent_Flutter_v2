@@ -34,17 +34,17 @@ if (envFile.exists()) {
 
 android {
     namespace = "com.jobs4dent.jobs4dent2"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     //ndkVersion = flutter.ndkVersion
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
         freeCompilerArgs = freeCompilerArgs + listOf(
             "-Xlint:-options",
             "-Xlint:-deprecation",
@@ -59,8 +59,8 @@ android {
 
     defaultConfig {
         applicationId = "com.jobs4dent.jobs4dent2"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = flutter.minSdkVersion // Android 6.0
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         
