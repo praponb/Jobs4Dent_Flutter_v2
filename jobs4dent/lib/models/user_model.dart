@@ -258,8 +258,9 @@ class UserModel {
   }
 
   static DateTime _parseDateTime(dynamic val) {
-    if (val == null)
+    if (val == null) {
       return DateTime.now(); // Fallback for required fields if null passed (context dependent)
+    }
     // Note: logic below handles nullable by returning DateTime. now() mostly for non-nullable usage or careful calling.
     // For nullable fields, caller helper should handle null or we handle it here.
     // Let's make it robust:

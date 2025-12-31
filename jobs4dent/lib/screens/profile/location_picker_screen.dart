@@ -60,13 +60,17 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        _showLocationError('การเข้าถึงตำแหน่งถูกปฏิเสธถาวร กรุณาเปิดในการตั้งค่า');
+        _showLocationError(
+          'การเข้าถึงตำแหน่งถูกปฏิเสธถาวร กรุณาเปิดในการตั้งค่า',
+        );
         return;
       }
 
       // Get current position
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       final currentLocation = LatLng(position.latitude, position.longitude);
@@ -76,9 +80,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       });
 
       _updateMarker(currentLocation);
-      _mapController?.animateCamera(
-        CameraUpdate.newLatLng(currentLocation),
-      );
+      _mapController?.animateCamera(CameraUpdate.newLatLng(currentLocation));
     } catch (e) {
       _showLocationError('ไม่สามารถระบุตำแหน่งปัจจุบันได้: ${e.toString()}');
     } finally {
@@ -110,10 +112,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   void _showLocationError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.orange,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.orange),
     );
   }
 
@@ -194,19 +193,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.blue[600],
-                    size: 20,
-                  ),
+                  Icon(Icons.info_outline, color: Colors.blue[600], size: 20),
                   const SizedBox(width: 8),
                   const Expanded(
                     child: Text(
                       'แตะบนแผนที่เพื่อเลือกตำแหน่งสาขา',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.black87),
                     ),
                   ),
                 ],
@@ -257,9 +249,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           if (_isLoading)
             Container(
               color: Colors.black.withValues(alpha: 0.3),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             ),
         ],
       ),
@@ -271,4 +261,4 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     _mapController?.dispose();
     super.dispose();
   }
-} 
+}
