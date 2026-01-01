@@ -43,7 +43,10 @@ void main() async {
   // Set up background message handler BEFORE Firebase initialization
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // Load environment variables
+  // Load environment variables and Initialize Firebase in parallel
+  // This prevents blocking the main thread for too long sequentially
+  // Load environment variables first (in case Firebase options depend on them)
+  // We must await this before Firebase.initializeApp
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
@@ -53,18 +56,28 @@ void main() async {
     );
   }
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Initialize Firebase (blocked by dotenv)
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("❌ Firebase Initialization Error: $e");
+  }
 
-  // Initialize App Check
-  await FirebaseAppCheck.instance.activate(
-    androidProvider: kReleaseMode
-        ? AndroidProvider.playIntegrity
-        : AndroidProvider.debug,
-    appleProvider: kReleaseMode
-        ? AppleProvider.deviceCheck
-        : AppleProvider.debug,
-  );
+  // Initialize App Check asynchronously (Fire and Forget)
+  // Do NOT await this, as it can take time and block the UI from appearing.
+  // The AuthWrapper handles the loading state naturally.
+  FirebaseAppCheck.instance
+      .activate(
+        androidProvider: kReleaseMode
+            ? AndroidProvider.playIntegrity
+            : AndroidProvider.debug,
+        appleProvider: kReleaseMode
+            ? AppleProvider.deviceCheck
+            : AppleProvider.debug,
+      )
+      .then((_) => debugPrint('✅ App Check Activated (Background)'));
 
   // Set up foreground message handlers AFTER Firebase initialization
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {

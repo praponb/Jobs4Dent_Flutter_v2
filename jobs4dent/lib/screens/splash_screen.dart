@@ -33,7 +33,7 @@ class SplashScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-            
+
             // App Title
             const Text(
               'Jobs4Dent',
@@ -45,7 +45,7 @@ class SplashScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            
+
             // Subtitle
             const Text(
               'เชื่อมต่อผู้เชี่ยวชาญทางทันตกรรม',
@@ -56,7 +56,7 @@ class SplashScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 50),
-            
+
             // Loading Indicator
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -66,4 +66,4 @@ class SplashScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}
