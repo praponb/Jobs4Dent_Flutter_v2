@@ -985,12 +985,22 @@ class _ApplicantManagementScreenState extends State<ApplicantManagementScreen>
 
     Navigator.pop(context); // Close dialog
 
+    // Determine collection name based on job type
+    String? collectionName;
+    final jobType = _jobTypeCache[application.jobId];
+    if (jobType == 'ผู้ช่วยทันตแพทย์') {
+      collectionName = 'job_applications_assistant';
+    } else if (jobType == 'ทันตแพทย์') {
+      collectionName = 'job_applications_dentist';
+    }
+
     final success = await jobProvider.updateApplicationStatus(
       applicationId: application.applicationId,
       newStatus: newStatus,
       notes: notes,
       interviewDate: interviewDate,
       interviewLocation: interviewLocation,
+      collectionName: collectionName,
     );
 
     if (success) {

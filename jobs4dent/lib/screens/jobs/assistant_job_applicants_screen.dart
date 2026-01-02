@@ -945,6 +945,7 @@ class _AssistantJobApplicantsScreenState
       notes: notes,
       interviewDate: interviewDate,
       interviewLocation: interviewLocation,
+      collectionName: 'job_applications_assistant',
     );
 
     if (success) {
