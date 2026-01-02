@@ -473,6 +473,7 @@ class JobProvider with ChangeNotifier {
     String? notes,
     DateTime? interviewDate,
     String? interviewLocation,
+    String? collectionName,
   }) async {
     try {
       _setLoading(true);
@@ -484,6 +485,7 @@ class JobProvider with ChangeNotifier {
         notes: notes,
         interviewDate: interviewDate,
         interviewLocation: interviewLocation,
+        collectionName: collectionName,
       );
 
       if (success) {
@@ -499,6 +501,22 @@ class JobProvider with ChangeNotifier {
             interviewLocation: interviewLocation,
             updatedAt: DateTime.now(),
           );
+          notifyListeners();
+        }
+
+        // Also update assistant applicants list if available
+        final assistantIndex = _assistantApplicantsForMyJobs.indexWhere(
+          (app) => app.applicationId == applicationId,
+        );
+        if (assistantIndex != -1) {
+          _assistantApplicantsForMyJobs[assistantIndex] =
+              _assistantApplicantsForMyJobs[assistantIndex].copyWith(
+                status: newStatus,
+                notes: notes,
+                interviewDate: interviewDate,
+                interviewLocation: interviewLocation,
+                updatedAt: DateTime.now(),
+              );
           notifyListeners();
         }
       }

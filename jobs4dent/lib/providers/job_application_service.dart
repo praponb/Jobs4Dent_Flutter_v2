@@ -223,6 +223,7 @@ class JobApplicationService {
     String? notes,
     DateTime? interviewDate,
     String? interviewLocation,
+    String? collectionName,
   }) async {
     try {
       final updateData = {
@@ -238,6 +239,19 @@ class JobApplicationService {
       }
       if (interviewLocation != null) {
         updateData['interviewLocation'] = interviewLocation;
+      }
+
+      // If collection name is provided, use it directly to avoid permission errors
+      if (collectionName != null) {
+        try {
+          await _firestore
+              .collection(collectionName)
+              .doc(applicationId)
+              .update(updateData);
+          return true;
+        } catch (e) {
+          throw Exception('ไม่พบใบสมัครในระบบ ($collectionName)');
+        }
       }
 
       // Try to update in dentist applications collection first
