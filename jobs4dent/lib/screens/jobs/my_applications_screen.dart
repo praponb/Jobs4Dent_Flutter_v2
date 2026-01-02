@@ -415,9 +415,11 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                   children: [
                     Icon(Icons.work, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 4),
-                    Text(
-                      'ประเภทงาน: ${assistantJob.workType}',
-                      style: TextStyle(color: Colors.grey[600]),
+                    Expanded(
+                      child: Text(
+                        'ประเภทงาน: ${assistantJob.workType}',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
                     ),
                   ],
                 ),
@@ -432,9 +434,11 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                         color: Colors.grey[600],
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        'เงินเดือน: ${assistantJob.salaryFullTime} บาท',
-                        style: TextStyle(color: Colors.grey[600]),
+                      Expanded(
+                        child: Text(
+                          'เงินเดือน: ${assistantJob.salaryFullTime} บาท',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                       ),
                     ],
                   ),
@@ -448,9 +452,11 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                         color: Colors.grey[600],
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        _formatPartTimeRate(assistantJob),
-                        style: TextStyle(color: Colors.grey[600]),
+                      Expanded(
+                        child: Text(
+                          _formatPartTimeRate(assistantJob),
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                       ),
                     ],
                   ),
@@ -477,9 +483,11 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                   children: [
                     Icon(Icons.work, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 4),
-                    Text(
-                      'ประเภทงาน: ${dentistJob.jobCategory}',
-                      style: TextStyle(color: Colors.grey[600]),
+                    Expanded(
+                      child: Text(
+                        'ประเภทงาน: ${dentistJob.jobCategory}',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
                     ),
                   ],
                 ),
@@ -493,9 +501,11 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen>
                         color: Colors.grey[600],
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        'เงินเดือน: ${dentistJob.minSalary} บาทขึ้นไป',
-                        style: TextStyle(color: Colors.grey[600]),
+                      Expanded(
+                        child: Text(
+                          'เงินเดือน: ${dentistJob.minSalary} บาทขึ้นไป',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                       ),
                     ],
                   ),
