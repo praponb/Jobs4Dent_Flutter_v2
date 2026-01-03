@@ -85,6 +85,14 @@ Before starting, ensure your Windows environment is set up:
     GOOGLE_MAPS_API_KEY=your_maps_api_key_here
     ```
 
+    ### Troubleshooting `.env` Issues
+    If the build fails with an error like "Could not find property 'GOOGLE_MAPS_API_KEY'" or "Missing .env file":
+
+    1.  **Verify File Location**: Ensure the file is named exactly `.env` (with the dot prefix) and is located in the **root** folder (the folder containing `pubspec.yaml`, `android`, `ios`, etc.), NOT inside `android/` or `lib/`.
+    2.  **Verify File Extension**: Windows sometimes hides extensions. Make sure it isn't named `.env.txt`. In File Explorer, go to View > Show > File name extensions to check.
+    3.  **Verify Content**: Open the file and ensure the variable names match exactly (`GOOGLE_MAPS_API_KEY` and `GOOGLE_AI_STUDIO_APIKEY`).
+    4.  **Reload**: If you just created the file, you might need to stop the build process completely and run `flutter clean` before trying again.
+
 ---
 
 ## 3. Package Name (Application ID) Verification
@@ -203,5 +211,4 @@ Now you are ready to build the release file for Google Play.
     *   Ensure `storeFile` path is correct.
 *   **"Java heap space"**:
     *   Run `cd android` and then `.\gradlew clean build`.
-*   **Missing `.env`**:
-    *   If the build fails finding `GOOGLE_MAPS_API_KEY`, ensure step 2.3 was verified.
+
