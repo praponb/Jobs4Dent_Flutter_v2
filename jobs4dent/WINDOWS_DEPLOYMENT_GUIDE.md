@@ -44,7 +44,7 @@ Before starting, ensure your Windows environment is set up:
     1.  Skip ahead briefly to **Step 4 (Keystore & Signing)** to generate your `upload-keystore.jks`.
     2.  Run the command in Step 4 to view your **SHA-1 Fingerprint**.
     3.  **Send this SHA-1 Fingerprint to the Original Developer.**
-    4.  Also tell them your chosen **New Package Name** (e.g., `com.yourcompany.jobs4dent`).
+    4.  Also tell them your chosen **New Package Name** (as decided in **Section 3.1**).
 
     #### Part B: Generate Files
     **Role: Mac User (Original Developer)**
@@ -59,6 +59,11 @@ Before starting, ensure your Windows environment is set up:
     5.  Enter the **New Package Name** (from Windows user).
     6.  Enter the **SHA-1 Fingerprint** (from Windows user).
     7.  Click **Register app**.
+    8.  **Add the SHA-256**: After the app is registered, stay in Project Settings.
+        *   Scroll down to the "SHA certificate fingerprints" section for this new app.
+        *   Click **Add fingerprint**.
+        *   Paste the **SHA-256 Fingerprint** (from Windows user).
+        *   (This fixes "Network Error" during Google Sign-In).
     8.  **Download `google-services.json`** to your **MacBook**.
     9.  **Generate `lib/firebase_options.dart` (On MacBook)**:
         *   You need to update this file to include the details of the new Android App you just created.
@@ -68,8 +73,10 @@ Before starting, ensure your Windows environment is set up:
             ```
         *   Select your project.
         *   When asked about platforms, ensure **android** is selected.
-        *   **Important**: It should detect the new package name (`com.yourcompany.jobs4dent`) and ask if you want to use the existing app (that you just registered in step 7) or create a new one. **Link it to the one you just created.**
-        *   This will automatically update `lib/firebase_options.dart` with the correct `appId` and `messagingSenderId`.
+        *   **Important**: It should detect the new package name (`com.yourcompany.jobs4dent`) and say that an app with that package name already exists (because you just created it in step 7).
+        *   It will ask something like: *"Android app with package name ... already exists. Do you want to use it?"*
+        *   **Select YES (y)**. (Or if it gives a list, select the App ID that matches the one you just created).
+        *   **Do NOT create a NEW app here**, otherwise you'll have duplicates. Link it to the existing one.
         
         > [!IMPORTANT]
         > **About the App ID**: You might see an **App ID** in the Firebase Console (like `1:693132385676:android:...`).
@@ -108,7 +115,7 @@ Before starting, ensure your Windows environment is set up:
                 4.  Search for and enable **Maps SDK for Android**.
                 5.  Go to **APIs & Services > Credentials**.
                 6.  Click **Create Credentials > API key**.
-                7.  (Important) Restrict the key to "Android apps" using the **New Package Name** (from Part A, Step 4) and the **Windows SHA-1 Fingerprint** (from Part A, Step 2).
+                7.  (Important) Restrict the key to "Android apps" using the **New Package Name** (from **Section 3.1**) and the **Windows SHA-1 Fingerprint** (from Part A, Step 2).
             </details>
     11. **Send 3 Files to the Windows User**:
         *   `.env`
@@ -193,9 +200,13 @@ Use the release keystore (`upload-keystore.jks`) to generate the SHA-1.
 5.  **Copy this SHA-1** (e.g., `DA:39:A3:EE:5E:6B:4B:0D:32:55:BF:EF:95:60:18:90:AF:D8:07:09`).
 
 **Final Output for Mac Developer** (Role: Windows User -> Send to Mac User):
-Send these two things to the Mac developer so they can generate the `google-services.json`:
+Send these items to the Mac developer so they can generate the `google-services.json`:
 1.  **Package Name**: `com.yourunique.newname` (or the existing one if not changed)
-2.  **SHA-1 Fingerprint**: `DA:39:A3...`
+2.  **SHA-1 Fingerprint**: `DA:39:A3...` (For default Firebase setup)
+3.  **SHA-256 Fingerprint**: `52:59:B4...` (Crucial for Google Sign-In & App Check)
+
+> [!IMPORTANT]
+> The **SHA-256** is often overlooked but IS REQUIRED for **Google Sign-In** to work in release builds. Make sure to copy it from the same `keytool` output (it is usually printed just below the SHA-1).
 
 ---
 
@@ -312,3 +323,53 @@ Now you are ready to build the release file for Google Play.
 *   **"Java heap space"**:
     *   Run `cd android` and then `.\gradlew clean build`.
 
+
+---
+
+## Appendix A: Verify Firebase Configuration (Kotlin DSL)
+
+If you need to verify that your Firebase configuration is correct, check these two files. The project should already be set up this way, but it's good to double-check if you encounter issues.
+
+### 1. Root-level Gradle file
+File: `android/build.gradle.kts`
+
+Ensure the Google services plugin is added as a dependency:
+
+```kotlin
+plugins {
+    // ... other plugins ...
+    
+    // Add the dependency for the Google services Gradle plugin
+    id("com.google.gms.google-services") version "4.4.4" apply false
+}
+```
+
+### 2. Module (App-level) Gradle file
+File: `android/app/build.gradle.kts`
+
+Ensure the plugin is applied and the Firebase BoM is imported:
+
+```kotlin
+plugins {
+    id("com.android.application")
+    
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
+    
+    // ... other plugins ...
+}
+
+dependencies {
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+
+    // Add the dependencies for Firebase products you want to use
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-analytics")
+    
+    // Add other Firebase dependencies as needed...
+}
+```
+
+> [!NOTE]
+> The exact versions (e.g., `4.4.4` or `34.7.0`) might vary slightly over time, but these are the versions currently used in this project.
