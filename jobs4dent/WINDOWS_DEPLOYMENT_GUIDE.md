@@ -116,20 +116,35 @@ Before starting, ensure your Windows environment is set up:
 The original keystore (`upload-keystore.jks`) is **ignored** by Git for security. You must generate your **OWN** keystore since you are the new publisher.
 
 ### A. Generate a New Keystore
-Open PowerShell inside `android/app/` and run:
+1.  Open PowerShell inside `android/app/`. 
+    
+    > **IMPORTANT**: Make sure you are in the `android/app` directory!
+    > Run `pwd` or look at your prompt to confirm it ends in `\android\app`.
+    > If you are in `jobs4dent`, run: `cd android/app`
 
-```powershell
-keytool -genkey -v -keystore upload-keystore.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-```
+2.  Run the generation command:
+    ```powershell
+    keytool -genkey -v -keystore upload-keystore.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+    ```
 
-*   **Password**: Create a strong password (e.g., `11223344`). **Remember this!**
-*   **Questions**: Answer Name, Org, City, etc. (Can be anything reasonable).
-*   **Result**: A file named `upload-keystore.jks` will be created in `android/app/`.
+3.  **Password**: Create a strong password (e.g., `11223344`). **Remember this!**
+4.  **Questions**: Answer Name, Org, City, etc. (Can be anything reasonable).
+5.  **Result**: A file named `upload-keystore.jks` will be created in `android/app/`.
 
-### B. Create `key.properties`
+### B. Verify SHA-1 Immediately
+Now that you have created the key, get the SHA-1 fingerprint right away so you can send it to the developer.
+
+1.  Run the list command:
+    ```powershell
+    keytool -list -v -keystore upload-keystore.jks -alias upload
+    ```
+2.  Enter the password you just created.
+3.  Copy the **SHA1** line and send it to the developer.
+
+### C. Create `key.properties`
 The build script expects a `key.properties` file in the `android/` folder to tell it where the keystore is and what the password is.
 
-1.  Go to the `android/` folder.
+1.  Go to the `android/` folder (run `cd ..`).
 2.  Create a new file named `key.properties`.
 3.  Add the following content (adjust passwords to match what you just created):
 
