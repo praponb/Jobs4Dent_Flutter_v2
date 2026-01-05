@@ -58,7 +58,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.jobs4dent.jobs4dent2"
+        //applicationId = "com.jobs4dent.jobs4dent2"
+        applicationId = "com.praponb.jobs4dent2"
         minSdk = flutter.minSdkVersion // Android 6.0
         targetSdk = 34
         versionCode = flutter.versionCode
