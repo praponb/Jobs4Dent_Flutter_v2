@@ -39,13 +39,19 @@ Before starting, ensure your Windows environment is set up:
 
     **This requires coordination between the Original Developer (Mac) and the Windows User.**
 
-    #### Part A: Windows User - Get the SHA-1
+    #### Part A: Get the SHA-1
+    **Role: Windows User**
     1.  Skip ahead briefly to **Step 4 (Keystore & Signing)** to generate your `upload-keystore.jks`.
     2.  Run the command in Step 4 to view your **SHA-1 Fingerprint**.
     3.  **Send this SHA-1 Fingerprint to the Original Developer.**
     4.  Also tell them your chosen **New Package Name** (e.g., `com.yourcompany.jobs4dent`).
 
-    #### Part B: Original Developer (Mac) - Generate Files
+    #### Part B: Generate Files
+    **Role: Mac User (Original Developer)**
+    
+    > [!NOTE]
+    > Only the Original Developer (Mac User) can do this because they own the Firebase project.
+
     1.  Go to the [Firebase Console](https://console.firebase.google.com/).
     2.  Open the project.
     3.  Go to **Project Settings > General > Your apps**.
@@ -69,8 +75,8 @@ Before starting, ensure your Windows environment is set up:
         > **About the App ID**: You might see an **App ID** in the Firebase Console (like `1:693132385676:android:...`).
         > *   **Yes, you should concern about this.**
         > *   This ID is **unique** to this new app.
-        > *   **How Aunnop gets it**: You do *not* need to manually type this ID on the Windows laptop. It is **automatically included** inside the `google-services.json` and `firebase_options.dart` files you are generating right now.
-        > *   **Why checking matters**: By running this command and downloading the JSON, you are ensuring Aunnop's build uses this exact new ID.
+        > *   **How the Windows User gets the ID**: They do *not* need to manually type this ID on the Windows laptop. It is **automatically included** inside the `google-services.json` and `firebase_options.dart` files you (Mac User) are generating right now.
+        > *   **Why your role matters**: By running this command and sending the files, you ensure the Windows build uses the correct ID.
     10. **Prepare `.env`**:
         *   Copy your existing `.env` file content. The keys can usually be reused.
         *   Example content:
@@ -115,8 +121,10 @@ Before starting, ensure your Windows environment is set up:
         > *   **Aunnop (Windows User)** does **NOT** need to enable APIs or use his own Google Cloud account.
         > *   **Why this works**: By adding Aunnop's **SHA-1** to **your** Firebase project (Part B, Step 6), you have authorized his specific laptop to talk to **your** backend. All "Enabled APIs" (like App Check) on your screen will automatically work for the app he builds.
 
-    #### Part C: Windows User - Place Files
-    Receive the files and place them **exactly** here:
+    #### Part C: Place Files
+    **Role: Windows User**
+    
+    Receive the files from the Mac User and place them **exactly** here:
 
     *   **`.env`** -> Paste into the **root** folder (same level as `pubspec.yaml`).
     *   **`google-services.json`** -> Paste into `android/app/`.
