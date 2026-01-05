@@ -68,8 +68,10 @@ Before starting, ensure your Windows environment is set up:
             ```
         *   Select your project.
         *   When asked about platforms, ensure **android** is selected.
-        *   **Important**: It should detect the new package name (`com.yourcompany.jobs4dent`) and ask if you want to use the existing app (that you just registered in step 7) or create a new one. **Link it to the one you just created.**
-        *   This will automatically update `lib/firebase_options.dart` with the correct `appId` and `messagingSenderId`.
+        *   **Important**: It should detect the new package name (`com.yourcompany.jobs4dent`) and say that an app with that package name already exists (because you just created it in step 7).
+        *   It will ask something like: *"Android app with package name ... already exists. Do you want to use it?"*
+        *   **Select YES (y)**. (Or if it gives a list, select the App ID that matches the one you just created).
+        *   **Do NOT create a NEW app here**, otherwise you'll have duplicates. Link it to the existing one.
         
         > [!IMPORTANT]
         > **About the App ID**: You might see an **App ID** in the Firebase Console (like `1:693132385676:android:...`).
