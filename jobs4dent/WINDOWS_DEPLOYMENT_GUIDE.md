@@ -132,9 +132,14 @@ Before starting, ensure your Windows environment is set up:
 
 ---
 
-## 3. Package Name (Application ID) Verification
+## 3. App Identity Verification (Package Name & SHA-1)
 
-**CRITICAL STEP**: Google Play treats the `applicationId` as the unique identity of the app. 
+**CRITICAL STEP**: You must determine the **Package Name** and obtain the **SHA-1 Fingerprint** so the Mac developer can register the app in Firebase.
+
+### 3.1. Package Name (Application ID)
+**Role: Windows User**
+
+Google Play treats the `applicationId` as the unique identity of the app.
 
 *   **Current ID**: `com.jobs4dent.jobs4dent2`
 *   **Action Required**:
@@ -142,12 +147,12 @@ Before starting, ensure your Windows environment is set up:
     *   If they haven't (or if this is a fresh retry), you might be able to use it.
     *   **Recommendation**: Change it to be safe (e.g., `com.yourcompany.jobs4dent`).
 
-### How to Rename (If needed)
+#### How to Rename (If needed)
 **Note**: You do NOT need a tool to "generate" this. You simply **invent** a unique name.
 *   **Format**: `com.yourname.projectname` (lowercase, no spaces, no special characters).
 *   **Example**: `com.johnsmith.jobs4dent`
 
-**Step-by-Step Change:**
+**Step-by-Step Change (Windows User):**
 
 1.  Open `android/app/build.gradle.kts` **(On Windows)**.
 2.  Find the `defaultConfig` block (around line 60):
@@ -162,8 +167,27 @@ Before starting, ensure your Windows environment is set up:
     *   *Why?* changing `namespace` requires moving folders and updating code imports. changing `applicationId` is handled automatically by the build system and is sufficient for the Google Play Store identity.
 4.  Run `flutter clean` in the terminal.
 
-**Verification**:
-Now, your app will be built with the ID `com.yourunique.newname`. Use **this exact name** when you register the app in Firebase (Part B, Step 5).
+### 3.2. Get SHA-1 Fingerprint (Release Key)
+**Role: Windows User**
+
+Use the release keystore (`upload-keystore.jks`) to generate the SHA-1.
+
+> [!IMPORTANT]
+> You must have completed **Step 4 (Keystore & Signing)** first to have the `upload-keystore.jks` file. If you haven't, go do Step 4A now, then come back here.
+
+1.  Open **PowerShell** in your project root.
+2.  Run this command:
+    ```powershell
+    keytool -list -v -keystore android/app/upload-keystore.jks -alias upload
+    ```
+3.  Enter the password you created (e.g., `11223344`).
+4.  Look for **Certificate fingerprints:** > **SHA1:**.
+5.  **Copy this SHA-1** (e.g., `DA:39:A3:EE:5E:6B:4B:0D:32:55:BF:EF:95:60:18:90:AF:D8:07:09`).
+
+**Final Output for Mac Developer** (Role: Windows User -> Send to Mac User):
+Send these two things to the Mac developer so they can generate the `google-services.json`:
+1.  **Package Name**: `com.yourunique.newname` (or the existing one if not changed)
+2.  **SHA-1 Fingerprint**: `DA:39:A3...`
 
 ---
 
