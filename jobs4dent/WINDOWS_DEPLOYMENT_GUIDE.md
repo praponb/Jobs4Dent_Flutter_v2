@@ -311,4 +311,3 @@ Now you are ready to build the release file for Google Play.
     *   Ensure `storeFile` path is correct.
 *   **"Java heap space"**:
     *   Run `cd android` and then `.\gradlew clean build`.
-
