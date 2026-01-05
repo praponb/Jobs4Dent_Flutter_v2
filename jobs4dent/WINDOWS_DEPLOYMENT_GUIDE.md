@@ -44,7 +44,7 @@ Before starting, ensure your Windows environment is set up:
     1.  Skip ahead briefly to **Step 4 (Keystore & Signing)** to generate your `upload-keystore.jks`.
     2.  Run the command in Step 4 to view your **SHA-1 Fingerprint**.
     3.  **Send this SHA-1 Fingerprint to the Original Developer.**
-    4.  Also tell them your chosen **New Package Name** (e.g., `com.yourcompany.jobs4dent`).
+    4.  Also tell them your chosen **New Package Name** (as decided in **Section 3.1**).
 
     #### Part B: Generate Files
     **Role: Mac User (Original Developer)**
@@ -108,7 +108,7 @@ Before starting, ensure your Windows environment is set up:
                 4.  Search for and enable **Maps SDK for Android**.
                 5.  Go to **APIs & Services > Credentials**.
                 6.  Click **Create Credentials > API key**.
-                7.  (Important) Restrict the key to "Android apps" using the **New Package Name** (from Part A, Step 4) and the **Windows SHA-1 Fingerprint** (from Part A, Step 2).
+                7.  (Important) Restrict the key to "Android apps" using the **New Package Name** (from **Section 3.1**) and the **Windows SHA-1 Fingerprint** (from Part A, Step 2).
             </details>
     11. **Send 3 Files to the Windows User**:
         *   `.env`
