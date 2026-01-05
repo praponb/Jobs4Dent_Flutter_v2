@@ -312,3 +312,53 @@ Now you are ready to build the release file for Google Play.
 *   **"Java heap space"**:
     *   Run `cd android` and then `.\gradlew clean build`.
 
+
+---
+
+## Appendix A: Verify Firebase Configuration (Kotlin DSL)
+
+If you need to verify that your Firebase configuration is correct, check these two files. The project should already be set up this way, but it's good to double-check if you encounter issues.
+
+### 1. Root-level Gradle file
+File: `android/build.gradle.kts`
+
+Ensure the Google services plugin is added as a dependency:
+
+```kotlin
+plugins {
+    // ... other plugins ...
+    
+    // Add the dependency for the Google services Gradle plugin
+    id("com.google.gms.google-services") version "4.4.4" apply false
+}
+```
+
+### 2. Module (App-level) Gradle file
+File: `android/app/build.gradle.kts`
+
+Ensure the plugin is applied and the Firebase BoM is imported:
+
+```kotlin
+plugins {
+    id("com.android.application")
+    
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
+    
+    // ... other plugins ...
+}
+
+dependencies {
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+
+    // Add the dependencies for Firebase products you want to use
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-analytics")
+    
+    // Add other Firebase dependencies as needed...
+}
+```
+
+> [!NOTE]
+> The exact versions (e.g., `4.4.4` or `34.7.0`) might vary slightly over time, but these are the versions currently used in this project.
