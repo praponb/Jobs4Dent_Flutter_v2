@@ -9,3 +9,9 @@
 # Google Play Core & Feature Delivery (Deferred Components)
 -dontwarn com.google.android.play.core.**
 -keep class com.google.android.play.core.** { *; }
+
+# Firebase & Google Play Services
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+-dontwarn com.google.firebase.**

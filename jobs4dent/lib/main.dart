@@ -18,8 +18,10 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/user_type_selection_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/splash_screen.dart';
+import 'services/local_notification_service.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 // Comment add by Aek to make empty change in b_pbv_main
 // Background message handler (must be top-level function)
@@ -40,6 +42,9 @@ void main() async {
       systemNavigationBarColor: Colors.transparent,
     ),
   );
+
+  // Initialize Local Notification Service
+  await LocalNotificationService.initialize();
 
   // Set up background message handler BEFORE Firebase initialization
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -83,13 +88,34 @@ void main() async {
   // Set up foreground message handlers AFTER Firebase initialization
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     debugPrint('Got a message whilst in the foreground!');
-    debugPrint('Message data: ${message.data}');
+
+    // Check if notification is meant for the current user
+    final currentUser = firebase_auth.FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      return;
+    }
+
+    final data = message.data;
+    final type = data['type'];
+    final intendedRecipientId = type == 'job_application'
+        ? data['clinicId']
+        : (type == 'application_status_update' ? data['applicantId'] : null);
+
+    if (intendedRecipientId != null && currentUser.uid != intendedRecipientId) {
+      debugPrint(
+        '🚫 Notification suppressed: intended for $intendedRecipientId, but current user is ${currentUser.uid}',
+      );
+      return;
+    }
 
     if (message.notification != null) {
-      debugPrint(
-        'Message also contained a notification: ${message.notification}',
+      debugPrint('🔔 Showing Local Notification');
+      LocalNotificationService.showNotification(
+        id: message.hashCode,
+        title: message.notification!.title ?? 'New Notification',
+        body: message.notification!.body ?? '',
+        payload: message.data.toString(), // Pass data payload
       );
-      // Show local notification or update UI
     }
   });
 

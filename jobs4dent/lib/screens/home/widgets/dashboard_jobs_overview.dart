@@ -25,10 +25,8 @@ class DashboardJobsOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeJobs = DashboardDataProcessor.getActiveJobsForOverview(jobs);
-    final activeAssistantJobs = DashboardDataProcessor.getActiveAssistantJobsForOverview(assistantJobs);
-    
-    debugPrint('DashboardJobsOverview: Total assistant jobs: ${assistantJobs.length}');
-    debugPrint('DashboardJobsOverview: Active assistant jobs: ${activeAssistantJobs.length}');
+    final activeAssistantJobs =
+        DashboardDataProcessor.getActiveAssistantJobsForOverview(assistantJobs);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,10 +62,15 @@ class DashboardJobsOverview extends StatelessWidget {
         if (activeJobs.isEmpty)
           _buildEmptyState(context)
         else
-          ...activeJobs.map((job) => _JobCard(
-            job: job,
-            applicationCount: DashboardDataProcessor.getApplicationsForJob(job.jobId, applications).length,
-          )),
+          ...activeJobs.map(
+            (job) => _JobCard(
+              job: job,
+              applicationCount: DashboardDataProcessor.getApplicationsForJob(
+                job.jobId,
+                applications,
+              ).length,
+            ),
+          ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,10 +103,16 @@ class DashboardJobsOverview extends StatelessWidget {
         if (activeAssistantJobs.isEmpty)
           _buildEmptyAssistantState(context)
         else
-          ...activeAssistantJobs.map((job) => _AssistantJobCard(
-            job: job,
-            applicationCount: DashboardDataProcessor.getApplicationsForAssistantJob(job.jobId, applications).length,
-          )),
+          ...activeAssistantJobs.map(
+            (job) => _AssistantJobCard(
+              job: job,
+              applicationCount:
+                  DashboardDataProcessor.getApplicationsForAssistantJob(
+                    job.jobId,
+                    applications,
+                  ).length,
+            ),
+          ),
       ],
     );
   }
@@ -202,10 +211,7 @@ class _JobCard extends StatelessWidget {
   final JobModel job;
   final int applicationCount;
 
-  const _JobCard({
-    required this.job,
-    required this.applicationCount,
-  });
+  const _JobCard({required this.job, required this.applicationCount});
 
   @override
   Widget build(BuildContext context) {
@@ -283,10 +289,7 @@ class _JobCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   'กำหนดส่ง: ${DashboardUtils.formatDate(job.deadline!)}',
-                  style: TextStyle(
-                    color: Colors.orange[600],
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.orange[600], fontSize: 12),
                 ),
               ],
             ),
@@ -295,7 +298,6 @@ class _JobCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 /// Individual assistant job card widget
@@ -303,10 +305,7 @@ class _AssistantJobCard extends StatelessWidget {
   final AssistantJobModel job;
   final int applicationCount;
 
-  const _AssistantJobCard({
-    required this.job,
-    required this.applicationCount,
-  });
+  const _AssistantJobCard({required this.job, required this.applicationCount});
 
   @override
   Widget build(BuildContext context) {
@@ -386,10 +385,7 @@ class _AssistantJobCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'ทักษะ: ${job.skillAssistant.take(2).join(", ")}${job.skillAssistant.length > 2 ? " และอีก ${job.skillAssistant.length - 2} ทักษะ" : ""}',
-                    style: TextStyle(
-                      color: Colors.blue[600],
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.blue[600], fontSize: 12),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -400,4 +396,4 @@ class _AssistantJobCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

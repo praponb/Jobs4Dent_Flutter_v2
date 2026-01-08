@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import '../../models/job_model.dart';
 import '../../models/assistant_job_model.dart';
 import '../../models/job_application_model.dart';
@@ -12,18 +11,34 @@ class DashboardDataProcessor {
     List<JobApplicationModel> applications,
   ) {
     final activeDentistJobs = dentistJobs.where((job) => job.isActive).length;
-    final activeAssistantJobs = assistantJobs.where((job) => job.isActive).length;
+    final activeAssistantJobs = assistantJobs
+        .where((job) => job.isActive)
+        .length;
     final activeJobs = activeDentistJobs + activeAssistantJobs;
 
     // Expired is based on dentist jobs only (assistant jobs have no deadline field)
-    final expiredJobs = dentistJobs.where((job) =>
-        job.deadline != null && job.deadline!.isBefore(DateTime.now())).length;
+    final expiredJobs = dentistJobs
+        .where(
+          (job) =>
+              job.deadline != null && job.deadline!.isBefore(DateTime.now()),
+        )
+        .length;
 
     // Filled jobs = jobs (dentist + assistant) with at least one 'hired' application
-    final filledDentistJobs = dentistJobs.where((job) =>
-        applications.any((app) => app.jobId == job.jobId && app.status == 'hired')).length;
-    final filledAssistantJobs = assistantJobs.where((job) =>
-        applications.any((app) => app.jobId == job.jobId && app.status == 'hired')).length;
+    final filledDentistJobs = dentistJobs
+        .where(
+          (job) => applications.any(
+            (app) => app.jobId == job.jobId && app.status == 'hired',
+          ),
+        )
+        .length;
+    final filledAssistantJobs = assistantJobs
+        .where(
+          (job) => applications.any(
+            (app) => app.jobId == job.jobId && app.status == 'hired',
+          ),
+        )
+        .length;
     final filledJobs = filledDentistJobs + filledAssistantJobs;
 
     final totalApplications = applications.length;
@@ -46,9 +61,9 @@ class DashboardDataProcessor {
 
   /// Get recent applications within specified days
   static List<JobApplicationModel> getRecentApplications(
-    List<JobApplicationModel> applications,
-    {int daysBack = 7}
-  ) {
+    List<JobApplicationModel> applications, {
+    int daysBack = 7,
+  }) {
     final cutoffDate = DateTime.now().subtract(Duration(days: daysBack));
     return applications
         .where((app) => app.appliedAt.isAfter(cutoffDate))
@@ -58,26 +73,21 @@ class DashboardDataProcessor {
 
   /// Get active jobs (limited number for overview)
   static List<JobModel> getActiveJobsForOverview(
-    List<JobModel> jobs,
-    {int limit = 3}
-  ) {
-    return jobs
-        .where((job) => job.isActive)
-        .take(limit)
-        .toList();
+    List<JobModel> jobs, {
+    int limit = 3,
+  }) {
+    return jobs.where((job) => job.isActive).take(limit).toList();
   }
 
   /// Get active assistant jobs (limited number for overview)
   static List<AssistantJobModel> getActiveAssistantJobsForOverview(
-    List<AssistantJobModel> assistantJobs,
-    {int limit = 3}
-  ) {
-    debugPrint('Processing ${assistantJobs.length} assistant jobs for overview');
+    List<AssistantJobModel> assistantJobs, {
+    int limit = 3,
+  }) {
     final activeJobs = assistantJobs
         .where((job) => job.isActive)
         .take(limit)
         .toList();
-    debugPrint('Found ${activeJobs.length} active assistant jobs');
     return activeJobs;
   }
 
@@ -91,24 +101,24 @@ class DashboardDataProcessor {
 
   /// Process monthly applications data for chart
   static Map<int, int> getMonthlyApplicationsData(
-    List<JobApplicationModel> applications
+    List<JobApplicationModel> applications,
   ) {
     final Map<int, int> monthlyData = {};
-    
+
     for (var app in applications) {
       final month = app.appliedAt.month;
       monthlyData[month] = (monthlyData[month] ?? 0) + 1;
     }
-    
+
     return monthlyData;
   }
 
   /// Get chart data points for applications chart (12 months)
   static List<ChartDataPoint> getApplicationsChartData(
-    List<JobApplicationModel> applications
+    List<JobApplicationModel> applications,
   ) {
     final monthlyData = getMonthlyApplicationsData(applications);
-    
+
     return List.generate(12, (index) {
       return ChartDataPoint(
         x: index.toDouble(),
@@ -119,9 +129,9 @@ class DashboardDataProcessor {
 
   /// Get limited branches for overview display
   static List<Map<String, dynamic>> getBranchesForOverview(
-    List<Map<String, dynamic>>? branches,
-    {int limit = 3}
-  ) {
+    List<Map<String, dynamic>>? branches, {
+    int limit = 3,
+  }) {
     if (branches == null || branches.isEmpty) return [];
     return branches.take(limit).toList();
   }
@@ -147,8 +157,5 @@ class ChartDataPoint {
   final double x;
   final double y;
 
-  const ChartDataPoint({
-    required this.x,
-    required this.y,
-  });
-} 
+  const ChartDataPoint({required this.x, required this.y});
+}

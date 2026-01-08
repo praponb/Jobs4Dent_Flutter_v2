@@ -52,20 +52,24 @@ class JobProvider with ChangeNotifier {
   static List<String> get applicationStatuses =>
       JobConstants.applicationStatuses;
 
-  void _setLoading(bool loading) {
+  void _setLoading(bool loading, {bool notify = true}) {
     _isLoading = loading;
-    // Defer notifyListeners to avoid calling during build phase
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      notifyListeners();
-    });
+    if (notify) {
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
   }
 
-  void _setError(String? error) {
+  void _setError(String? error, {bool notify = true}) {
     _error = error;
-    // Defer notifyListeners to avoid calling during build phase
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      notifyListeners();
-    });
+    if (notify) {
+      // Defer notifyListeners to avoid calling during build phase
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
   }
 
   // Job Management Methods
@@ -147,24 +151,27 @@ class JobProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getMyPostedJobs(String clinicId) async {
+  Future<void> getMyPostedJobs(String clinicId, {bool notify = true}) async {
     try {
-      _setLoading(true);
-      _setError(null);
+      _setLoading(true, notify: notify);
+      _setError(null, notify: notify);
 
       _myPostedJobs = await _jobManagementService.getMyPostedJobs(clinicId);
-      notifyListeners();
+      if (notify) notifyListeners();
     } catch (e) {
-      _setError(e.toString());
+      _setError(e.toString(), notify: notify);
     } finally {
-      _setLoading(false);
+      _setLoading(false, notify: notify);
     }
   }
 
-  Future<void> getMyPostedAssistantJobs(String clinicId) async {
+  Future<void> getMyPostedAssistantJobs(
+    String clinicId, {
+    bool notify = true,
+  }) async {
     try {
-      _setLoading(true);
-      _setError(null);
+      _setLoading(true, notify: notify);
+      _setError(null, notify: notify);
 
       debugPrint('Loading assistant jobs for clinic ID: $clinicId');
 
@@ -210,23 +217,18 @@ class JobProvider with ChangeNotifier {
       }
 
       _myPostedAssistantJobs = assistantJobs;
-      debugPrint(
-        'Loaded ${assistantJobs.length} assistant jobs for clinic $clinicId',
-      );
-      for (var job in assistantJobs) {
-        debugPrint(
-          'Assistant Job: ${job.jobId}, Title: ${job.titlePost}, Active: ${job.isActive}',
-        );
-      }
+      _myPostedAssistantJobs = assistantJobs;
       // Defer notifyListeners to avoid calling during build phase
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifyListeners();
-      });
+      if (notify) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
+      }
     } catch (e) {
       debugPrint('Error in getMyPostedAssistantJobs: $e');
-      _setError(e.toString());
+      _setError(e.toString(), notify: notify);
     } finally {
-      _setLoading(false);
+      _setLoading(false, notify: notify);
     }
   }
 
@@ -437,18 +439,47 @@ class JobProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getApplicantsForMyJobs(String clinicId) async {
+  Future<void> getApplicantsForMyJobs(
+    String clinicId, {
+    bool notify = true,
+  }) async {
     try {
-      _setLoading(true);
-      _setError(null);
+      _setLoading(true, notify: notify);
+      _setError(null, notify: notify);
 
       _applicantsForMyJobs = await _jobApplicationService
           .getApplicantsForMyJobs(clinicId);
+      if (notify) notifyListeners();
+    } catch (e) {
+      _setError(e.toString(), notify: notify);
+    } finally {
+      _setLoading(false, notify: notify);
+    }
+  }
+
+  // Combined data loading for Clinic Dashboard to reduce rebuilds
+  Future<void> loadClinicDashboardData(String clinicId) async {
+    try {
+      // Set loading once at the beginning
+      _setLoading(true, notify: true);
+      _setError(null, notify: false);
+
+      debugPrint('🚀 Starting batch load for Clinic Dashboard: $clinicId');
+
+      await Future.wait([
+        getMyPostedJobs(clinicId, notify: false),
+        getMyPostedAssistantJobs(clinicId, notify: false),
+        getApplicantsForMyJobs(clinicId, notify: false),
+      ]);
+
+      debugPrint('✅ Batch load completed - notifying listeners once');
       notifyListeners();
     } catch (e) {
-      _setError(e.toString());
+      debugPrint('❌ Error in batch load: $e');
+      _setError(e.toString(), notify: true);
     } finally {
-      _setLoading(false);
+      // Set loading false once at the end
+      _setLoading(false, notify: true);
     }
   }
 

@@ -37,13 +37,6 @@
             {
               "client_id": "693132385676-jl2eqn3q6qn3f0hn2aejko6diin4cfd9.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "693132385676-3sptr7eu8p1m5eu72dtcsnfpkud048jm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.jobs4dent.jobs4dent2"
-              }
             }
           ]
         }
@@ -89,13 +82,43 @@
             {
               "client_id": "693132385676-jl2eqn3q6qn3f0hn2aejko6diin4cfd9.apps.googleusercontent.com",
               "client_type": 3
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693132385676:android:46e7f56f68dbfd62890aa9",
+        "android_client_info": {
+          "package_name": "com.praponb.jobs4dent2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "693132385676-v8vf2ql17gu6aa6kca8llbm3mla86n65.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.praponb.jobs4dent2",
+            "certificate_hash": "d6da7b7c959646adf756f933eb676aa31429e8b4"
+          }
+        },
+        {
+          "client_id": "693132385676-jl2eqn3q6qn3f0hn2aejko6diin4cfd9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAUkkfFwTmmaiH6WALVE7nwTcGeWCZLFc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
             {
-              "client_id": "693132385676-3sptr7eu8p1m5eu72dtcsnfpkud048jm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.jobs4dent.jobs4dent2"
-              }
+              "client_id": "693132385676-jl2eqn3q6qn3f0hn2aejko6diin4cfd9.apps.googleusercontent.com",
+              "client_type": 3
             }
           ]
         }
