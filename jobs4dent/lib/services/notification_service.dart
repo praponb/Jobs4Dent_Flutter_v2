@@ -43,6 +43,10 @@ class NotificationService {
         return;
       }
 
+      debugPrint(
+        '🔍 Found ${deviceTokens.length} device tokens for clinic: $clinicId',
+      );
+
       // Call Cloud Function to send notification
       try {
         final callable = _functions.httpsCallable(
@@ -64,6 +68,13 @@ class NotificationService {
         });
 
         debugPrint('✅ Notification sent successfully: ${result.data}');
+
+        // Attempt to clean up invalid tokens
+        await _cleanupInvalidTokens(
+          userId: clinicId,
+          tokens: deviceTokens,
+          result: Map<String, dynamic>.from(result.data as Map),
+        );
       } catch (e) {
         debugPrint('❌ Error calling Cloud Function: $e');
 
@@ -243,6 +254,13 @@ class NotificationService {
         debugPrint(
           '✅ Status update notification sent successfully: ${result.data}',
         );
+
+        // Attempt to clean up invalid tokens
+        await _cleanupInvalidTokens(
+          userId: applicantId,
+          tokens: deviceTokens,
+          result: Map<String, dynamic>.from(result.data as Map),
+        );
       } catch (e) {
         debugPrint('❌ Error calling Cloud Function: $e');
 
@@ -291,6 +309,48 @@ class NotificationService {
       );
     } catch (e) {
       debugPrint('❌ Error storing status update notification in Firestore: $e');
+    }
+  }
+
+  /// Helper to clean up invalid tokens from the result of a multicast send
+  Future<void> _cleanupInvalidTokens({
+    required String userId,
+    required List<dynamic> tokens,
+    required Map<String, dynamic> result,
+  }) async {
+    try {
+      if (result['failureCount'] != null &&
+          (result['failureCount'] as int) > 0) {
+        final results = result['results'] as List<dynamic>?;
+        if (results != null && results.length == tokens.length) {
+          final List<String> tokensToRemove = [];
+
+          for (int i = 0; i < results.length; i++) {
+            final res = Map<String, dynamic>.from(results[i] as Map);
+            final error = res['error'];
+            if (error != null) {
+              final errorCode = error['code'] as String?;
+              // Check for common validity errors
+              if (errorCode == 'messaging/invalid-registration-token' ||
+                  errorCode == 'messaging/registration-token-not-registered') {
+                tokensToRemove.add(tokens[i] as String);
+              }
+            }
+          }
+
+          if (tokensToRemove.isNotEmpty) {
+            debugPrint(
+              '🧹 Cleaning up ${tokensToRemove.length} stale tokens for user $userId',
+            );
+            await _firestore.collection('users').doc(userId).update({
+              'deviceTokens': FieldValue.arrayRemove(tokensToRemove),
+            });
+            debugPrint('✅ Stale tokens removed');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error cleaning up tokens: $e');
     }
   }
 }

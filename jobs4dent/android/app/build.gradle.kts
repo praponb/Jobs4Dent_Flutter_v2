@@ -15,6 +15,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
 
 // Load keystore properties from key.properties file if it exists
@@ -41,6 +42,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -58,8 +60,7 @@ android {
     }
 
     defaultConfig {
-        //applicationId = "com.jobs4dent.jobs4dent2"
-        applicationId = "com.praponb.jobs4dent2"
+        applicationId = "com.jobs4dent.jobs4dent2"
         minSdk = flutter.minSdkVersion // Android 6.0
         targetSdk = 34
         versionCode = flutter.versionCode

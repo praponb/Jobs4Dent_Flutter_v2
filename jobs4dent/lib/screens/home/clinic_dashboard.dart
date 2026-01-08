@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/job_provider.dart';
+import '../../models/user_model.dart';
 
 import '../profile/profile_screen.dart';
 import '../profile/sub_branch_management_screen.dart';
@@ -39,12 +40,8 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
         'Clinic Dashboard: User type: ${authProvider.userModel!.userType}',
       );
 
-      // Load clinic's posted jobs (both dentist and assistant) and their applicants
-      await Future.wait([
-        jobProvider.loadMyPostedJobs(authProvider.userModel!.userId),
-        jobProvider.loadMyPostedAssistantJobs(authProvider.userModel!.userId),
-        jobProvider.loadApplicantsForMyJobs(authProvider.userModel!.userId),
-      ]);
+      // Load all dashboard data in a single batch to reduce rebuilds
+      await jobProvider.loadClinicDashboardData(authProvider.userModel!.userId);
 
       debugPrint('Clinic Dashboard: Data loading completed');
       debugPrint(
@@ -80,63 +77,67 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           ),
         ],
       ),
-      body: Consumer2<AuthProvider, JobProvider>(
-        builder: (context, authProvider, jobProvider, child) {
-          final user = authProvider.userModel;
+      body: Selector<AuthProvider, UserModel?>(
+        selector: (context, authProvider) => authProvider.userModel,
+        builder: (context, user, child) {
           if (user == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final metrics = DashboardDataProcessor.calculateMetrics(
-            jobProvider.myPostedJobs,
-            jobProvider.myPostedAssistantJobs,
-            jobProvider.applicantsForMyJobs,
-          );
+          return Consumer<JobProvider>(
+            builder: (context, jobProvider, child) {
+              final metrics = DashboardDataProcessor.calculateMetrics(
+                jobProvider.myPostedJobs,
+                jobProvider.myPostedAssistantJobs,
+                jobProvider.applicantsForMyJobs,
+              );
 
-          return RefreshIndicator(
-            onRefresh: _loadData,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Clinic Info Card
-                  ClinicInfoCard(user: user),
-                  const SizedBox(height: 24),
+              return RefreshIndicator(
+                onRefresh: _loadData,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Clinic Info Card
+                      ClinicInfoCard(user: user),
+                      const SizedBox(height: 24),
 
-                  // Key Metrics
-                  DashboardMetricsWidget(metrics: metrics),
-                  const SizedBox(height: 24),
+                      // Key Metrics
+                      DashboardMetricsWidget(metrics: metrics),
+                      const SizedBox(height: 24),
 
-                  // Quick Actions
-                  const DashboardQuickActions(),
-                  const SizedBox(height: 24),
+                      // Quick Actions
+                      const DashboardQuickActions(),
+                      const SizedBox(height: 24),
 
-                  // Job Posting Performance Chart
-                  DashboardPerformanceChart(
-                    applications: jobProvider.applicantsForMyJobs,
+                      // Job Posting Performance Chart
+                      DashboardPerformanceChart(
+                        applications: jobProvider.applicantsForMyJobs,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Active Jobs Overview
+                      DashboardJobsOverview(
+                        jobs: jobProvider.myPostedJobs,
+                        assistantJobs: jobProvider.myPostedAssistantJobs,
+                        applications: jobProvider.applicantsForMyJobs,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Recent Applications
+                      DashboardRecentApplications(
+                        applications: jobProvider.applicantsForMyJobs,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Branch Management Section
+                      //_buildBranchManagement(user),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-
-                  // Active Jobs Overview
-                  DashboardJobsOverview(
-                    jobs: jobProvider.myPostedJobs,
-                    assistantJobs: jobProvider.myPostedAssistantJobs,
-                    applications: jobProvider.applicantsForMyJobs,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Recent Applications
-                  DashboardRecentApplications(
-                    applications: jobProvider.applicantsForMyJobs,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Branch Management Section
-                  //_buildBranchManagement(user),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
       ),

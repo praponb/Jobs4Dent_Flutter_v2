@@ -3,7 +3,6 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -18,13 +17,19 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -47,30 +52,11 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static FirebaseOptions get web => FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_WEB_API_KEY'] ?? '',
-    appId: '1:693132385676:web:4c28d9bc8af8b6e0890aa9',
-    messagingSenderId: '693132385676',
-    projectId: 'flutter-jobs4dent',
-    authDomain: 'flutter-jobs4dent.firebaseapp.com',
-    storageBucket: 'flutter-jobs4dent.firebasestorage.app',
-    measurementId: 'G-MMDTGGDY33',
-  );
-
-  static FirebaseOptions get android => FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY'] ?? '',
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyBAUkkfFwTmmaiH6WALVE7nwTcGeWCZLFc',
     appId: '1:693132385676:android:a9c08f8177a49177890aa9',
     messagingSenderId: '693132385676',
     projectId: 'flutter-jobs4dent',
     storageBucket: 'flutter-jobs4dent.firebasestorage.app',
-  );
-
-  static FirebaseOptions get ios => FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_IOS_API_KEY'] ?? '',
-    appId: '1:693132385676:ios:cfeb22c1d87a8e74890aa9',
-    messagingSenderId: '693132385676',
-    projectId: 'flutter-jobs4dent',
-    storageBucket: 'flutter-jobs4dent.firebasestorage.app',
-    iosBundleId: 'com.jobs4dent.jobs4dent2',
   );
 }

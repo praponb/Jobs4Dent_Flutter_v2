@@ -27,7 +27,10 @@ interface NotificationRequest {
  */
 export const sendJobApplicationNotification = functions
   .region("asia-southeast1")
-  .https.onCall(async (data: NotificationRequest, context) => {
+  .https.onCall(async (
+    data: NotificationRequest,
+    context: functions.https.CallableContext
+  ) => {
     // Verify that the user is authenticated
     if (!context || !context.auth) {
       throw new functions.https.HttpsError(
@@ -82,14 +85,15 @@ export const sendJobApplicationNotification = functions
 
       // Handle failed tokens (optional: remove invalid tokens)
       if (response.failureCount > 0) {
-        const failedTokens: string[] = [];
-        response.responses.forEach((resp, idx) => {
+        response.responses.forEach((
+          resp: admin.messaging.SendResponse,
+          idx: number
+        ) => {
           if (!resp.success) {
             console.error(
               `Failed to send to token ${deviceTokens[idx]}: ` +
               `${resp.error}`
             );
-            failedTokens.push(deviceTokens[idx]);
           }
         });
       }
@@ -98,6 +102,7 @@ export const sendJobApplicationNotification = functions
         success: true,
         successCount: response.successCount,
         failureCount: response.failureCount,
+        results: response.responses,
       };
     } catch (error) {
       console.error("Error sending notification:", error);

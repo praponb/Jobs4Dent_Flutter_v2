@@ -502,4 +502,48 @@ class UserModel {
       workLimitations: workLimitations ?? this.workLimitations,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is UserModel &&
+        other.userId == userId &&
+        other.email == email &&
+        other.userName == userName &&
+        other.profilePhotoUrl == profilePhotoUrl &&
+        other.isDentist == isDentist &&
+        other.userType == userType &&
+        other.isEmailVerified == isEmailVerified &&
+        other.authProvider == authProvider &&
+        other.isProfileComplete == isProfileComplete &&
+        other.isActive == isActive &&
+        listEquals(other.deviceTokens, deviceTokens) &&
+        other.updatedAt == updatedAt;
+  }
+
+  @override
+  int get hashCode {
+    return userId.hashCode ^
+        email.hashCode ^
+        userName.hashCode ^
+        profilePhotoUrl.hashCode ^
+        isDentist.hashCode ^
+        userType.hashCode ^
+        isEmailVerified.hashCode ^
+        authProvider.hashCode ^
+        isProfileComplete.hashCode ^
+        isActive.hashCode ^
+        deviceTokens.hashCode ^
+        updatedAt.hashCode;
+  }
+}
+
+bool listEquals<T>(List<T>? a, List<T>? b) {
+  if (a == null) return b == null;
+  if (b == null || a.length != b.length) return false;
+  for (int i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
 }
