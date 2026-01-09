@@ -372,9 +372,5 @@ dependencies {
 ```
 
 
-
 > [!NOTE]
 > The exact versions (e.g., `4.4.4` or `34.7.0`) might vary slightly over time, but these are the versions currently used in this project.
-
-
-
