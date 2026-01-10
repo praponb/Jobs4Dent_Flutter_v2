@@ -14,7 +14,11 @@ This guide outlines the collaborative process to update Aunnop's existing app (`
 **Goal**: Generate the official upload keystore that belongs to Aunnop's Google Play account.
 
 ### 1.1. Open Command Prompt / PowerShell
-Aunnop needs to open a terminal in the folder where he wants to save the key (e.g., `Documents` or `Desktop`).
+Aunnop needs to open a terminal and navigate to the `android/app/` folder (where he wants to save the key).
+
+```powershell
+cd android/app
+```
 
 ### 1.2. Run the Key Generation Command
 Aunnop must copy and paste this **EXACT** command:
